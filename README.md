@@ -22,10 +22,9 @@ It's a mobile app for shopping cart which is developed using React Native.
 5. Install the required modules for this project   
 
    5.1. For Android        
-        Open command console and go to the directory where yo downloaded this project in step 3. Under this directory, type the command
+        Open command console and go to the directory where you downloaded this project in step 3. Under this directory, type the command
 
         npm install
-        npm audit fix
     
    5.2. For iOS     
         I have not tested it yet on iOS. So, to avoid misdirection, I won't write this step here. You can find it easily out there.
