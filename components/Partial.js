@@ -119,9 +119,10 @@ export default class Partial extends LessPureComponent {
                         return data;
                     })
                     .catch(err => {
-                        console.log('submitData err: ', err)
+                        let isNotHandled = !(typeof(err) == 'object' && err?.handled);
+                        if (isNotHandled) console.log('submitData err: ', err)
                         Notification.errorHandler(err);
-                        reject(err); 
+                        if (isNotHandled) reject(err); 
                     })
                     .finally(() => _submittingIndicator?.hide())
                     .then(showResponseMessage);

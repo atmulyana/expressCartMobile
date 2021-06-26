@@ -5,4 +5,5 @@
  * @format
  * @flow strict-local
  */
- export {default as stripe} from './Stripe';
+export {default as paypal} from './Paypal';
+export {default as stripe} from './Stripe';

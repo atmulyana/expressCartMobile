@@ -104,6 +104,7 @@ export default function() {
 
         openCart() {
             navigation?.dispatch(DrawerActions.openDrawer());
+            cart?.loadData();
         }
 
         closeCart() {
@@ -184,11 +185,11 @@ export default function() {
             >
                 <Drawer.Screen name="root" component={App}
                     options={{swipeEnabled: false}}
-                    listeners={{
-                        drawerOpen: () => {
-                            cart?.loadData();
-                        },
-                    }}
+                    // listeners={{
+                    //     drawerOpen: () => {
+                    //         cart?.loadData();
+                    //     },
+                    // }}
                 />
             </Drawer.Navigator>
         </NavigationContainer>

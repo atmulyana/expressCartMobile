@@ -24,7 +24,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.14.0",
     "react-addons-shallow-compare": "^15.6.3",
-    "react-native": "^0.64.0",
+    "react-native": "^0.63.0",
     "react-native-feather": "^1.0.2",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-image-slider-box": "^1.0.12",

@@ -90,7 +90,12 @@ class PaymentPanel extends Partial {
                     const PaymentComponent = payments[item];
                     if (!PaymentComponent) return null;
                     return <Box key={idx} style={{marginHorizontal:0}}>
-                        <PaymentComponent config={this.data.paymentConfig} submitData={this.submitData} pageSubmit={this.props.pageSubmit} />
+                        <PaymentComponent
+                            config={this.data.config}
+                            paymentConfig={this.data.paymentConfig}
+                            submitData={this.submitData}
+                            pageSubmit={this.props.pageSubmit}
+                        />
                     </Box>;
                 })}
         </ValidationContainer>;

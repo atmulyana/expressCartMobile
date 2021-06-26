@@ -15,10 +15,10 @@ import {rule} from '../../../validations';
 
 export default class Stripe extends PaymentComponent {
     render() {
-        const {config, submitData, pageSubmit} = this.props;
+        const {paymentConfig, submitData, pageSubmit} = this.props;
         let cc = null, ccValidator, ccErrMessage;
         return <>
-            <Text para4>{config.stripe.description}</Text>
+            <Text para4>{paymentConfig.stripe.description}</Text>
             <CreditCard ref={comp => cc = comp} style={styles.para4} validator={() => ccValidator} />
             <Validation ref={comp => ccValidator = comp}
                 input={() => cc}
@@ -39,7 +39,7 @@ export default class Stripe extends PaymentComponent {
                     submitData(
                         `https://api.stripe.com/v1/tokens`, 
                         postData,
-                        { Authorization: `Bearer ${config.stripe.publicKey}` }
+                        { Authorization: `Bearer ${paymentConfig.stripe.publicKey}` }
                     )
                     .then(token => {
                         //console.log(JSON.stringify(token, null, '\t'))
