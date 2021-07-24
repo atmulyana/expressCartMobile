@@ -23,12 +23,16 @@ export default class Stripe extends PaymentComponent {
             <Validation ref={comp => ccValidator = comp}
                 input={() => cc}
                 rule={rule(() => {
+                    if (!cc?.isValid) return false;
                     if (!ccErrMessage) return true;
                     return ccErrMessage;
                 })}
             />
             <Button style={[styles.buttonOutlineSuccess, {alignSelf:'flex-start'}]} title={lang('Process Payment')}
                 onPress={() => {
+                    ccErrMessage = null;
+                    if (!ccValidator?.validate()) return;
+
                     const ccData = cc.value, postData = new URLSearchParams();
                     postData.append('card[number]', ccData.number);
                     postData.append('card[exp_month]', ccData.expired.month);
@@ -53,7 +57,6 @@ export default class Stripe extends PaymentComponent {
                     })
                     .catch(err => {
                         //console.log(JSON.stringify(err, null, '\t'))
-                        ccErrMessage = null;
                         err.handled = true;
                         if (err.status == 401) {
                             Notification.error(lang('Wrong public key'));

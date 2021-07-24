@@ -88,7 +88,7 @@ class ReviewForm extends LessPureComponent {
 }
 
 export default class Product extends Content {
-    _reviewForm = null;
+    #reviewForm = null;
     
     constructor(props) {
         super(props);
@@ -127,7 +127,7 @@ export default class Product extends Content {
         if (imageLocations.length < 1) imageLocations.push(imagePlaceholder);
         
         return <>
-            <ReviewForm ref={form => this._reviewForm = form} productId={result._id} />
+            <ReviewForm ref={form => this.#reviewForm = form} productId={result._id} />
 
             <View style={[styles.productRow, styles.productInfoRow]}>
                 <View style={[styles.productInfoCol, {width: colWidth}]}>
@@ -179,7 +179,7 @@ export default class Product extends Content {
                     <Text>{lang('Quantity')}</Text>
                     <IntegerSpinner min={1} max={config.maxQuantity} value={state.quantity} maxLength={digitCount(config.maxQuantity)}
                         style={[styles.para8, styles.textInputHeight]}
-                        onValueChange={value => this.state.quantity = value /* need not to re-render */}
+                        onValueChange={value => state.quantity = value /* need not to re-render */}
                         onExceedMax={() => Notification.warning(`Exceeds maximum quantity: ${config.maxQuantity}`)}
                     />
 
@@ -218,7 +218,7 @@ export default class Product extends Content {
                             <Button title={lang('Add review')}
                                 onPress={() => {
                                     this.submitData('/customer/check')
-                                    .then(() => this._reviewForm.show())
+                                    .then(() => this.#reviewForm.show())
                                     .catch(err => {
                                         if (err.status == 400) {
                                             appHelpers.loadContent(routes.customerLogin);

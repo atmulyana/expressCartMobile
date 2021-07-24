@@ -14,6 +14,7 @@ import {
 import PropTypes from 'prop-types';
 import LessPureComponent from './LessPureComponent';
 import Text from './Text';
+import {noop} from '../common';
 import {inputError as inputErrorStyle} from '../styles';
 import {ValidationRule, Required, validate} from '../validations';
 
@@ -26,34 +27,22 @@ export default class Validation extends LessPureComponent {
     };
     static defaultProps = {
         ...View.defaultProps,
+        input: noop,
         rule: new Required(),
     };
 
-    constructor(props) {
-        super(props);
-        this.state.layout = props.layout;
-    }
-
     state = {
         error: '',
-        layout: null,
-    }
-
-    setLayout(layout) {
-        this.setState({layout});
     }
     
     validate() {
-        const props = this.props;
-        const input = props.input && props.input();
+        let {input, rule, value} = this.props;
+        input = input();
 
-        let value = props.value;
         if (typeof(value) == 'function') value = value();
-        else if (value === undefined && input) {
-            value = input?.props?.value;
-        }
+        else if (value === undefined && input) value = input?.props?.value;
 
-        let error = validate(value, props.rule);
+        let error = validate(value, rule);
         //if (typeof(error) == 'function') error = error();
         if (typeof(error) == 'string') {
             error = error.trim();
@@ -69,28 +58,25 @@ export default class Validation extends LessPureComponent {
     }
 
     clearValidation() {
-        const input = this.props.input && this.props.input();
+        const input = this.props.input();
         this.setState({error: ''});
         typeof(input?.setErrorStyle) == 'function' && input.setErrorStyle(null);
     }
 
     render() {
-        const {layout, error} = this.state;
-        let style = [];
-        if (this.props.style) style = style.concat(this.props.style);
-        if (layout) style.push({top: layout.y + layout.height, left: layout.x, width: layout.width});
-        return <View {...this.props} style={style}>
-            {this.props.children}
+        const {props: {children, style}, state: {error}, layout} = this;
+        let styles = [];
+        if (style) styles = styles.concat(style);
+        if (layout) styles.push({top: layout.y + layout.height, left: layout.x, width: layout.width});
+        return <View {...this.props} style={styles}>
+            {children}
             <Text small error style={[errorStyle, {display: error ? 'flex' : 'none'}]}>{error}</Text>
-        </View>
+        </View>;
     }
 }
 
 const {errorStyle} = StyleSheet.create({
     errorStyle: {
-        //bottom: -5,
-        //position: 'absolute',
-        //right: 4,
         alignSelf: 'flex-end',
         paddingHorizontal: 4,
         top: -5,

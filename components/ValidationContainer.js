@@ -10,12 +10,13 @@ import {StyleSheet} from 'react-native';
 import LessPureComponent from './LessPureComponent';
 import Validation from './Validation';
 import {joinRefHandler, updateSubtreeElements} from '../common';
-import {ValidationRule} from '../validations'
+import {ValidationRule} from '../validations';
 
 const {validationStyle} = StyleSheet.create({
     validationStyle: {
+        //height: 0,
         position: 'absolute',
-        height: 0,
+        //overflow: 'visible',
     }
 });
 
@@ -23,17 +24,13 @@ export default class ValidationContainer extends LessPureComponent {
     constructor(props) {
         super(props);
         
-        const validations = [], inputs = [];
+        const validations = [], inputs = [], layouts = [];
         let idx = 0;
         const refHandler = (comp, collections, elmIdx) => collections[elmIdx] = comp;
-            
+
         this._map = child => {
             if (!child) return child;
-            let currentIdx, child2 = child, inputLayout = null;
-            const setLayout = ({nativeEvent: {layout}}) => {
-                validations[currentIdx]?.setLayout(layout);
-                inputLayout = layout;
-            };
+            let currentIdx, child2 = child;
             
             if (child.type === Validation) {
                 currentIdx = idx++;
@@ -59,15 +56,18 @@ export default class ValidationContainer extends LessPureComponent {
                             ...child.props,
                             onLayout: ev => {
                                 child.props.onLayout && child.props.onLayout(ev);
-                                setLayout(ev);
+                                layouts[currentIdx] = { ...ev.nativeEvent.layout };
+                                if (validations[currentIdx]) validations[currentIdx].layout = layouts[currentIdx];
                             },
                             validator: () => validations[currentIdx],
                         },
                     },
                     <Validation key={`validator_${currentIdx}`}
-                        ref={comp => refHandler(comp, validations, currentIdx)}
+                        ref={comp => {
+                            if (comp && layouts[currentIdx]) comp.layout = layouts[currentIdx];
+                            refHandler(comp, validations, currentIdx);
+                        }}
                         input={() => inputs[currentIdx]}
-                        layout={inputLayout}
                         rule={child.props.validation}
                         style={validationStyle}
                     />,
@@ -77,9 +77,10 @@ export default class ValidationContainer extends LessPureComponent {
         };
 
         this._reset = () => {
-            validations.length = 0;
-            inputs.length = 0;
             idx = 0;
+            inputs.length = 0;
+            layouts.length = 0;
+            validations.length = 0;
         };
 
         this.validate = () => {

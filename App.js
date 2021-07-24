@@ -9,6 +9,7 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import {
     Image,
+    //LogBox,
     SafeAreaView,
     StatusBar,
     Text,
@@ -33,6 +34,14 @@ import {SideBarCart} from './contents/partials/Cart';
 import HeaderBar from './components/HeaderBar';
 
 const routeNames = Object.keys(Contents).filter(name => name != 'default');
+
+/*** We do really need VirtualizedList (FlatList) inside ScrollView */
+//LogBox.ignoreLogs(['VirtualizedLists should never be nested']); //NOT working
+const _logError = console.error.bind(console);
+console.error = (message, ...optinalParams) => {
+    if (typeof(message) == 'string' && message.startsWith('VirtualizedLists should never be nested')) return; 
+    _logError(message, ...optinalParams);
+};
 
 export default function() {
     let navigation = null;

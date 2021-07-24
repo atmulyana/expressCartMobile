@@ -152,20 +152,19 @@ export const isViewStyleValidProp = propName =>
 export const isTextStyleValidProp = propName => isViewStyleValidProp(propName) || isTextStyleProp(propName);
 export const isImageStyleValidProp = propName => isViewStyleValidProp(propName) || isImageStyleProp(propName);
 
+export const styleArrayToObject = style => Array.isArray(style) ? Object.assign({}, ...style.flat(Infinity)) : style??{};
+
 export const extractTextStyle = (style, paddingForText = true, attrName='style') => {
     const textStyle = {}, viewStyle = {};
-    if (!Array.isArray(style)) style = [style];
-    for (let i in style) {
-        if (!style[i]) continue;
-        for (let propName in style[i]) {
-            if (!isTextStyleValidProp(propName))
-                throw `${propName} is not valid property for ${attrName}`;
-            if (isTextStyleProp(propName) || paddingForText && propName.indexOf('padding') > -1) {
-                textStyle[propName] = style[i][propName];
-            }
-            else {
-                viewStyle[propName] = style[i][propName];
-            }
+    style = styleArrayToObject(style);
+    for (let propName in style) {
+        if (!isTextStyleValidProp(propName))
+            throw `${propName} is not valid property for ${attrName}`;
+        if (isTextStyleProp(propName) || paddingForText && propName.indexOf('padding') > -1) {
+            textStyle[propName] = style[propName];
+        }
+        else {
+            viewStyle[propName] = style[propName];
         }
     }
     return {view: viewStyle, text: textStyle};
@@ -173,18 +172,15 @@ export const extractTextStyle = (style, paddingForText = true, attrName='style')
 
 export const extractImageStyle = (style, attrName='style') => {
     const imageStyle = {}, viewStyle = {};
-    if (!Array.isArray(style)) style = [style];
-    for (let i in style) {
-        if (!style[i]) continue;
-        for (let propName in style[i]) {
-            if (!isImageStyleValidProp(propName))
-                throw `${propName} is not valid property for ${attrName}`;
-            if (isImageStyleProp(propName)) {
-                imageStyle[propName] = style[i][propName];
-            }
-            else {
-                viewStyle[propName] = style[i][propName];
-            }
+    style = styleArrayToObject(style);
+    for (let propName in style) {
+        if (!isImageStyleValidProp(propName))
+            throw `${propName} is not valid property for ${attrName}`;
+        if (isImageStyleProp(propName)) {
+            imageStyle[propName] = style[propName];
+        }
+        else {
+            viewStyle[propName] = style[propName];
         }
     }
     return {view: viewStyle, image: imageStyle};

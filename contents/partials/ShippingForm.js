@@ -88,7 +88,7 @@ export default class extends LessPureComponent {
             </View>
             <TextInput placeholder={lang("Address 1")} value={state.address1} onChangeText={address1 => this.setState({address1})}
                 fixHeight para4 validation={required} />
-            <TextInput placeholder={lang("Address 2 (optional)")} value={state.address2} onChangeText={address2 => this.setState({address2})}
+            <TextInput placeholder={`${lang("Address 2")} (${lang("optional")})`} value={state.address2} onChangeText={address2 => this.setState({address2})}
                 fixHeight para4 />
             <ComboBox
                 placeholder={{value: '', label: lang('Select Country')}}

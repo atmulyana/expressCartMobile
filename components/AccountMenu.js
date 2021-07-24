@@ -20,7 +20,7 @@ import {
 } from 'react-native-popup-menu';
 const {Popover} = MenuRenderers;
 
-import { appHelpers, callServer, lang } from '../common';
+import { appHelpers, lang } from '../common';
 import styles from '../styles';
 import routes from '../contents/routes';
 import ContentLink from './ContentLink';

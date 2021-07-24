@@ -9,6 +9,7 @@ import React from 'react';
 import {View} from 'react-native';
 import PropTypes from 'prop-types';
 import * as Icons from 'react-native-feather';
+import {styleArrayToObject} from '../styleProps';
 
 export const ICON_SIZE = 24;
 export const ICON_COLOR = "#212529";
@@ -20,13 +21,13 @@ export default function Icon(props) {
     if (!Icon) throw `Invalid icon name: no name ${props2.icon}`;
     let iconSize = ICON_SIZE;
     let {height = iconSize, width = iconSize, style = {}} = props2;
+    style = styleArrayToObject(style);
     delete props2.icon;
     delete props2.style;
 
     props2.height = props2.width = '100%';
     props2.stroke = props2.stroke ?? style.color ?? ICON_COLOR;
     props2.fill = props2.fill ?? style.backgroundColor ?? 'transparent';
-    delete style.color;
     
     return (<View style={[{flex: -1, height, width}, style]}>
         <Icon {...props2} />

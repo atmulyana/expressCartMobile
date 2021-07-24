@@ -14,7 +14,7 @@ import {
 import PropTypes from 'prop-types';
 
 import ValidatedInput from './ValidatedInput';
-import {extractTextStyle, isViewStyleProp} from '../styleProps';
+import {extractTextStyle, styleArrayToObject, isViewStyleProp} from '../styleProps';
 import {textInput as textInputStyle} from '../styles';
 
 const defaultStyles = StyleSheet.create({
@@ -114,8 +114,7 @@ export default class IconTextInput extends ValidatedInput {
         style = extractTextStyle([textInputStyle].concat(style).concat(this.state.errorStyle));
         style.view = Object.assign(style.view, requiredStyles.container);
         
-        if (Array.isArray(iconStyle)) iconStyle = Object.assign({}, ...iconStyle);
-        iconStyle = Object.assign({}, defaultStyles.iconContainer, iconStyle, requiredStyles.iconContainer);
+        iconStyle =  styleArrayToObject([defaultStyles.iconContainer, iconStyle, requiredStyles.iconContainer]);
         
         const prefixIcon = this.renderPrefixIcon(iconStyle, style.text),
               suffixIcon = this.renderSuffixIcon(iconStyle, style.text);

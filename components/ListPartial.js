@@ -8,7 +8,7 @@
 import React from 'react';
 import {
     FlatList,
-    LogBox,
+    //LogBox,
     RefreshControl,
     View,
 } from 'react-native';
@@ -89,10 +89,10 @@ export default class ListPartial extends Partial {
         this.__data = null; //force to get fresh data from server when reloading
     }
 
-    componentDidMount() {
-        super.componentDidMount();
-        LogBox.ignoreLogs(['VirtualizedLists should never be nested']); //We do really need VirtualizedList (FlatList) inside ScrollView
-    }
+    // componentDidMount() {
+    //     super.componentDidMount();
+    //     LogBox.ignoreLogs(['VirtualizedLists should never be nested']); //We do really need VirtualizedList (FlatList) inside ScrollView
+    // }
 
     shouldComponentUpdate(nextProps, nextState) {
         this.__data = nextProps.data;

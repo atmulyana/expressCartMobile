@@ -7,9 +7,10 @@
  */
 import Toast from 'react-native-tiny-toast';
 import styles from '../styles';
+import {styleArrayToObject} from '../styleProps';
 
 function showToast(message, style, duration = Toast.duration.SHORT) {
-    const containerStyle = Object.assign({}, styles.alert, style);
+    const containerStyle = styleArrayToObject([{}, styles.alert, style]);
     delete containerStyle.color;
     Toast.show(message, {
         containerStyle,
