@@ -9,7 +9,6 @@ import React from 'react';
 import { View } from 'react-native';
 
 import styles from '../styles';
-import { appHelpers } from '../common';
 import routes from '../contents/routes';
 import AccountMenu from './AccountMenu';
 import LessPureComponent from './LessPureComponent';
@@ -22,7 +21,7 @@ export default class CheckoutBar extends LessPureComponent {
     render() {
         return (
             <View style={styles.stickyBar}>
-                <ContentLink route={routes.home} onPress={() => !appHelpers.isAtHome()}>
+                <ContentLink route={routes.home}>
                     <Icon icon="Home" />
                 </ContentLink>
 

@@ -149,7 +149,7 @@ class Orders extends LessPureComponent {
             {orders && orders.length > 0
                 ? orders.map((item, idx) => <OrderItem key={idx} data={item} config={config} />)
                 : <Text>{lang('There are no orders for this account')}{'. '}
-                    <Text green link onPress={() => appHelpers.loadContent(routes.home)}>{lang('Order here')}</Text>
+                    <Text green link onPress={() => appHelpers.goHome()}>{lang('Order here')}</Text>
                   </Text>
             }
         </>;

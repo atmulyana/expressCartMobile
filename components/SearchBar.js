@@ -38,16 +38,13 @@ export default class SearchBar extends LessPureComponent {
         let txtSearch = null;
         return (
             <View style={styles.stickyBar}>
-                <ContentLink route={home}
-                             onPress={() => !appHelpers.isAtHome()}
-                             style={{display: isSearching ? 'none' : 'flex'}}>
+                <ContentLink route={home} style={{display: isSearching ? 'none' : 'flex'}}>
                     <Icon icon="Home" />
                 </ContentLink>
                 <ContentLink route={home}
                              onPress={() => {
                                  this.setState({searchText:''});
                                  txtSearch?.blur();
-                                 return !appHelpers.isAtHome()
                              }}
                              style={[styles.ml4, {display: isSearching ? 'flex' : 'none'}]}>
                     <Icon icon="ArrowLeft" />

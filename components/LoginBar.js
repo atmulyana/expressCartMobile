@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 
 import styles from '../styles';
-import { appHelpers } from '../common';
 import routes from '../contents/routes';
 import LessPureComponent from './LessPureComponent';
 import ContentLink from './ContentLink';
@@ -24,7 +23,7 @@ export default class LoginBar extends LessPureComponent {
     render() {
         return (
             <View style={styles.stickyBar}>
-                <ContentLink route={routes.home} onPress={() => !appHelpers.isAtHome()}>
+                <ContentLink route={routes.home}>
                     <Icon icon="Home" />
                 </ContentLink>
 

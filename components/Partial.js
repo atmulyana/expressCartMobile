@@ -59,7 +59,7 @@ export default class Partial extends LessPureComponent {
             let dataLoadingProcess = url && !this.contentData ? callServer(url) : NULL;
             return dataLoadingProcess
                 .then(data => {
-                    _data = data || this.contentData || {};
+                    _data = data || this.contentData || { $cartCount: null };
                     if (this.onDataReady(silent, data) === false)
                         throw {status:-1, handled: true};
                     return _data;
@@ -74,6 +74,9 @@ export default class Partial extends LessPureComponent {
                             appHelpers.setCartCount( //data.session.totalCartItems
                                 cart ? Object.keys(cart).length : 0    //Sometimes, totalCartItems is not synchronized
                             );
+                        }
+                        else if (data.$cartCount !== null) {
+                            appHelpers.setCartCount(0);
                         }
                         if (data.session && appHelpers.isLoggedIn != data.session?.customerPresent) {
                             data.session?.customerPresent ? appHelpers.login() : appHelpers.logout();

@@ -104,7 +104,8 @@ export default function() {
         }
 
         goHome() {
-            this.loadContent(routes.home);
+            //this.loadContent(routes.home);
+            navigation.navigate(routes.home.name, {url: routes.home.url});
         }
 
         setHeaderBar(headerBar = 'search') {
@@ -164,6 +165,7 @@ export default function() {
                                 key={idx}
                                 name={name}
                                 component={Contents[name]}
+                                getId={({params}) => params.url ?? params.$url}
                                 initialParams={Contents[name].defaultParams}
                             />
                         )}

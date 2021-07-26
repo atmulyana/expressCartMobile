@@ -8,7 +8,6 @@
  import React from 'react';
  import {Button, Text} from '../components';
  import Content from './Content';
- import routes from './routes';
  import {appHelpers, lang} from '../common';
  import {buttonOutlinePrimary, green, yellow, red} from '../styles';
 
@@ -41,7 +40,7 @@
             {(status == 'Paid' || status == 'Pending') &&
                 <Text center para4 bold yellow>{lang('Please retain the details above as a reference of payment')}</Text>}
             <Button style={[buttonOutlinePrimary, {alignSelf:'center'}]} title={lang('Home')}
-                onPress={() => appHelpers.loadContent(routes.home)}
+                onPress={() => appHelpers.goHome()}
             />
         </>;
     }
