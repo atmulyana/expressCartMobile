@@ -8,7 +8,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { SliderBox } from 'react-native-image-slider-box';
-import stripHtml from "string-strip-html";
+import { stripHtml } from "string-strip-html";
 import {
     Button,
     ComboBox,
