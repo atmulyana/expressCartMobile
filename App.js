@@ -157,6 +157,7 @@ export default function() {
                     
                     <Stack.Navigator initialRouteName={Contents.default} screenOptions={{
                         headerStyle: styles.navHeader,
+                        headerTitleAlign: 'center',
                         headerTitleStyle: styles.navHeaderTitle,
                         title: '',
                     }}>
@@ -187,12 +188,17 @@ export default function() {
         <StatusBar backgroundColor="white" barStyle="dark-content" />
         <NavigationContainer ref={nav => navigation = nav}>
             <Drawer.Navigator
-                drawerPosition='right'
-                drawerStyle={{
-                    backgroundColor: 'white',
-                    width: '100%',
-                }}
                 drawerContent={() => <SideBarCart ref={elm => cart = elm} />}
+                screenOptions={{
+                    drawerPosition: 'right',
+                    drawerStyle: {
+                        backgroundColor: 'white',
+                        width: '100%',
+                    },
+                    drawerType: 'front',
+                    headerShown: false,
+                    title: ''
+                }}
             >
                 <Drawer.Screen name="root" component={App}
                     options={{swipeEnabled: false}}

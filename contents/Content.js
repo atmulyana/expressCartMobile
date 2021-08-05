@@ -11,7 +11,7 @@ import {
     ScrollView,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import {customerLogin, getRouteByUrl} from './routes';
+import {customerLogin, home, getRouteByUrl} from './routes';
 import {p8 as scrollContentStyle, scrollView as scrollViewStyle} from '../styles';
 import {appHelpers, lang} from '../common';
 import {Partial} from '../components';
@@ -121,7 +121,10 @@ export default class Content extends Partial {
             let redirectUrl = data.responseURL?.pathname;
             if (redirectUrl) {
                 const route = getRouteByUrl(redirectUrl);
-                if (route) {
+                if (route == home) {
+                    appHelpers.goHome();
+                }
+                else if (route) {
                     delete data.responseURL; //non serialized object can't be put on the state
                     appHelpers.replaceContent({ ...route, data });
                     return false;

@@ -11,6 +11,6 @@
 
  export default class Error extends Content {
      render() {
-         return <Text center>{this.onDataReady.message}</Text>
+         return <Text center>{this.data.message}</Text>
      }
  }

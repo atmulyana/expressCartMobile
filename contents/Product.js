@@ -100,9 +100,10 @@ export default class Product extends Content {
         });  
     }
 
-    onDataReady() {
+    onDataReady(silent, data) {
         if (this.data?.variants && this.data.variants.length > 0) this.state.variant = this.data.variants[0];
         else this.state.variant = null;
+        return super.onDataReady(silent, data);
     }
 
     render() {

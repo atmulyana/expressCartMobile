@@ -170,8 +170,9 @@ StyleSheet.create({
     },
     navHeaderTitle: {
         ...fontBase,
+        flex: 1,
         fontWeight: 'normal',
-        textAlign: 'center',
+        textAlignVertical: 'center',
     },
 
     scrollView: {
