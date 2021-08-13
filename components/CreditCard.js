@@ -214,6 +214,7 @@ export default class CreditCard extends ValidatedInput {
                 year: parseInt(this.#expired?.validity?.year) || 0,
             },
             cvc: this.#cvc?.value,
+            cardHolder: this.#cardHolder?.value,
             zip: this.#zip?.value,
         };
     }
