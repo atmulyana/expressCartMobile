@@ -203,6 +203,7 @@ export default class CreditCard extends ValidatedInput {
         return this.#number?.isValid
             && this.#expired?.isValid
             && this.#cvc?.isValid
+            && this.#cardHolder?.isValid
             && (!this.#zip.value || this.#zip?.isValid); 
     }
 
@@ -234,7 +235,8 @@ export default class CreditCard extends ValidatedInput {
         this.#number.blur();
         this.#expired.blur();
         this.#cvc.blur();
-        this.#zip.blur();
+        this.#cardHolder?.blur();
+        this.#zip?.blur();
         this.#scroller.scrollTo({x: this.#scrollPos + dir * this.#scrollStep});
     }
 
@@ -331,7 +333,7 @@ export default class CreditCard extends ValidatedInput {
                     ref={comp => this.#cardHolder = comp}
                     style={[
                         {flex:0, width:oneWidth*20},
-                        (!this.#cardHolder?.value || this.#cardHolder?.isValid)  ? null : textColorStyle
+                        this.#cardHolder?.isValid  ? null : textColorStyle
                     ]}
                 />}
                 {this.props.showPostalCode && <CardZIP
