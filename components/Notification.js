@@ -32,9 +32,9 @@ export default {
         }
         if (!err || !err.data || err.valid === false || err.handled) return;
         if (err.status == 400) {
-            if (typeof(err.data) == 'object' && err.data?.message) {
+            if (typeof(err.data) == 'object' && (err.data?.message || err.data?.error || err.data?.err)) {
                 err.handled = true;
-                error(err.data.message);
+                error(err.data.message || err.data.error || err.data.err);
             }
             else if (Array.isArray(err.data) && typeof(err.data[0]) == 'object' && err.data[0]?.message) {
                 err.handled = true;

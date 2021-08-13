@@ -19,7 +19,7 @@ export default class Stripe extends PaymentComponent {
         let cc = null, ccValidator, ccErrMessage;
         return <>
             <Text para4>{paymentConfig.stripe.description}</Text>
-            <CreditCard ref={comp => cc = comp} style={styles.para4} validator={() => ccValidator} />
+            <CreditCard ref={comp => cc = comp} showPostalCode style={styles.para4} validator={() => ccValidator} />
             <Validation ref={comp => ccValidator = comp}
                 input={() => cc}
                 rule={rule(() => {

@@ -168,9 +168,19 @@ const CardExpiry = createInput('expirationDate', text => {
 });
 
 const CardCVC = createInput('cvv');
+const CardHolder = createInput('cardholderName');
 const CardZIP = createInput('postalCode');
 
 export default class CreditCard extends ValidatedInput {
+    static propTypes = {
+        showCardHolder: PropTypes.bool,
+        showPostalCode: PropTypes.bool,
+    };
+    static defaultProps = {
+        showCardHolder: false,
+        showPostalCode: false,
+    };
+
     constructor(props) {
         super(props);
         Object.assign(this.state, {
@@ -182,6 +192,7 @@ export default class CreditCard extends ValidatedInput {
     #number;
     #expired;
     #cvc;
+    #cardHolder;
     #zip;
 
     #scroller;
@@ -300,7 +311,7 @@ export default class CreditCard extends ValidatedInput {
                 />
                 <CardCVC
                     maxLength={card.code.size}
-                    nextInput={() => this.#zip}
+                    nextInput={() => this.#cardHolder ?? this.#zip}
                     onFocus={this.handleFocus}
                     placeholder={card.code.name}
                     prevInput={() => this.#expired}
@@ -310,17 +321,29 @@ export default class CreditCard extends ValidatedInput {
                         this.#cvc?.isValid  ? null : textColorStyle
                     ]}
                 />
-                <CardZIP
+                {this.props.showCardHolder && <CardHolder
+                    maxLength={255}
+                    nextInput={() => this.#zip}
+                    onFocus={this.handleFocus}
+                    placeholder={lang("Card holder name")}
+                    prevInput={() => this.#cvc}
+                    ref={comp => this.#cardHolder = comp}
+                    style={[
+                        {flex:0, width:oneWidth*20},
+                        (!this.#cardHolder?.value || this.#cardHolder?.isValid)  ? null : textColorStyle
+                    ]}
+                />}
+                {this.props.showPostalCode && <CardZIP
                     maxLength={6}
                     onFocus={this.handleFocus}
-                    placeholder={lang("Postal Code")}
-                    prevInput={() => this.#cvc}
+                    placeholder={lang("Postal code")}
+                    prevInput={() => this.#cardHolder ?? this.#cvc}
                     ref={comp => this.#zip = comp}
                     style={[
                         {flex:0, width:oneWidth*6},
                         (!this.#zip?.value || this.#zip?.isValid) ? null : textColorStyle
                     ]}
-                />
+                />}
             </ScrollView>
             <TouchableOpacity 
                 onPress={() => this.scroll(1)}
