@@ -203,8 +203,8 @@ export default class CreditCard extends ValidatedInput {
         return this.#number?.isValid
             && this.#expired?.isValid
             && this.#cvc?.isValid
-            && this.#cardHolder?.isValid
-            && (!this.#zip.value || this.#zip?.isValid); 
+            && (!this.props.showCardHolder || this.#cardHolder?.isValid)
+            && (!this.#zip?.value || this.#zip?.isValid); 
     }
 
     get value() {
