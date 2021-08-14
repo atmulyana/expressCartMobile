@@ -123,9 +123,9 @@ const createInput = (field, fnFormat = justNumbers) => {
             this.#cursorPos = start;
             let endPos = this.props.maxLength,
                 endPos2 = this.value.length;
-            if (this.#prevCursorPos == endPos-1 && this.#cursorPos == endPos) this.nextFocus();
+            if (this.#prevCursorPos == endPos-1 && this.#cursorPos == endPos && endPos == endPos2) this.nextFocus();
             else if (this.isValid && this.#prevCursorPos == endPos2-1 && this.#cursorPos == endPos2) this.nextFocus();
-            else if (this.#prevCursorPos == 1 && this.#cursorPos == 0) this.prevFocus();
+            //else if (this.#prevCursorPos == 1 && this.#cursorPos == 0 && endPos2 != 0) this.prevFocus();
         }
 
         prevFocus() {
@@ -133,8 +133,9 @@ const createInput = (field, fnFormat = justNumbers) => {
         }
 
         render() {
-            return <TextInput {...this.props}
+            return <TextInput
                 keyboardType="number-pad"
+                {...this.props}
                 onChangeText={this.onChangeText}
                 onKeyPress={this.onKeyPress}
                 onSelectionChange={this.onSelectionChange}
@@ -168,7 +169,7 @@ const CardExpiry = createInput('expirationDate', text => {
 });
 
 const CardCVC = createInput('cvv');
-const CardHolder = createInput('cardholderName');
+const CardHolder = createInput('cardholderName', s => s);
 const CardZIP = createInput('postalCode');
 
 export default class CreditCard extends ValidatedInput {
@@ -245,9 +246,13 @@ export default class CreditCard extends ValidatedInput {
         const icon = icons[card.type] ?? icons[unknownCard.type];
         //if (!icons[card.type]) console.log(card.type);
         const oneWidth = styles.textInput.fontSize,
-              textColorStyle = errorStyle ? {color: errorStyle.color} : null,
               iconStyle = {flex:0, height:textBaseStyle[0].height},
-              arrowStyle = {backgroundColor: styles.box.borderColor, color: ARROW_COLOR, height: '100%', width: ARROW_WIDTH};
+              arrowStyle = {backgroundColor: styles.box.borderColor, color: ARROW_COLOR, height: '100%', width: ARROW_WIDTH},
+              inputStyle = (isValid, widthUnits) => [
+                {flex:0, width: oneWidth * widthUnits},
+                isValid || !errorStyle ? null : {color: errorStyle.color}
+              ],
+              placeholderTextColor = isValid => isValid ? styles.gray : errorStyle?.color ?? styles.gray;
         return <View style={[
             styles.box,
             this.props.style,
@@ -294,58 +299,49 @@ export default class CreditCard extends ValidatedInput {
                     onFocus={this.handleFocus}
                     onValidate={this.handleCardValidation}
                     placeholder={lang('Card number')}
+                    placeholderTextColor={placeholderTextColor(this.#number?.isValid)}
                     ref={comp => this.#number = comp}
-                    style={[
-                        {flex:0, width:oneWidth*16},
-                        this.#number?.isValid  ? null : textColorStyle
-                    ]}
+                    style={inputStyle(this.#number?.isValid, 16)}
                 />
                 <CardExpiry
                     maxLength={5}
                     nextInput={() => this.#cvc}
                     onFocus={this.handleFocus}
                     placeholder="MM/YY"
+                    placeholderTextColor={placeholderTextColor(this.#expired?.isValid)}
                     prevInput={() => this.#number}
                     ref={comp => this.#expired = comp}
-                    style={[
-                        {flex:0, width:oneWidth*4},
-                        this.#expired?.isValid  ? null : textColorStyle
-                    ]}
+                    style={inputStyle(this.#expired?.isValid, 4)}
                 />
                 <CardCVC
                     maxLength={card.code.size}
                     nextInput={() => this.#cardHolder ?? this.#zip}
                     onFocus={this.handleFocus}
                     placeholder={card.code.name}
+                    placeholderTextColor={placeholderTextColor(this.#cvc?.isValid)}
                     prevInput={() => this.#expired}
                     ref={comp => this.#cvc = comp}
-                    style={[
-                        {flex:0, width:oneWidth*3},
-                        this.#cvc?.isValid  ? null : textColorStyle
-                    ]}
+                    style={inputStyle(this.#cvc?.isValid, 3)}
                 />
                 {this.props.showCardHolder && <CardHolder
+                    keyboardType="default"
                     maxLength={255}
                     nextInput={() => this.#zip}
                     onFocus={this.handleFocus}
                     placeholder={lang("Card holder name")}
+                    placeholderTextColor={placeholderTextColor(this.#cardHolder?.isValid)}
                     prevInput={() => this.#cvc}
                     ref={comp => this.#cardHolder = comp}
-                    style={[
-                        {flex:0, width:oneWidth*20},
-                        this.#cardHolder?.isValid  ? null : textColorStyle
-                    ]}
+                    style={inputStyle(this.#cardHolder?.isValid, 20)}
                 />}
                 {this.props.showPostalCode && <CardZIP
                     maxLength={6}
                     onFocus={this.handleFocus}
                     placeholder={lang("Postal code")}
+                    placeholderTextColor={placeholderTextColor(!this.#zip?.value || this.#zip?.isValid)}
                     prevInput={() => this.#cardHolder ?? this.#cvc}
                     ref={comp => this.#zip = comp}
-                    style={[
-                        {flex:0, width:oneWidth*6},
-                        (!this.#zip?.value || this.#zip?.isValid) ? null : textColorStyle
-                    ]}
+                    style={inputStyle(this.#zip?.isValid, 6)}
                 />}
             </ScrollView>
             <TouchableOpacity 
