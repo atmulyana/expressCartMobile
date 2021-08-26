@@ -36,7 +36,7 @@ local.properties
 # node.js
 #
 node_modules/
-!node_modules/jsbn-rsa/*
+package-lock.json
 npm-debug.log
 yarn-error.log
 

@@ -19,6 +19,7 @@
     "card-validator": "^8.1.1",
     "css-tree": "^1.1.3",
     "i18n-js": "^3.8.0",
+    "jsbn-rsa": "file:./tmp/jsbn-rsa",
     "jssimpledateformat": "^2.1.0",
     "lodash.memoize": "^4.1.2",
     "moment": "^2.29.1",
