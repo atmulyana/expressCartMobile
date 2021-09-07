@@ -56,7 +56,7 @@ export default function() {
         constructor(props) {
             super(props);
 
-            for (let m of ['setCartTitle', 'loadContent', 'replaceContent', 'isAtHome', 'goHome', 'setHeaderBar',
+            for (let m of ['setCartTitle', 'loadContent', 'replaceContent', 'isAtHome', 'goto', 'goHome', 'setHeaderBar',
                         'openCart', 'closeCart', 'setLang', 'login', 'logout'])
             {
                 this[m] = this[m].bind(this);
@@ -103,9 +103,13 @@ export default function() {
             return this.isOnRoute(routes.home);
         }
 
+        goto(route) {
+            navigation.navigate(route.name, {url: route.url});
+        }
+
         goHome() {
             //this.loadContent(routes.home);
-            navigation.navigate(routes.home.name, {url: routes.home.url});
+            this.goto(routes.home);
         }
 
         setHeaderBar(headerBar = 'search') {

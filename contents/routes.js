@@ -30,6 +30,11 @@ const routes = {
         url: '/checkout/payment',
         headerBar: 'checkout',
     },
+    checkoutBlockonomics: {
+        name: 'CheckoutBlockonomics',
+        url: '/blockonomics_payment',
+        headerBar: 'checkout',
+    },
     checkoutShipping: {
         name: 'CheckoutShipping',
         url: '/checkout/shipping',
@@ -61,6 +66,11 @@ const routes = {
     },
     payment: orderId => ({
         name: 'PaymentComplete',
+        url: `/payment/${orderId}`,
+        headerBar: 'checkout',
+    }),
+    paymentBlockonomics: orderId => ({
+        name: 'PaymentCompleteBlockonomics',
         url: `/payment/${orderId}`,
         headerBar: 'checkout',
     }),

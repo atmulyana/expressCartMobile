@@ -7,6 +7,7 @@
  */
 export {default as adyen} from './Adyen';
 export {default as authorizenet} from './Authorizenet';
+export {default as blockonomics} from './Blockonomics';
 export {default as instore} from './Instore';
 export {default as paypal} from './Paypal';
 export {default as payway} from './Payway';
