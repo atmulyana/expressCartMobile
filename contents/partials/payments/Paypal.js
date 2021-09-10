@@ -37,6 +37,7 @@ export default class Paypal extends PaymentComponent {
                 this.props.pageSubmit(`/paypal/checkout_return${query}`, null);
                 break;
             case PaymenStatus.Cancelled:
+                //It's better to delete order from database (should be done in '/paypal/checkout_cancel' route handler in server app)
                 Alert.alert(lang("Payment Status"), lang("The payment was cancelled"));
                 break;
             case PaymenStatus.Error:
@@ -96,7 +97,10 @@ export default class Paypal extends PaymentComponent {
                 />
                 <SubmittingIndicator visible={this.state.isLoading} />
                 <Icon icon="X" strokeWidth={4} height={16} width={16} style={{opacity: 0.3, position:'absolute', right: 2, top: 2}}
-                    onPress={() => this.setState({paypalVisible: false})}
+                    onPress={() => {
+                        this.setState({paypalVisible: false});
+                        this._paymentStatus(PaymenStatus.Cancelled);
+                    }}
                 />
             </Modal>
         </>;
