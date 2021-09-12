@@ -43,8 +43,8 @@ export default class ListContent extends Content {
             });
         }
 
-        this.onDataReady = (silent, data) => {
-            super.onDataReady(silent, data);
+        this.onDataReady = async (silent, data) => {
+            await super.onDataReady(silent, data);
             lastUrl = undefined;
             this.state.lastPageUrl = this.contentUrl;
         }

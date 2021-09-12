@@ -17,10 +17,7 @@ export default class Box extends LessPureComponent {
     static propTypes = {
         ...ViewPropTypes
     };
-    static defaultProps = {
-        ...View.defaultProps
-    };
-
+    
     render() {
         const props = this.props;
         return <View {...props} style={[styles.box, styles.m8, styles.p8].concat(props.style)}>

@@ -34,6 +34,7 @@ export default class CustomerLogin extends Content {
     }
 
     render() {
+        const state = this.state;
         let form;
         return <Form ref={f => form = f} style={{width:correctWidth(300)}}>
             <ValidationContainer>
@@ -41,23 +42,23 @@ export default class CustomerLogin extends Content {
                 <TextInput fixHeight para4 placeholder={lang("Email address")}
                     underlineColorAndroid="transparent" returnKeyType="done" keyboardType="email-address"
                     autoCorrect={false} spellCheck={false} autoCompleteType="off"
-                    value={this.state.email} onChangeText={email => this.setState({email})}
+                    value={state.email} onChangeText={email => this.setState({email})}
                     validation={[required, email]}
                 />
                 <TextInput fixHeight para4 placeholder={lang("Password")}
                     underlineColorAndroid="transparent" returnKeyType="done" secureTextEntry
                     autoCorrect={false} spellCheck={false} autoCompleteType="off"
-                    value={this.state.password} onChangeText={password => this.setState({password})}
+                    value={state.password} onChangeText={password => this.setState({password})}
                     validation={required}
                 />
                 <Button title={lang("Sign in")} style={styles.buttonOutlinePrimary}
                     onPress={() => {
                         form.submitData('/customer/login_action', {
-                            loginEmail: this.state.email,
-                            loginPassword: this.state.password,
+                            loginEmail: state.email,
+                            loginPassword: state.password,
                         })
                         .valid(() => {
-                            appHelpers.login();
+                            appHelpers.login(state.email, state.password);
                             appHelpers.replaceContent(routes.customerAccount);
                         });
                     }}

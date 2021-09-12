@@ -16,12 +16,13 @@ import {p8 as scrollContentStyle, scrollView as scrollViewStyle} from '../styles
 import {appHelpers, lang} from '../common';
 import {Partial} from '../components';
 
-function LoadingData({ url, loader, refresher, aborter }) {
+function LoadingData({ url, loader, refresher, submitter, aborter }) {
     useFocusEffect(
         React.useCallback(
             () => {
-                loader();
                 appHelpers.refreshContent = refresher;
+                appHelpers.submitData = submitter;
+                loader();
                 return aborter;
             }, 
             [url]
@@ -32,9 +33,9 @@ function LoadingData({ url, loader, refresher, aborter }) {
 }
 
 export default class Content extends Partial {
-    static propTypes = {
+    static propTypes = { //overrides Partial.propTypes
     };
-    static defaultProps = {
+    static defaultProps = { //overrides Partial.defaultProps
     };
 
     constructor(props) {
@@ -102,7 +103,12 @@ export default class Content extends Partial {
 
         return (<>
             {this.props.navigation &&
-                <LoadingData url={this.props?.route?.params?.url} loader={this.loadData} refresher={this.refreshData.bind(this)} />}
+                <LoadingData
+                    url={this.props?.route?.params?.url}
+                    loader={this.loadData}
+                    refresher={this.refreshData.bind(this)}
+                    submitter={this.submitData.bind(this)}
+                />}
             {submittingIndicator}
             <Scroller ref={this.setScroller} {...scrollerProps}>
                 {content}
@@ -138,9 +144,11 @@ export default class Content extends Partial {
         if (this.props.route && this.props.route.params) this.props.route.params.data = null; //force to get fresh data from server when reloading
     }
 
-    onDataReady(silent, data) {
-        if (this.authenticated) {
-            if (!this.data.session?.customerPresent) {
+    async onDataReady(silent, data) {
+        if (!this.data.session?.customerPresent) {
+            if (this.data.session = await appHelpers.relogin()) { //succeeds to relogin
+            }
+            else if (this.authenticated) { //cannot relogin but need to login
                 appHelpers.replaceContent(customerLogin);
                 return false;
             }

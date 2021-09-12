@@ -27,7 +27,6 @@ export default class Partial extends LessPureComponent {
         url: PropTypes.string,
     };
     static defaultProps = {
-        ...View.defaultProps,
         autoLoad: true,
     };
     
@@ -58,18 +57,21 @@ export default class Partial extends LessPureComponent {
             const url = this.contentUrl;
             let dataLoadingProcess = url && !this.contentData ? callServer(url) : NULL;
             return dataLoadingProcess
-                .then(data => {
+                .then(async data => {
                     _data = data || this.contentData || { $cartCount: null };
-                    if (this.onDataReady(silent, data) === false)
+                    if (await this.onDataReady(silent, data) === false)
                         throw {status:-1, handled: true};
                     return _data;
                 })
-                .then(data => {
+                .then(async data => {
                     if (!silent) {
                         if (typeof(data.paymentConfig) == 'object' && data.paymentConfig) appHelpers.paymentConfig = data.paymentConfig;
                         if (typeof(data.config?.maxQuantity) == 'number') appHelpers.maxQuantity = data.config.maxQuantity;
                         if (data.menu) appHelpers.setMenu(data.menu);
-                        if (typeof(data?.session?.totalCartItems) == 'number') { //we get valid session
+                        if (appHelpers.isLoggedIn != (data.session?.customerPresent ?? false)) {
+                            data.session?.customerPresent ? appHelpers.login() : (data.session = await appHelpers.relogin());
+                        }
+                        if (typeof(data.session?.totalCartItems) == 'number') { //we get valid session
                             const cart = data.session.cart;
                             appHelpers.setCartCount( //data.session.totalCartItems
                                 cart ? Object.keys(cart).length : 0    //Sometimes, totalCartItems is not synchronized
@@ -77,9 +79,6 @@ export default class Partial extends LessPureComponent {
                         }
                         else if (data.$cartCount !== null) {
                             appHelpers.setCartCount(0);
-                        }
-                        if (data.session && appHelpers.isLoggedIn != data.session?.customerPresent) {
-                            data.session?.customerPresent ? appHelpers.login() : appHelpers.logout();
                         }
                     }
                     return data;
@@ -109,7 +108,7 @@ export default class Partial extends LessPureComponent {
             configurable: false,
             get() { return _submittingIndicator; },
         });
-        this.submitData = (url, data = {}, httpHeaders) => {
+        this.submitData = (url, data = {}, httpHeaders, message) => {
             return new Promise((resolve, reject) => {
                 const submit = () => callServer(url, data, httpHeaders)
                     .then(data => {
@@ -130,7 +129,7 @@ export default class Partial extends LessPureComponent {
                     })
                     .finally(() => _submittingIndicator?.hide())
                     .then(showResponseMessage);
-                _submittingIndicator ? _submittingIndicator.show(submit) : submit();
+                _submittingIndicator ? _submittingIndicator.show(submit, message) : submit();
             });
         };
 
@@ -175,7 +174,7 @@ export default class Partial extends LessPureComponent {
         return this.loadData(silent);
     }
 
-    onDataReady() {
+    async onDataReady() {
         //To be overriden by child class
     }
 

@@ -122,7 +122,7 @@ export const callServer = async (url, data, headers={}) => {
         } 
         
         xhr.setRequestHeader('X-Requested-With', 'expressCartMobile');
-        if (typeof(headers) == 'object') {
+        if (typeof(headers) == 'object' && headers) {
             for (let headerName in headers) {
                 xhr.setRequestHeader(headerName, headers[headerName])
             }

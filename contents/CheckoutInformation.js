@@ -38,9 +38,9 @@ class LoginForm extends LessPureComponent {
                     <Button title={lang('Forgotten')} onPress={() => appHelpers.loadContent(routes.forgotten)} />
                     <Button title={lang('Login')}
                         onPress={() => {
-                            form.submitData('/customer/login_action', this.state)
+                            form.submitData('/customer/login_action', state)
                             .valid(() => {
-                                appHelpers.login();
+                                appHelpers.login(state.loginEmail, state.loginPassword);
                                 appHelpers.refreshContent();
                             });
                         }}

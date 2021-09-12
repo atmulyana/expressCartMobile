@@ -19,14 +19,14 @@ export default class LessPureComponent extends React.Component /*React.PureCompo
         return state;
     }
     
-    __isMounted = false;
+    #isMounted = false;
 
     componentDidMount() {
-        this.__isMounted = true;
+        this.#isMounted = true;
     }
 
     componentWillUnmount() {
-        this.__isMounted = false;
+        this.#isMounted = false;
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -34,6 +34,6 @@ export default class LessPureComponent extends React.Component /*React.PureCompo
     }
 
     setState(state, callback) {
-        if (this.__isMounted) super.setState(state, callback); //Securing for async process
+        if (this.#isMounted) super.setState(state, callback); //Securing for async process
     }
 }

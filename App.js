@@ -18,6 +18,7 @@ import {
 
 import { MenuProvider } from 'react-native-popup-menu';
 import { addEventListener, removeEventListener } from 'react-native-localize';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 import { NavigationContainer, StackActions, DrawerActions } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -26,7 +27,7 @@ const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
 import styles from './styles';
-import { appHelpers, setLang } from './common';
+import { appHelpers, lang, noop, setLang } from './common';
 
 import * as Contents from './contents';
 import routes from './contents/routes';
@@ -57,7 +58,7 @@ export default function() {
             super(props);
 
             for (let m of ['setCartTitle', 'loadContent', 'replaceContent', 'isAtHome', 'goto', 'goHome', 'setHeaderBar',
-                        'openCart', 'closeCart', 'setLang', 'login', 'logout'])
+                        'openCart', 'closeCart', 'setLang', 'login', 'logout', 'relogin'])
             {
                 this[m] = this[m].bind(this);
                 appHelpers[m] = this[m];
@@ -104,7 +105,7 @@ export default function() {
         }
 
         goto(route) {
-            navigation.navigate(route.name, {url: route.url});
+            navigation.navigate(route.name, {url: route.url ?? route.$url});
         }
 
         goHome() {
@@ -136,14 +137,43 @@ export default function() {
             this.setLang();
         }
 
-        login() {
+        login(email, password) {
+            if (email && password) {
+                EncryptedStorage.setItem("email", email).catch(noop); //Ignores errors
+                EncryptedStorage.setItem("password", password).catch(noop); //Ignores errors
+            }
             appHelpers.isLoggedIn = true;
             this.forceUpdate();
         }
 
-        logout() {
+        logout(clearLogin = true) {
+            if (clearLogin) {
+                EncryptedStorage.removeItem("email").catch(noop); //Ignores errors
+                EncryptedStorage.removeItem("password").catch(noop); //Ignores errors
+            }
             appHelpers.isLoggedIn = false;
             this.forceUpdate();
+        }
+
+        async relogin() {
+            try {
+                let loginEmail = await EncryptedStorage.getItem('email'),
+                    loginPassword = await EncryptedStorage.getItem('password');
+                if (loginEmail && loginPassword) {
+                    let response = await appHelpers.submitData(
+                        '/customer/login_action',
+                        {loginEmail, loginPassword},
+                        undefined,
+                        lang('Relogin')
+                    );
+                    this.login();
+                    return response.session;
+                }
+            }
+            catch {
+            }
+
+            this.logout(false); //don't clear the saved login data because we can try to relogin later
         }
 
         componentDidMount() {

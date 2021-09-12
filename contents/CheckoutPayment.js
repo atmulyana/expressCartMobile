@@ -28,8 +28,8 @@ class PaymentPanel extends Partial {
         discountCode: '',
     });
 
-    onDataReady(silent, data) {
-        super.onDataReady(silent, data);
+    async onDataReady(silent, data) {
+        await super.onDataReady(silent, data);
         this.setState({discountCode: this.data.session.discountCode})
     }
 

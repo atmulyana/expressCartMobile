@@ -26,7 +26,6 @@ export default class Validation extends LessPureComponent {
         value: PropTypes.any,
     };
     static defaultProps = {
-        ...View.defaultProps,
         input: noop,
         rule: new Required(),
     };

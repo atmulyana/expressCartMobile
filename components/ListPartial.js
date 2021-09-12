@@ -26,15 +26,15 @@ export default class ListPartial extends Partial {
         refreshable: false,
     };
 
-    __data = null;
+    #data = null;
 
     constructor(props) {
         super(props);
-        this.__data = this.props.data;
+        this.#data = this.props.data;
     }
 
     get contentData() {
-        return this.__data;
+        return this.#data;
     }
 
     _render(_, submittingIndicator) {
@@ -86,7 +86,7 @@ export default class ListPartial extends Partial {
     }
 
     clearLocalData() {
-        this.__data = null; //force to get fresh data from server when reloading
+        this.#data = null; //force to get fresh data from server when reloading
     }
 
     // componentDidMount() {
@@ -95,7 +95,7 @@ export default class ListPartial extends Partial {
     // }
 
     shouldComponentUpdate(nextProps, nextState) {
-        this.__data = nextProps.data;
+        this.#data = nextProps.data;
         return super.shouldComponentUpdate(nextProps, nextState);
     }
 
