@@ -28,6 +28,10 @@ It's a mobile app for shopping cart which is developed using React Native.
 
         npm install
 
+   For iOS, the above command must be followed by
+
+        cd ios && pod install && cd ..
+
 6. Ready to run project    
    Start Metro server by issueing command
 
