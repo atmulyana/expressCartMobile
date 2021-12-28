@@ -6,6 +6,9 @@
  */
 
 module.exports = {
+  resolver: {
+    nodeModulesPaths: ['node_modules.local'], //"jsbn-rsa": "^1.0.3",
+  },
   transformer: {
     getTransformOptions: async () => ({
       transform: {

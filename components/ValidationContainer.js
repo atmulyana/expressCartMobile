@@ -57,7 +57,7 @@ export default class ValidationContainer extends LessPureComponent {
                             onLayout: ev => {
                                 child.props.onLayout && child.props.onLayout(ev);
                                 layouts[currentIdx] = { ...ev.nativeEvent.layout };
-                                if (validations[currentIdx]) validations[currentIdx].layout = layouts[currentIdx];
+                                if (validations[currentIdx]) validations[currentIdx].setLayout(layouts[currentIdx]);
                             },
                             validator: () => validations[currentIdx],
                         },

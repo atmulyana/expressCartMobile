@@ -71,8 +71,8 @@ export class StrLength extends ValidationRule {
     validate() {
         this._message = '';
         var strVal = this.value+'';
-        if (this.min !== undefined && strVal.length < this.min) this._message = str(lang('validation-minlength'), this.min);
-        if (this.max !== undefined && strVal.length > this.max) this._message = str(lang('validation-maxlength'), this.max);
+        if (this.min !== undefined && strVal.length < this.min) this._message = str(lang('must be at least $1 characters'), this.min);
+        if (this.max !== undefined && strVal.length > this.max) this._message = str(lang("don't exceed $1 characters"), this.max);
         this.isValid = !this._message;
         return this;
     }
@@ -82,7 +82,7 @@ export const strlen = (min, max) => new StrLength(min, max);
 export class Email extends ValidationRule {
     static regex = /^([\w-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
     get errorMessage() {
-        return lang('validation-email');
+        return lang('invalid email address');
     }
     validate() {
         this.isValid = Email.regex.test(this.value);
@@ -94,7 +94,7 @@ export const email = new Email();
 export class Numeric extends ValidationRule {
     static regex = /^(\+|-)?\d+(\.\d+)?$/;
     get errorMessage() {
-        return lang('validation-numeric');
+        return lang('invalid numeric value');
     }
     validate() {
         this.isValid = Numeric.regex.test(this.value);
@@ -113,7 +113,7 @@ export class Min extends ValidationRule {
     
     get priority() {return 1}
     get errorMessage() {
-        return str(lang('validation-min'), this.min);
+        return str(lang('minimum $1'), this.min);
     }
 
     validate() {
@@ -134,7 +134,7 @@ export class Max extends ValidationRule {
     
     get priority() {return 1}
     get errorMessage() {
-        return str(lang('validation-max'), this.max);
+        return str(lang('maximum $1'), this.max);
     }
 
     validate() {
@@ -149,7 +149,7 @@ export class CustomRule extends ValidationRule {
     constructor(validateFunc, errorMessage) {
         super();
         this._validate = validateFunc;
-        this._errorMessage = errorMessage ?? lang('invalid');
+        this._errorMessage = errorMessage;
     }
 
     _validate;
@@ -165,7 +165,7 @@ export class CustomRule extends ValidationRule {
         this.isValid = validationValue === true;
         this._message = this.isValid ? null 
             : (typeof(validationValue) == 'string') ? validationValue
-            : this._errorMessage+'';
+            : (this._errorMessage ?? lang('invalid'));
         return this;
     }
 }

@@ -8,6 +8,7 @@
 import React from 'react';
 import {Alert, Modal, StyleSheet} from 'react-native';
 import WebView from 'react-native-webview';
+import {SafeAreaInsetsContext} from 'react-native-safe-area-context';
 import PaymentComponent from './PaymentComponent';
 import routes from '../../routes';
 import {Button, Icon, SubmittingIndicator, Text} from '../../../components';
@@ -64,44 +65,47 @@ export default class Paypal extends PaymentComponent {
                 onShow={() => this.setState({inProcess: true})}
                 visible={this.state.paypalVisible}
             >
-                <WebView
-                    cacheMode="LOAD_NO_CACHE"
-                    onNavigationStateChange={(navState) => {
-                        if (navState.url.includes('paypal.com') && !navState.loading) this.setState({isLoading: false});
-                    }}
-                    onShouldStartLoadWithRequest={(request) => {
-                        if (request.url == `${rootUrl}/checkout/payment`) {
-                            this._paymentStatus(PaymenStatus.Error);
-                            return false;
-                        }
-                        else if (request.url == `${rootUrl}/` || request.url == rootUrl) {
-                            this._paymentStatus(PaymenStatus.EmptyCart);
-                            return false;
-                        }
-                        else if (request.url.startsWith(`${config.baseUrl}/paypal/checkout_cancel`)) {
+                <SafeAreaInsetsContext.Consumer>{insets => <>
+                    <WebView
+                        cacheMode="LOAD_NO_CACHE"
+                        onNavigationStateChange={(navState) => {
+                            if (navState.url?.includes('paypal.com') && !navState.loading) this.setState({isLoading: false});
+                        }}
+                        onShouldStartLoadWithRequest={(request) => {
+                            if (request.url == `${rootUrl}/checkout/payment`) {
+                                this._paymentStatus(PaymenStatus.Error);
+                                return false;
+                            }
+                            else if (request.url == `${rootUrl}/` || request.url == rootUrl) {
+                                this._paymentStatus(PaymenStatus.EmptyCart);
+                                return false;
+                            }
+                            else if (request.url?.startsWith(`${config.baseUrl}/paypal/checkout_cancel`)) {
+                                this._paymentStatus(PaymenStatus.Cancelled);
+                                return false;
+                            }
+                            else if (request.url?.startsWith(`${config.baseUrl}/paypal/checkout_return`)) {
+                                this._paymentStatus(PaymenStatus.Success, request.url);
+                                return false;
+                            }
+                            return true;
+                        }}
+                        sharedCookiesEnabled={true}
+                        source={this.state.inProcess ? {uri: `${rootUrl}/paypal/checkout_action`, method: 'POST'} : {uri: null}}
+                        // startInLoadingState={true}
+                        // renderLoading={() => <SubmittingIndicator visible={true} />}
+                        style={[{position: 'absolute'}, insets]}
+                        thirdPartyCookiesEnabled={true}
+                    />
+                    <SubmittingIndicator visible={this.state.isLoading} />
+                    <Icon icon="X" strokeWidth={4} height={16} width={16}
+                        style={{opacity: 0.3, position:'absolute', right: insets.right + 2, top: insets.top + 2}}
+                        onPress={() => {
+                            this.setState({paypalVisible: false});
                             this._paymentStatus(PaymenStatus.Cancelled);
-                            return false;
-                        }
-                        else if (request.url.startsWith(`${config.baseUrl}/paypal/checkout_return`)) {
-                            this._paymentStatus(PaymenStatus.Success, request.url);
-                            return false;
-                        }
-                        return true;
-                    }}
-                    sharedCookiesEnabled={true}
-                    source={this.state.inProcess ? {uri: `${rootUrl}/paypal/checkout_action`, method: 'POST'} : {uri: 'about:blank'}}
-                    // startInLoadingState={true}
-                    // renderLoading={() => <SubmittingIndicator visible={true} />}
-                    style={StyleSheet.absoluteFill}
-                    thirdPartyCookiesEnabled={true}
-                />
-                <SubmittingIndicator visible={this.state.isLoading} />
-                <Icon icon="X" strokeWidth={4} height={16} width={16} style={{opacity: 0.3, position:'absolute', right: 2, top: 2}}
-                    onPress={() => {
-                        this.setState({paypalVisible: false});
-                        this._paymentStatus(PaymenStatus.Cancelled);
-                    }}
-                />
+                        }}
+                    />
+                </>}</SafeAreaInsetsContext.Consumer>
             </Modal>
         </>;
     }

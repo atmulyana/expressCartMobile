@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 import React from 'react';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 
 import {appHelpers, lang} from '../common';
 import styles from '../styles';
@@ -52,7 +52,8 @@ export default class SearchBar extends LessPureComponent {
 
                 <SearchText ref={inp => txtSearch = inp} style={[styles.searchText, styles.ml4]}
                     placeholder={lang("Search shop")} underlineColorAndroid="transparent"
-                    returnKeyType="search" keyboardType="visible-password" autoCorrect={false} spellCheck={false} autoCompleteType="off"
+                    returnKeyType="search" keyboardType={Platform.OS == 'android' ? "visible-password" : "default"}
+                    autoCorrect={false} spellCheck={false} autoCompleteType="off"
                     value={this.state.searchText} onChangeText={value => this.setState({searchText: value})}
                     onSubmitEditing={() => {
                         if (isSearching) 

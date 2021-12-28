@@ -171,7 +171,7 @@ StyleSheet.create({
     navHeaderTitle: {
         ...fontBase,
         flex: 1,
-        fontWeight: 'normal',
+        fontWeight: 'bold',
         textAlignVertical: 'center',
     },
 
@@ -335,8 +335,8 @@ StyleSheet.create({
 
     twoPane: {
         alignSelf: 'stretch',
-        alignContent: 'flex-start',
-        alignItems: 'flex-start',
+        alignContent: 'flex-end',
+        alignItems: 'flex-end',
         flexDirection: 'row',
         flexWrap: 'wrap-reverse',
         justifyContent: 'center',

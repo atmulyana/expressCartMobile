@@ -170,9 +170,10 @@ export default class Cart extends LessPureComponent {
     }
 
     render() {
+        const props = this.props;
         return <>
-            <Box>
-                <CartContent ref={elm => this._content = elm} data={this.props.data} refreshable={this.props.refreshable}
+            <Box style={{flex: -1}}>
+                <CartContent ref={elm => this._content = elm} data={props.data} refreshable={props.refreshable}
                     setCartEmpty={cartEmpty => this.setState({cartEmpty})} />
             </Box>
             <View style={[
@@ -184,7 +185,7 @@ export default class Cart extends LessPureComponent {
                 styles.ph8,
                 styles.para8
             ]}>
-                {this.props.showCheckoutButton && <Button
+                {props.showCheckoutButton && <Button
                     title={lang('Checkout')}
                     onPress={() => {
                         appHelpers.loadContent(routes.checkoutInformation);

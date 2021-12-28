@@ -7,8 +7,6 @@
  */
 import React from 'react';
 import {ActivityIndicator, StyleSheet} from 'react-native';
-//It seems to need more memories on emulator for Clipboard operation 
-import Clipboard from '@react-native-clipboard/clipboard';
 import PropTypes from 'prop-types';
 import {Box, LessPureComponent, Notification, Text, TwoPane} from '../components';
 import Content from './Content';
@@ -16,6 +14,11 @@ import routes from './routes';
 import {CartContent} from './partials/Cart';
 import {appHelpers, currencySymbol, formatAmount, lang} from '../common';
 import styles from '../styles';
+
+//It seems to need more memories on emulator for Clipboard operation 
+require('../setNativeEventListeners')('RNCClipboard'); //'require' must be ended by ';' if not an error happens
+//must be using 'require', not 'import', to make the above line works
+const Clipboard = require('@react-native-clipboard/clipboard').default;
 
 const {rowBoxStyle, timerBoxStyle} = StyleSheet.create({
     rowBoxStyle: {

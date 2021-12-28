@@ -6,6 +6,7 @@
  * @flow strict-local
  */
 import React from 'react';
+import {View} from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import PropTypes from 'prop-types';
 import Icon from './Icon';
@@ -24,7 +25,6 @@ const defaultProps = {
             top: styles.textInput.paddingVertical + styles.textInput.borderWidth
         },
     },
-    useNativeAndroidPickerStyle: false,
     Icon: () => <Icon icon="ChevronDown" width={styles.text.fontSize} height={styles.text.fontSize} />,
 };
 
@@ -37,29 +37,54 @@ export default class ComboBox extends ValidatedInput {
     //     ...RNPickerSelect.defaultProps,
     // };
 
-    _input;
+    #input;
+    #inputLayout;
 
     focus() {
-        this._input?.inputRef?.focus();
+        this.#input?.inputRef?.focus();
     }
 
     render() {
-        const props = this.setValidationHandler('onValueChange'), {errorStyle} = this.state;
-        
-        let {style} = defaultProps;
+        let props = this.setValidationHandler('onValueChange'),
+            containerProps = {},
+            {errorStyle} = this.state,
+            {style} = defaultProps;
+
         if (props.style) {
             style = {...props.style};
             style.inputIOS = inputStyle.concat(style.inputIOS).concat(errorStyle);
             style.inputAndroid = inputStyle.concat(style.inputAndroid).concat(errorStyle);
             style.iconContainer = [defaultProps.style.iconContainer].concat(style.iconContainer);
-        }
-
-        if (typeof(props.onLayout) == 'function') {
-            props.touchableWrapperProps = props.touchableWrapperProps ?? {};
-            props.pickerProps = props.pickerProps ?? {};
-            props.touchableWrapperProps.onLayout = props.pickerProps.onLayout = props.onLayout;
+            if (style.viewContainer) {
+                containerProps.style = style.viewContainer;
+                delete style.viewContainer;
+            }
         }
         
-        return <RNPickerSelect ref={input => this._input = input}  {...{...defaultProps, ...props, style}} />
+        props = {
+            ...defaultProps,
+            ...props,
+            style,
+            useNativeAndroidPickerStyle: false, //Always headless on android to make tiny height combobox
+        };
+        
+        if (typeof(props.onLayout) == 'function') {
+            props.textInputProps = props.textInputProps ?? {};
+            props.textInputProps.onLayout = ev => this.#inputLayout = ev.nativeEvent.layout;
+            containerProps.onLayout = ev => {
+                if (this.#inputLayout) {
+                    ev.nativeEvent.layout = {
+                        ...ev.nativeEvent.layout,
+                        height: this.#inputLayout.height,
+                        width: this.#inputLayout.width,
+                    };
+                }
+                props.onLayout(ev);
+            };
+        }
+        
+        return <View {...containerProps}>
+            <RNPickerSelect {...props} ref={input => this.#input = input} />
+        </View>;
     }
 }

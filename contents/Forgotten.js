@@ -37,8 +37,8 @@ export default class Forgotten extends Content {
         let form;
         return <Form ref={f => form = f} style={{width: correctWidth(300)}}>
             <ValidationContainer>
-                <Text large para4>{lang("Please enter your email address")}</Text>
-                <TextInput fixHeight para4 placeholder={lang("Email address")}
+                <Text large para8>{lang("Please enter your email address")}</Text>
+                <TextInput fixHeight para8 placeholder={lang("Email address")}
                     underlineColorAndroid="transparent" returnKeyType="done" keyboardType="email-address"
                     autoCorrect={false} spellCheck={false} autoCompleteType="off"
                     value={this.state.email} onChangeText={email => this.setState({email})}

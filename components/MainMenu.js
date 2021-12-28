@@ -57,10 +57,10 @@ export default class MainMenu extends LessPureComponent {
                     <Icon icon="Globe" style={styles.menuIcon} />
                     <Text style={[styles.menuText, styles.ml4]}>{lang("Languages")}</Text>
                 </View>
-                {availableLanguages().map((code, idx) =>
-                    <MenuOption key={idx} style={[styles.menuItem, styles.subMenu]} onSelect={() => appHelpers.setLang(code)}>
-                        <Icon icon={currentLanguage() == code ? "CheckCircle" : "Circle"} style={styles.menuIcon} />
-                        <Text style={[styles.menuText, styles.ml4]}>{lang(code)}</Text>
+                {availableLanguages().map((lang, idx) =>
+                    <MenuOption key={idx} style={[styles.menuItem, styles.subMenu]} onSelect={() => appHelpers.setLang(lang.code)}>
+                        <Icon icon={currentLanguage() == lang.code ? "CheckCircle" : "Circle"} style={styles.menuIcon} />
+                        <Text style={[styles.menuText, styles.ml4]}>{lang.name}</Text>
                     </MenuOption>
                 )}
                 

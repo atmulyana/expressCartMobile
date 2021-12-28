@@ -28,13 +28,13 @@ class LoginForm extends LessPureComponent {
         let form;
         return <Form ref={frm => form = frm}>
             <ValidationContainer>
-                <Text para4>{lang('Existing customer')}</Text>
+                <Text para8>{lang('Existing customer')}</Text>
                 <TextInput placeholder={lang('Email address')} value={state.loginEmail}
                     onChangeText={loginEmail => this.setState({loginEmail})}
-                    keyboardType="email-address" fixHeight para4 validation={[required, email, strlen(5)]} />
+                    keyboardType="email-address" fixHeight para8 validation={[required, email, strlen(5)]} />
                 <TextInput placeholder={lang('Password')} value={state.loginPassword} onChangeText={loginPassword => this.setState({loginPassword})}
-                    secureTextEntry={true} fixHeight para4 validation={required} />
-                <View style={[styles.para4, {flexDirection:'row', justifyContent:'space-between'}]}>
+                    secureTextEntry={true} fixHeight para8 validation={required} />
+                <View style={[styles.para8, {flexDirection:'row', justifyContent:'space-between'}]}>
                     <Button title={lang('Forgotten')} onPress={() => appHelpers.loadContent(routes.forgotten)} />
                     <Button title={lang('Login')}
                         onPress={() => {
@@ -74,13 +74,13 @@ export default class CheckoutInformation extends Content {
                 <ShippingForm ref={comp => refs.shipping = comp}
                     data={this.data}
                     header={appHelpers.isLoggedIn
-                        ? <Button title={lang('Change customer')} onPress={appHelpers.doLogout} style={[styles.para4, {alignSelf:'flex-end'}]} />
+                        ? <Button title={lang('Change customer')} onPress={appHelpers.doLogout} style={[styles.para8, {alignSelf:'flex-end'}]} />
                         : <LoginForm />
                     }
                     footer={<>
                         {!appHelpers.isLoggedIn && <>
                             <Text gray para4>{lang('Enter a password to create an account for next time')}</Text>
-                            <View style={[styles.para4, {flexDirection:'row'}]}>
+                            <View style={[styles.para8, {flexDirection:'row'}]}>
                                 <TextInput placeholder={lang('Password')} value={state.password} onChangeText={password => this.setState({password})}
                                     secureTextEntry={true} style={{flex:1}} fixHeight ref={inp => refs.pwdInput = inp}
                                     validation={rule(
@@ -92,13 +92,16 @@ export default class CheckoutInformation extends Content {
                                     )}
                                 />
                                 <View style={[styles.ml4, {flex:1, flexDirection:'row'}]}>
-                                    <CheckBox value={state.createAccount}
+                                    <CheckBox 
+                                        boxType="square"
+                                        value={state.createAccount}
                                         onValueChange={createAccount => {
                                             this.setState({createAccount});
                                             if (!createAccount) refs.pwdInput.validator.clearValidation();
                                         }}
                                         tintColors={{false:styles.box.borderColor}} tintColor={styles.box.borderColor}
                                         onCheckColor={styles.button.color} onFillColor={styles.button.backgroundColor}
+                                        style={{height: styles.textInputHeight.height}}
                                     />
                                     <Text style={{alignSelf:'center', lineHeight:styles.text.fontSize}}>{lang('Create an account')}</Text>
                                 </View>

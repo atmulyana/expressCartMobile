@@ -51,11 +51,10 @@ export default class ListPartial extends Partial {
                 contentInsetAdjustmentBehavior: "automatic",
                 refreshControl: this.props.refreshable && <RefreshControl
                     refreshing={this.state.isLoading}
-                    onRefresh={() => {
-                        this.state.isLoading = true; //when refreshing, it must be <true>, so that after data refreshed, it will be re-rendered
-                                                     //not use setState because to avoid double re-render
-                        this.refreshData();
-                    }}
+                    onRefresh={() => this.setState(
+                        {isLoading: true},
+                        () => this.refreshData()
+                    )}
                 />,
             },
             props1,

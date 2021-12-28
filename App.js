@@ -8,16 +8,17 @@
 import 'react-native-gesture-handler';
 import React from 'react';
 import {
+    Dimensions,
     Image,
     //LogBox,
-    SafeAreaView,
+    Platform,
     StatusBar,
     Text,
     View,
 } from 'react-native';
+import {SafeAreaInsetsContext, SafeAreaProvider} from 'react-native-safe-area-context';
 
 import { MenuProvider } from 'react-native-popup-menu';
-import { addEventListener, removeEventListener } from 'react-native-localize';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
 import { NavigationContainer, StackActions, DrawerActions } from '@react-navigation/native';
@@ -27,7 +28,8 @@ const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
 import styles from './styles';
-import { appHelpers, lang, noop, setLang } from './common';
+import { appHelpers, lang, noop } from './common';
+//import lang from './lang';
 
 import * as Contents from './contents';
 import routes from './contents/routes';
@@ -49,6 +51,8 @@ export default function() {
     let cart = null;
 
     class App extends React.Component {
+        #removeDimensionListener;
+        #refreshTimer = null;
         state = {
             cartTitle: 'Online Shop',
             headerBar: 'search',
@@ -126,11 +130,16 @@ export default function() {
             navigation?.dispatch(DrawerActions.closeDrawer());
         }
 
-        setLang(code) {
-            setLang(code);
-            this.forceUpdate();
+        forceUpdateContent() {
             //appHelpers.refreshContent();
             navigation?.setParams({timestamp: new Date().getTime()}); //to refresh content without reloading data (timestamp param is not used)
+        }
+
+        setLang(code) {
+            lang.set(code).then(() => {
+                this.forceUpdate();
+                this.forceUpdateContent();
+            });
         }
 
         onLangChange = () => {
@@ -146,8 +155,8 @@ export default function() {
             this.forceUpdate();
         }
 
-        logout(clearLogin = true) {
-            if (clearLogin) {
+        logout(isLoginCleared = true) {
+            if (isLoginCleared) {
                 EncryptedStorage.removeItem("email").catch(noop); //Ignores errors
                 EncryptedStorage.removeItem("password").catch(noop); //Ignores errors
             }
@@ -155,7 +164,8 @@ export default function() {
             this.forceUpdate();
         }
 
-        async relogin() {
+        async relogin(data) {
+            if (!(data instanceof Object)) data = {};
             try {
                 let loginEmail = await EncryptedStorage.getItem('email'),
                     loginPassword = await EncryptedStorage.getItem('password');
@@ -167,29 +177,51 @@ export default function() {
                         lang('Relogin')
                     );
                     this.login();
-                    return response.session;
+                    data.session = response.session;
+                    return true;
                 }
             }
             catch {
             }
 
             this.logout(false); //don't clear the saved login data because we can try to relogin later
+            return false;
         }
 
         componentDidMount() {
-            addEventListener('change', this.onLangChange);
+            this.setLang();
+            lang.addChangeListeners(this.onLangChange);
+            
+            this.#removeDimensionListener = Dimensions.addEventListener('change', //specially for rotating event. Some contents need to reposition/resize because they depend to window width
+                () => {
+                    //use setTimeout to give time for SafeAreaInsetsContext to update all four side insets
+                    if (this.#refreshTimer !== null) clearTimeout(this.#refreshTimer);
+                    this.#refreshTimer = setTimeout(
+                        () => {
+                            this.#refreshTimer = null;
+                            this.forceUpdateContent();
+                        },
+                        100
+                    )
+                }
+            );
         }
 
         componentWillUnmount() {
-            removeEventListener('change', this.onLangChange);
+            lang.removeChangeListeners(this.onLangChange);
+            typeof(this.#removeDimensionListener) == 'function' && this.#removeDimensionListener();
+            this.#removeDimensionListener = null;
         }
 
         render() {
             return (
-                <SafeAreaView style={{flex:1}}>
+                <>
                     <HeaderBar name={this.state.headerBar} />
                     
                     <Stack.Navigator initialRouteName={Contents.default} screenOptions={{
+                        animationEnabled: Platform.OS == 'android', //On iOS, animation keeps issueing warning log
+                        headerBackTitleVisible: false,
+                        headerStatusBarHeight: 0,
                         headerStyle: styles.navHeader,
                         headerTitleAlign: 'center',
                         headerTitleStyle: styles.navHeaderTitle,
@@ -213,36 +245,51 @@ export default function() {
                             <Text style={styles.appNameText}>Mobile</Text>
                         </View>
                     </View>
-                </SafeAreaView>
+                </>
             );
         }
     }
 
-    return <MenuProvider>
-        <StatusBar backgroundColor="white" barStyle="dark-content" />
-        <NavigationContainer ref={nav => navigation = nav}>
-            <Drawer.Navigator
-                drawerContent={() => <SideBarCart ref={elm => cart = elm} />}
-                screenOptions={{
-                    drawerPosition: 'right',
-                    drawerStyle: {
-                        backgroundColor: 'white',
-                        width: '100%',
-                    },
-                    drawerType: 'front',
-                    headerShown: false,
-                    title: ''
-                }}
-            >
-                <Drawer.Screen name="root" component={App}
-                    options={{swipeEnabled: false}}
-                    // listeners={{
-                    //     drawerOpen: () => {
-                    //         cart?.loadData();
-                    //     },
-                    // }}
-                />
-            </Drawer.Navigator>
-        </NavigationContainer>
-    </MenuProvider>;
+    return <SafeAreaProvider><SafeAreaInsetsContext.Consumer>
+    {insets => {
+        appHelpers.winInsets = insets;
+        return <View
+            style={{
+                flex: 1,
+                paddingBottom: insets.bottom,
+                paddingLeft: insets.left,
+                paddingRight: insets.right,
+                paddingTop: insets.top,
+            }}
+        >
+            <MenuProvider>
+                <StatusBar backgroundColor="white" barStyle="dark-content" />
+                <NavigationContainer ref={nav => navigation = nav}>
+                    <Drawer.Navigator
+                        drawerContent={() => <SideBarCart ref={elm => cart = elm} />}
+                        screenOptions={{
+                            drawerPosition: 'right',
+                            drawerStyle: {
+                                backgroundColor: 'white',
+                                width: '100%',
+                            },
+                            drawerType: 'front',
+                            headerShown: false,
+                            title: ''
+                        }}
+                    >
+                        <Drawer.Screen name="root" component={App}
+                            options={{swipeEnabled: false}}
+                            // listeners={{
+                            //     drawerOpen: () => {
+                            //         cart?.loadData();
+                            //     },
+                            // }}
+                        />
+                    </Drawer.Navigator>
+                </NavigationContainer>
+            </MenuProvider>
+        </View>;
+    }}
+    </SafeAreaInsetsContext.Consumer></SafeAreaProvider>;
 };

@@ -8,7 +8,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { SliderBox } from 'react-native-image-slider-box';
-import { stripHtml } from "string-strip-html";
+import RenderHtml from 'react-native-render-html';
 import {
     Button,
     ComboBox,
@@ -112,12 +112,20 @@ export default class Product extends Content {
         
         //Recalculate the image width in the case the screen width is too small
         const imageStyle = {...styles.productInfoImage};
-        let imageWidth = contentWidth() - styles.productInfoCol.padding * 2;
+        const cntWidth = contentWidth();
+        let imageWidth = cntWidth - styles.productInfoCol.padding * 2;
         if (imageWidth < imageStyle.width) {
             imageStyle.height = imageStyle.width = imageWidth;
         }
-        let colWidth = imageWidth + styles.productInfoCol.padding * 2;
-        let relImageWidth = Math.round(imageStyle.width / 5);
+        else {
+            imageWidth = imageStyle.width;
+        }
+        let colWidth = cntWidth / 2;
+        if (colWidth < imageWidth + styles.productInfoCol.padding * 2) {
+            colWidth = cntWidth;
+            imageStyle.alignSelf = 'center';
+        }
+        let relImageWidth = Math.round(imageWidth / 5);
 
         const imageLocations = [];
         for (let i in images) {
@@ -133,7 +141,7 @@ export default class Product extends Content {
             <View style={[styles.productRow, styles.productInfoRow]}>
                 <View style={[styles.productInfoCol, {width: colWidth}]}>
                     <SliderBox images={imageLocations}
-                               parentWidth={imageWidth}
+                               parentWidth={colWidth}
                                ImageComponentStyle={[styles.productImage, imageStyle]}
                                dotColor="#888"
                                inactiveDotColor="#aaa"
@@ -210,15 +218,15 @@ export default class Product extends Content {
                         }}
                     />
                     
-                    <Text para8>
-                        {stripHtml(result.productDescription).result}
-                    </Text>
+                    <View style={styles.para8}>
+                        <RenderHtml source={{html: result.productDescription}} contentWidth={cntWidth} />
+                    </View>
                     
                     {(config.modules.enabled.reviews || null) && <>
                         <View style={[styles.para8, {flexDirection:'row', flexWrap: 'wrap', justifyContent:'space-between'}]}>
                             <Button title={lang('Add review')}
                                 onPress={() => {
-                                    this.submitData('/customer/check')
+                                    this.submitData('/customer/check', undefined, undefined, undefined, true)
                                     .then(() => this.#reviewForm.show())
                                     .catch(err => {
                                         if (err.status == 400) {

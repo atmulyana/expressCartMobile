@@ -17,26 +17,29 @@ It's a mobile app for shopping cart which is developed using React Native.
         const SERVER = 'http://192.168.56.1:1111';
    
    This is the root URL of the web application you just installed in step 1. Change the IP/Host to the one of your own. Don't use
-   `localhost` for it because `localhost` means the web application runs on device (HP) emulator. Use one of your LAN/WAP IPs.
+   `localhost` for it because `localhost` means the web application runs on device (HP) emulator. Use one of your LAN/WAN IPs.
 
 5. Install the required modules for this project   
+   Open Terminal/Command console then make the project directory is the active directory of the console
 
-   5.1. For Android        
-        Open command console and go to the directory where you downloaded this project in step 3. Under this directory, type the command
+        cd <path_to_project_directory>
+
+   Then execute
 
         npm install
-    
-   5.2. For iOS     
-        I have not tested it yet on iOS. So, to avoid misdirection, I won't write this step here. You can find it easily out there.
 
 6. Ready to run project    
+   Start Metro server by issueing command
+
+        npx react-native start
+
+   Open another Terminal/Command console and go to the project directory too as the before one. At new console, type
+   the following command
 
    6.1. For Android     
-        Under the project directory, type the command
 
         npx react-native run-android
 
    6.2. For iOS   
-        I have not tested it yet but if everything ok, similar to Android, type the command
 
         npx react-native run-ios

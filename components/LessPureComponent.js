@@ -20,6 +20,9 @@ export default class LessPureComponent extends React.Component /*React.PureCompo
     }
     
     #isMounted = false;
+    get isMounted() {
+        return this.#isMounted;
+    }
 
     componentDidMount() {
         this.#isMounted = true;

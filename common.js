@@ -6,9 +6,6 @@
  * @flow strict-local
  */
 import {Alert, Dimensions} from 'react-native';
-import {findBestAvailableLanguage} from 'react-native-localize';
-import i18n from 'i18n-js';
-import memoize from 'lodash.memoize';
 import numeral from 'numeral';
 import moment from 'moment';
 import {URL} from 'react-native-url-polyfill';
@@ -29,43 +26,29 @@ export const appHelpers = {
     refreshContent: noop,
     setCartCount: noop,
     setMenu: noop,
+    winInsets: {left: 0, right: 0}
 };
 
 export const contentPadding = 8;
-export const contentWidth = () => Dimensions.get('window').width - 2 * contentPadding;
+export const contentWidth = () => {
+    const {winInsets} = appHelpers;
+    return Dimensions.get('window').width - 2 * contentPadding - winInsets.left - winInsets.right;
+};
 export const correctWidth = width => {
     const maxWidth = contentWidth();
     return width > maxWidth ? maxWidth : width;
 }
 
+import lang, {availableLanguages, currentLanguage} from './lang';
+export {lang, availableLanguages, currentLanguage};
+// export const lang = text => text;
+// export const availableLanguages = () => [{code: 'en', name: 'English'}];
+// export const currentLanguage = () => 'en';
+// lang.set = () => Promise.resolve();
+// lang.addChangeListeners = noop;
+// lang.removeChangeListeners = noop;
 
-const loadLangs = {
-    en: () => require('./locales/en.json'),
-    id: () => require('./locales/id.json'),
-    it: () => require('./locales/it.json'),
-}
-export const availableLanguages = () => Object.keys(loadLangs);
-export const currentLanguage = () => i18n.locale;
-export const lang = memoize(
-    (key, config) => i18n.translations[i18n.locale][key] === undefined ? key : i18n.t(key, config),
-    (key, config) => (config ? key + JSON.stringify(config) : key)
-);
-export const setLang = code => {
-    let languageTag = 'en';
-    if (loadLangs[code]) languageTag = code;
-    else {
-        let langs = findBestAvailableLanguage(Object.keys(loadLangs));
-        if (langs) languageTag = langs.languageTag;
-    }
-    lang.cache.clear();
-    i18n.translations = {
-        [languageTag]: loadLangs[languageTag]()
-    }
-    i18n.locale = languageTag;
-};
-setLang();
-
-export const serverUrl = url => SERVER + url.replace('\\', '/');
+export const serverUrl = url => SERVER + url.replaceAll('\\', '/');
 
 export const callServer = async (url, data, headers={}) => {
     //'fetch' function seems more elegant but  https://reactnative.dev/docs/network#known-issues-with-fetch-and-cookie-based-authentication
@@ -80,7 +63,7 @@ export const callServer = async (url, data, headers={}) => {
             && url?.startsWith(SERVER) //don't care if it's URL of outside
         return data
     }
-    const error = (reject, message) => { 
+    const error = (reject, message) => {
         let err = {
             status: xhr.status,
             data: getResponse(),
@@ -99,7 +82,7 @@ export const callServer = async (url, data, headers={}) => {
             data ? 'POST' : 'GET',
             url
         )
-        
+
         xhr.onload = () => {
             if (isProcessing) {
                 if (xhr.status == 404) {
@@ -114,12 +97,12 @@ export const callServer = async (url, data, headers={}) => {
             }
             isProcessing = false
         }
-         
-        xhr.onerror = err => {
+
+        xhr.ontimeout = xhr.onerror = err => {
             if (isProcessing)
                 error(reject, lang("Can't connect to server"), err)
             isProcessing = false
-        } 
+        }
         
         xhr.setRequestHeader('X-Requested-With', 'expressCartMobile');
         if (typeof(headers) == 'object' && headers) {

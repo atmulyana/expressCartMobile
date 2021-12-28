@@ -17,7 +17,7 @@
         let message = '', color = green;
         switch(status) {
             case 'Paid':
-                message = lang('Your payment has been successfully processed');
+                message = lang('Your payment has been successfully processed.');
                 break;
             case 'Pending':
                 if((config.paymentGateway === 'instore' || Array.isArray(config.paymentGateway) && config.paymentGateway.includes('instore'))

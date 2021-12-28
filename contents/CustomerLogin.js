@@ -39,13 +39,13 @@ export default class CustomerLogin extends Content {
         return <Form ref={f => form = f} style={{width:correctWidth(300)}}>
             <ValidationContainer>
                 <Text large para4>{lang("Please sign in")}</Text>
-                <TextInput fixHeight para4 placeholder={lang("Email address")}
+                <TextInput fixHeight para8 placeholder={lang("Email address")}
                     underlineColorAndroid="transparent" returnKeyType="done" keyboardType="email-address"
                     autoCorrect={false} spellCheck={false} autoCompleteType="off"
                     value={state.email} onChangeText={email => this.setState({email})}
                     validation={[required, email]}
                 />
-                <TextInput fixHeight para4 placeholder={lang("Password")}
+                <TextInput fixHeight para8 placeholder={lang("Password")}
                     underlineColorAndroid="transparent" returnKeyType="done" secureTextEntry
                     autoCorrect={false} spellCheck={false} autoCompleteType="off"
                     value={state.password} onChangeText={password => this.setState({password})}

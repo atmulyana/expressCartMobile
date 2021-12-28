@@ -7,12 +7,15 @@
  */
 import React from 'react';
 import {
+    ActivityIndicator,
     RefreshControl,
     ScrollView,
+    StyleSheet,
+    View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import {customerLogin, home, getRouteByUrl} from './routes';
-import {p8 as scrollContentStyle, scrollView as scrollViewStyle} from '../styles';
+import {contentCentered, p8 as scrollContentStyle, scrollView as scrollViewStyle} from '../styles';
 import {appHelpers, lang} from '../common';
 import {Partial} from '../components';
 
@@ -85,13 +88,12 @@ export default class Content extends Partial {
                 nestedScrollEnabled: true,
                 refreshControl: <RefreshControl
                     refreshing={this.state.isLoading}
-                    onRefresh={() => {
-                        this.state.isLoading = true; //when refreshing, it must be <true>, so that after data refreshed, it will be re-rendered
-                                                     //not use setState because to avoid double re-render
-                        this.refreshData();
-                    }}
-
+                    onRefresh={() => this.setState(
+                        {isLoading: true},
+                        () => this.refreshData()
+                    )}
                 />,
+                //refreshing: this.state.isLoading,
             },
             props1,
             props2,
@@ -109,20 +111,31 @@ export default class Content extends Partial {
                     refresher={this.refreshData.bind(this)}
                     submitter={this.submitData.bind(this)}
                 />}
+    
+            {this.state.isStarting
+                /*On iOS, RefreshControl can only be shown by 'pull-down' gesture. Only setting 'refreshing' to 'true' doesn't have effect.
+                *Therefore, we need to use ActivityIndicator to show loading process when the content is first loaded.
+                */
+                ? <View style={[StyleSheet.absoluteFill, contentCentered]}>
+                    <ActivityIndicator animating={true} size="large" color='#000' />
+                  </View>
+
+                : <Scroller ref={this.setScroller} {...scrollerProps}>
+                    {content}
+                  </Scroller>
+            }
+            
             {submittingIndicator}
-            <Scroller ref={this.setScroller} {...scrollerProps}>
-                {content}
-            </Scroller>
         </>);
     }
     
-    _setTitle = () => {
+    #setTitle = () => {
         let cartTitle = this.data?.config?.cartTitle ?? '';
         if (cartTitle) appHelpers.setCartTitle(cartTitle);
         this.props.navigation?.setOptions({title: this.contentTitle});
     };
     
-    _handleRedirection = data => {
+    #handleRedirection = data => {
         if (data.responseRedirected) {
             let redirectUrl = data.responseURL?.pathname;
             if (redirectUrl) {
@@ -146,26 +159,30 @@ export default class Content extends Partial {
 
     async onDataReady(silent, data) {
         if (!this.data.session?.customerPresent) {
-            if (this.data.session = await appHelpers.relogin()) { //succeeds to relogin
+            if (await appHelpers.relogin(this.data)) { //succeeds to relogin
+                if (this.authenticated) { //It must already be redirected to login form at server, so don't continue, just reload data instead
+                    setTimeout(appHelpers.refreshContent, 10);
+                    return false;
+                }
             }
-            else if (this.authenticated) { //cannot relogin but need to login
-                appHelpers.replaceContent(customerLogin);
+            else if (this.authenticated) { //cannot (re)login but need to login
+                appHelpers.replaceContent(customerLogin); //show login form
                 return false;
             }
         }
-        if (data && this._handleRedirection(data) === false) return false;
+        if (data && this.#handleRedirection(data) === false) return false;
         if (!silent) {
             appHelpers.setHeaderBar(this.props.route?.params?.headerBar);  
-            this._setTitle();
+            this.#setTitle();
         }
     }
 
     onMoreDataReady() {
-        this._setTitle();
+        this.#setTitle();
     }
 
     onDataSubmitted(data) {
-        return this._handleRedirection(data);
+        return this.#handleRedirection(data);
     }
 
     getScroller() {

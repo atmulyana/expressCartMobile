@@ -59,9 +59,8 @@ const createInput = (field, fnFormat = justNumbers) => {
             prevInput: noop,
         };
         
-        #cursorPos = -1;
         #input;
-        #prevCursorPos = -1;
+        #prevTextLength = 0;
         #validatorParams = [];
         #validity;
 
@@ -110,6 +109,7 @@ const createInput = (field, fnFormat = justNumbers) => {
             };
             text = fnFormat(text, validate);
             if (isNotValidated) validate();
+            this.#prevTextLength = this.state.text.length;
             this.setState({text});
             this.props.onValidate(this.#validity);
         }
@@ -118,14 +118,11 @@ const createInput = (field, fnFormat = justNumbers) => {
             if (this.state.text == "" && key == 'Backspace') this.prevFocus();
         }
 
-        onSelectionChange = ({ nativeEvent: { selection: { start } } }) => {
-            this.#prevCursorPos = this.#cursorPos;
-            this.#cursorPos = start;
+        onSelectionChange = ({ nativeEvent: { selection: { start:pos } } }) => {
             let endPos = this.props.maxLength,
                 endPos2 = this.value.length;
-            if (this.#prevCursorPos == endPos-1 && this.#cursorPos == endPos && endPos == endPos2) this.nextFocus();
-            else if (this.isValid && this.#prevCursorPos == endPos2-1 && this.#cursorPos == endPos2) this.nextFocus();
-            //else if (this.#prevCursorPos == 1 && this.#cursorPos == 0 && endPos2 != 0) this.prevFocus();
+            if (this.#prevTextLength < endPos2 && pos == endPos && endPos == endPos2) this.nextFocus();
+            else if (this.isValid && this.#prevTextLength < endPos2 && pos == endPos2) this.nextFocus();
         }
 
         prevFocus() {
@@ -279,6 +276,7 @@ export default class CreditCard extends ValidatedInput {
                 keyboardShouldPersistTaps="never"
                 ref={comp => this.#scroller = comp}
                 scrollEnabled={true}
+                scrollEventThrottle={1}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 style={{flex:1}}

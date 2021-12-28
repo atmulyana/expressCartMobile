@@ -32,6 +32,7 @@ export default class Partial extends LessPureComponent {
     
     state = {
         isLoading: false,
+        isStarting: false,
     };
 
     constructor(props) {
@@ -69,7 +70,7 @@ export default class Partial extends LessPureComponent {
                         if (typeof(data.config?.maxQuantity) == 'number') appHelpers.maxQuantity = data.config.maxQuantity;
                         if (data.menu) appHelpers.setMenu(data.menu);
                         if (appHelpers.isLoggedIn != (data.session?.customerPresent ?? false)) {
-                            data.session?.customerPresent ? appHelpers.login() : (data.session = await appHelpers.relogin());
+                            data.session?.customerPresent ? appHelpers.login() : await appHelpers.relogin(data);
                         }
                         if (typeof(data.session?.totalCartItems) == 'number') { //we get valid session
                             const cart = data.session.cart;
@@ -85,7 +86,7 @@ export default class Partial extends LessPureComponent {
                 })
                 .catch(Notification.errorHandler)
                 .finally(() => {
-                    if (!silent) this.setState({isLoading:false})
+                    if (!silent) this.setState({isLoading:false, isStarting:false})
                 })
                 .then(showResponseMessage);
         };
@@ -93,7 +94,7 @@ export default class Partial extends LessPureComponent {
         this.loadData = silent =>
             silent               ? _loadData(silent) :
             this.state.isLoading ? _loadData() : 
-            /* else */             this.setState({isLoading: true}, _loadData);
+            /* else */             this.setState({isLoading:true, isStarting:true}, () => _loadData());
 
         this.mergeData = newData => {
             let results = null;
@@ -108,7 +109,7 @@ export default class Partial extends LessPureComponent {
             configurable: false,
             get() { return _submittingIndicator; },
         });
-        this.submitData = (url, data = {}, httpHeaders, message) => {
+        this.submitData = (url, data = {}, httpHeaders, message, rejectIfHandled = false) => {
             return new Promise((resolve, reject) => {
                 const submit = () => callServer(url, data, httpHeaders)
                     .then(data => {
@@ -122,8 +123,8 @@ export default class Partial extends LessPureComponent {
                     })
                     .catch(err => {
                         Notification.errorHandler(err);
-                        if (typeof(err) != 'object' || !err?.handled) {
-                            console.log('submitData err: ', err)
+                        if (typeof(err) != 'object' || !err?.handled || err?.handled && rejectIfHandled) {
+                            if (!rejectIfHandled) console.log('submitData err: ', err)
                             reject(err);
                         }
                     })
