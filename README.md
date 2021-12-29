@@ -5,7 +5,30 @@ It's a mobile app for shopping cart which is developed using React Native.
 #### Brief guide how to run this project
 
 1. Download and install the server application (a web app) from [here](https://github.com/atmulyana/expressCart).
-   Follow the [documentation](https://github.com/mrvautin/expressCart/wiki) for installation.
+   Follow the [documentation](https://github.com/mrvautin/expressCart/wiki) for installation.  
+    
+   It's better to set session has no expiration. It's because the cart content is saved in the session storage. So, if the session expires
+   then what have been chosen to buy will be gone. Therefore, the payment must be made before the session ends. In some situations, it's
+   not comfortable for users.  
+
+   But the question is what happens if the session has no expiration. If we open the application via browser, the session will end when
+   the browser is closed. If we use the mobile app, the session will never expire. You decide whether it's acceptable or not for you.  
+
+   To make the session without expiration, open `app.js` file at the root of project, then go to about line 380, you'll find the block of code
+
+        app.use(session({
+            resave: true,
+            saveUninitialized: true,
+            secret: config.secretSession,
+            cookie: {
+                path: '/',
+                httpOnly: true,
+                maxAge: 900000
+            },
+            store: store
+        }));
+
+   Change the value of `maxAge` to `null`.
 
 2. You should have set up the React Native development environment as described [here](https://reactnative.dev/docs/environment-setup).
    Follow "React Native CLI Quickstart".   
