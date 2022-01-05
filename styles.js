@@ -361,7 +361,23 @@ StyleSheet.create({
 
     alert: {
         ...boxBase,
+        alignItems: 'center',
+        flex: 0,
+        flexDirection: 'row',
         padding: 8,
+    },
+    alertContainer: {
+        bottom: 0,
+        flex: 0,
+        left: 0,
+        position: 'absolute',
+        right: 0,
+        zIndex: 400000,
+    },
+    alertDanger: {
+        backgroundColor: '#f8d7da',
+        borderColor: '#ffecb5',
+        color: '#842029',
     },
     alertSuccess: {
         backgroundColor: '#d1e7dd',
@@ -372,10 +388,5 @@ StyleSheet.create({
         backgroundColor: '#fff3cd',
         borderColor: '#badbcc',
         color: '#664d03',
-    },
-    alertDanger: {
-        backgroundColor: '#f8d7da',
-        borderColor: '#ffecb5',
-        color: '#842029',
     },
 }));

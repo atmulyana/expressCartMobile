@@ -14,6 +14,7 @@ const SERVER = 'http://192.168.56.1:1111';
 
 export const noop = () => {};
 export const appHelpers = {
+    contentCanGoBack: false,
     doLogout: () => {
         callServer('/customer/logout', {})
         .then(() => {

@@ -12,9 +12,10 @@ import Button from './Button';
 import Form from './Form';
 import Icon from './Icon';
 import LessPureComponent from './LessPureComponent';
+import Notification from './Notification';
 import Text from './Text';
 import ValidationContainer from './ValidationContainer';
-import {lang, noop} from '../common';
+import {appHelpers, lang, noop} from '../common';
 import styles from '../styles';
 
 export default class extends LessPureComponent {
@@ -79,12 +80,14 @@ export default class extends LessPureComponent {
             transparent
             visible={this.state.visible}
         >
-        <View style={{
-            alignItems: 'center',
-            height: '100%',
-            justifyContent: 'center',
-            width: '100%',
-        }}>
+        <View style={[
+            {
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'absolute',
+            },
+            appHelpers.winInsets,
+        ]}>
             <Pressable style={[styles.modalBackdrop, StyleSheet.absoluteFill]} onPress={this.hide} />
             <Form ref={elm => this._form = elm} style={[styles.modal, props.style]}>
             <ValidationContainer>
@@ -107,6 +110,8 @@ export default class extends LessPureComponent {
                 </View>
             </ValidationContainer>
             </Form>
+
+            <Notification />
         </View>
         </Modal>;
     }

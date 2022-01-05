@@ -54,7 +54,7 @@ export default class SubmittingIndicator extends LessPureComponent {
         let coverage = this.visible ? '100%' : 0;
         return (
             <View style={{alignItems: 'center', display: display, height: coverage, justifyContent: 'center',
-                          position: 'absolute', width: coverage, zIndex:3000000000}}>
+                          position: 'absolute', width: coverage, zIndex:300000}}>
                 <View style={[StyleSheet.absoluteFill, {backgroundColor: '#888', opacity: 0.1}]}></View>
                 <ActivityIndicator animating={this.visible} size="large" color='#00f' style={{display: display}} />
                 {this.state.message && <Text style={{backgroundColor:'white', color:'black'}}>{this.state.message}</Text>}

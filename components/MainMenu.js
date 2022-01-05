@@ -50,7 +50,7 @@ export default class MainMenu extends LessPureComponent {
     render() {
         const menuItems = this.state.menu?.items ?? [];
 
-        return <Menu renderer={Popover}>
+        return <Menu renderer={Popover} rendererProps={{placement: 'bottom'}}>
             <MenuTrigger>{this.props.trigger || <Icon icon="Menu" style={this.props.style} />}</MenuTrigger>
             <MenuOptions style={styles.menuContainer}>
                 <View style={styles.menuItem}>

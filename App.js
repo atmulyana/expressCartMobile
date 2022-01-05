@@ -8,6 +8,7 @@
 import 'react-native-gesture-handler';
 import React from 'react';
 import {
+    BackHandler,
     Dimensions,
     Image,
     //LogBox,
@@ -21,7 +22,7 @@ import {SafeAreaInsetsContext, SafeAreaProvider} from 'react-native-safe-area-co
 import { MenuProvider } from 'react-native-popup-menu';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
-import { NavigationContainer, StackActions, DrawerActions } from '@react-navigation/native';
+import { NavigationContainer, StackActions, DrawerActions, useFocusEffect } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
 const Drawer = createDrawerNavigator();
@@ -34,7 +35,7 @@ import { appHelpers, lang, noop } from './common';
 import * as Contents from './contents';
 import routes from './contents/routes';
 import {SideBarCart} from './contents/partials/Cart';
-import HeaderBar from './components/HeaderBar';
+import {HeaderBar, Notification} from './components';
 
 const routeNames = Object.keys(Contents).filter(name => name != 'default');
 
@@ -46,8 +47,31 @@ console.error = (message, ...optinalParams) => {
     _logError(message, ...optinalParams);
 };
 
+function BackHandlerHook({canGoBack}) {
+    useFocusEffect(React.useCallback(() => {
+        let yesBack = false;
+        const onBackPress = () => {
+            if (canGoBack()) {
+                yesBack = false;
+                return false;
+            }
+            else if (!yesBack) {
+                Notification.warning(lang("Press 'Back' again to exit!"));
+                yesBack = true;
+                setTimeout(() => yesBack = false, Notification.durations.short);
+                return true;
+            }
+        };
+    
+        BackHandler.addEventListener('hardwareBackPress', onBackPress);
+        return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []));
+
+    return null;
+}
+
 export default function() {
-    let navigation = null;
+    let navigation;
     let cart = null;
 
     class App extends React.Component {
@@ -67,6 +91,7 @@ export default function() {
                 this[m] = this[m].bind(this);
                 appHelpers[m] = this[m];
             }
+            Object.defineProperty(appHelpers, 'currentRoute', {get: () => navigation?.getCurrentRoute(), configurable: true});
         }
 
         setCartTitle(title) {
@@ -83,10 +108,10 @@ export default function() {
                 && header1 == header2;
         }
 
-        loadContent(name, url, headerBar = 'search', isReplace = false) {
+        loadContent(name, url, headerBar, isReplace = false) {
             var data;
             if (typeof(name) == 'object')
-                var {name, url, headerBar = 'search', data} = name;
+                var {name, url, headerBar, data} = name;
 
             if (navigation) {
                 if (this.isOnRoute({name, url, headerBar}))
@@ -100,7 +125,7 @@ export default function() {
             }
         }
 
-        replaceContent(name, url, headerBar = 'search') {
+        replaceContent(name, url, headerBar) {
             this.loadContent(name, url, headerBar, true);
         }
 
@@ -117,7 +142,7 @@ export default function() {
             this.goto(routes.home);
         }
 
-        setHeaderBar(headerBar = 'search') {
+        setHeaderBar(headerBar = routes.home.headerBar) {
             this.setState({headerBar});
         }
 
@@ -216,6 +241,7 @@ export default function() {
         render() {
             return (
                 <>
+                    <BackHandlerHook canGoBack={() => this.props.navigation?.canGoBack() || appHelpers.contentCanGoBack} />
                     <HeaderBar name={this.state.headerBar} />
                     
                     <Stack.Navigator initialRouteName={Contents.default} screenOptions={{
@@ -264,6 +290,7 @@ export default function() {
         >
             <MenuProvider>
                 <StatusBar backgroundColor="white" barStyle="dark-content" />
+                
                 <NavigationContainer ref={nav => navigation = nav}>
                     <Drawer.Navigator
                         drawerContent={() => <SideBarCart ref={elm => cart = elm} />}
@@ -288,6 +315,8 @@ export default function() {
                         />
                     </Drawer.Navigator>
                 </NavigationContainer>
+            
+                <Notification />
             </MenuProvider>
         </View>;
     }}

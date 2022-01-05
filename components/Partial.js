@@ -88,7 +88,9 @@ export default class Partial extends LessPureComponent {
                 .finally(() => {
                     if (!silent) this.setState({isLoading:false, isStarting:false})
                 })
-                .then(showResponseMessage);
+                .then(data => (url && !this.contentData) /*If really just got response from server then*/ && showResponseMessage(data)
+                                                                                                          || data
+                );
         };
 
         this.loadData = silent =>
@@ -142,8 +144,12 @@ export default class Partial extends LessPureComponent {
             //As the first statement:
             //Let the initial process before rendering in original render function is executed first
             //For ex., it can set this.scrollerProps in Content component
-            const content = this.data && oriRender();
-            return this._render(content, <SubmittingIndicator ref={elm => _submittingIndicator = elm} />);
+            let content = this.data && oriRender();
+            content = this._render(content, <SubmittingIndicator ref={elm => _submittingIndicator = elm} />);
+            let contentInit = this._renderInits(!this.data);
+            return contentInit && content && <>{contentInit}{content}</>
+                || contentInit
+                || content;
         };
     }
 
@@ -164,6 +170,10 @@ export default class Partial extends LessPureComponent {
             </View>
             {submittingIndicator}
         </View>;
+    }
+
+    _renderInits(isNoData) {
+        return null;
     }
 
     clearLocalData() {

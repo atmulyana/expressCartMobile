@@ -84,6 +84,7 @@ const CartTotal = props => {
     </View>;
 };
 
+const cartContents = [];
 export class CartContent extends ListPartial {
     static defaultParams = {
         url: '/checkout/cartdata',
@@ -94,13 +95,17 @@ export class CartContent extends ListPartial {
         Object.assign(this.state, {refreshFlag: 0});
     }
 
-    refresh = () => {
-        this.refreshData(true)
-            .then(() => {
-                this.setState(state => ({refreshFlag: state.refreshFlag ^ -1}));
-            });
-    }
-
+    refresh = () => this.refreshData(true)
+        .then(data => {
+            this.setState(state => ({refreshFlag: state.refreshFlag ^ -1}));
+            for (let cart of cartContents) {
+                if (cart != this) {
+                    Object.assign(cart.data, data);
+                    cart.setState(state => ({refreshFlag: state.refreshFlag ^ -1}));
+                }
+            }
+        });
+    
     getListComponent() {
         const {isLoading, refreshFlag} = this.state;
         let session, cart, cartIds, cartReadOnly, currency, maxQty, qtyLength;
@@ -141,6 +146,17 @@ export class CartContent extends ListPartial {
         return elm;
     }
 
+    componentDidMount() {
+        super.componentDidMount();
+        cartContents.push(this);
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        const idx = cartContents.indexOf(this);
+        if (idx > -1) cartContents.splice(idx, 1); 
+    }
+
     // componentDidUpdate(prevProps, prevState, snapshot) {
     //     super.componentDidUpdate(prevProps, prevState, snapshot);
     //     if (typeof(this.props.setCartEmpty) == 'function') {
@@ -151,11 +167,13 @@ export class CartContent extends ListPartial {
 
 export default class Cart extends LessPureComponent {
     static propTypes = {
+        autoLoad: PropTypes.bool,
         data: PropTypes.object,
         refreshable: PropTypes.bool,
         showCheckoutButton: PropTypes.bool,
     };
     static defaultProps = {
+        autoLoad: true,
         refreshable: false,
         showCheckoutButton: true,
     };
@@ -173,7 +191,7 @@ export default class Cart extends LessPureComponent {
         const props = this.props;
         return <>
             <Box style={{flex: -1}}>
-                <CartContent ref={elm => this._content = elm} data={props.data} refreshable={props.refreshable}
+                <CartContent ref={elm => this._content = elm} autoLoad={props.autoLoad} data={props.data} refreshable={props.refreshable}
                     setCartEmpty={cartEmpty => this.setState({cartEmpty})} />
             </Box>
             <View style={[
@@ -201,7 +219,7 @@ export default class Cart extends LessPureComponent {
                             .then(data => {
                                 this._content.refresh();
                                 Notification.success(data.message);
-                                appHelpers.refreshContent();
+                                appHelpers.setCartCount(0);//appHelpers.refreshContent();
                             });
                         });
                     }}
@@ -213,9 +231,6 @@ export default class Cart extends LessPureComponent {
 
 export class SideBarCart extends LessPureComponent {
     _content = null;
-    state = {
-        cartEmpty: true,
-    };
 
     loadData() {
         this._content?.loadData();
@@ -228,7 +243,7 @@ export class SideBarCart extends LessPureComponent {
                     <Icon icon="X" stroke="white" width={16} height={16} />
                 </Button>
             </View>
-            <Cart ref={elm => this._content = elm} refreshable={true} />
+            <Cart ref={elm => this._content = elm} autoLoad={false} refreshable={true} />
         </>
     }
 }

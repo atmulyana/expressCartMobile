@@ -8,8 +8,9 @@
 import React from 'react';
 import AccountBar from './AccountBar';
 import CheckoutBar from './CheckoutBar';
-import LoginhBar from '../components/LoginBar';
-import SearchBar from '../components/SearchBar';
+import LessPureComponent from './LessPureComponent';
+import LoginhBar from './LoginBar';
+import SearchBar from './SearchBar';
 
 const headerBars = {
     account: AccountBar,
@@ -18,7 +19,10 @@ const headerBars = {
     search: SearchBar,
 };
 
-export default props => {
-    const Bar = headerBars[props.name];
-    return Bar ? <Bar {...props} /> : null;
+export default class extends LessPureComponent {
+    render() {
+        const props = this.props;
+        const Bar = headerBars[props.name];
+        return Bar ? <Bar {...props} /> : null;
+    }
 }

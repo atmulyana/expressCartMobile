@@ -9,11 +9,18 @@ import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import LessPureComponent from './LessPureComponent';
 import Icon from './Icon';
-import {appHelpers, noop} from '../common';
+import {appHelpers} from '../common';
 import styles from '../styles';
 
 //This variable will be shared among instances of CartButton so that the new instance will get the recent cartCount
 let m_cartCount = 0;
+
+const m_buttons = [];
+
+appHelpers.setCartCount = cartCount => {
+    m_cartCount = cartCount;
+    for (let btn of m_buttons) btn.setState({cartCount});
+}
 
 export default class CartButton extends LessPureComponent {
     state = {
@@ -22,15 +29,13 @@ export default class CartButton extends LessPureComponent {
 
     componentDidMount() {
         super.componentDidMount();
-        appHelpers.setCartCount = cartCount => {
-            m_cartCount = cartCount;
-            this.setState({cartCount});
-        }
+        m_buttons.push(this);
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        appHelpers.setCartCount = noop;
+        const idx = m_buttons.indexOf(this);
+        if (idx > -1) m_buttons.splice(idx, 1); 
     }
 
     render() {

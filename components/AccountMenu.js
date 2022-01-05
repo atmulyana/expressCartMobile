@@ -30,7 +30,7 @@ import LessPureComponent from './LessPureComponent';
 export default class AccountMenu extends LessPureComponent {
     render = () => appHelpers.isLoggedIn
         ? (
-            <Menu renderer={Popover}>
+            <Menu renderer={Popover} rendererProps={{placement: 'bottom'}}>
                 <MenuTrigger>
                     <View {...this.props} style={[this.props.style, {flexDirection:'row'}]}>
                         <Icon icon="User" />

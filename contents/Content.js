@@ -13,23 +13,31 @@ import {
     StyleSheet,
     View,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import {customerLogin, home, getRouteByUrl} from './routes';
 import {contentCentered, p8 as scrollContentStyle, scrollView as scrollViewStyle} from '../styles';
 import {appHelpers, lang} from '../common';
 import {Partial} from '../components';
 
-function LoadingData({ url, loader, refresher, submitter, aborter }) {
+function ContentInit({ url, loader, refresher, submitter, nav }) {
+    if (!nav) return null;
+
     useFocusEffect(
         React.useCallback(
             () => {
                 appHelpers.refreshContent = refresher;
                 appHelpers.submitData = submitter;
-                loader();
-                return aborter;
+                appHelpers.contentCanGoBack = nav.canGoBack();
+                appHelpers.setHeaderBar(appHelpers.currentRoute?.params?.headerBar);
             }, 
-            [url]
+            []
         )
+    )
+    React.useEffect(
+        () => {
+            loader();
+        },
+        [url]
     );
     
     return null;
@@ -103,15 +111,7 @@ export default class Content extends Partial {
             }
         );
 
-        return (<>
-            {this.props.navigation &&
-                <LoadingData
-                    url={this.props?.route?.params?.url}
-                    loader={this.loadData}
-                    refresher={this.refreshData.bind(this)}
-                    submitter={this.submitData.bind(this)}
-                />}
-    
+        return <>
             {this.state.isStarting
                 /*On iOS, RefreshControl can only be shown by 'pull-down' gesture. Only setting 'refreshing' to 'true' doesn't have effect.
                 *Therefore, we need to use ActivityIndicator to show loading process when the content is first loaded.
@@ -126,7 +126,17 @@ export default class Content extends Partial {
             }
             
             {submittingIndicator}
-        </>);
+        </>;
+    }
+
+    _renderInits() {
+        return <ContentInit
+            url={this.props?.route?.params?.url}
+            loader={this.loadData}
+            refresher={this.refreshData.bind(this)}
+            submitter={this.submitData.bind(this)}
+            nav={this.props?.navigation}
+        />;
     }
     
     #setTitle = () => {
