@@ -35,8 +35,6 @@ export default class Validation extends LessPureComponent {
         layout: null,
     }
 
-    #currentLang;
-
     getErrorMessage() {
         let {input, rule, value} = this.props;
         input = input();
@@ -72,17 +70,11 @@ export default class Validation extends LessPureComponent {
         typeof(input?.setErrorStyle) == 'function' && input.setErrorStyle(null);
     }
 
-    componentDidMount() {
-        super.componentDidMount();
-        this.#currentLang = this.state.lang;
-    }
-
-    componentDidUpdate() {
-        if (this.state.lang != this.#currentLang //languange has just changed
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.lang != prevState.lang //languange has just changed
             && this.state.error //the input is invalid at the moment
         ) {
             //updates the language of error message
-            this.#currentLang = this.state.lang;
             let error = this.getErrorMessage();
             this.setState({error});
         }

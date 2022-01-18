@@ -100,8 +100,11 @@ export class CartContent extends ListPartial {
             this.setState(state => ({refreshFlag: state.refreshFlag ^ -1}));
             for (let cart of cartContents) {
                 if (cart != this) {
-                    Object.assign(cart.data, data);
-                    cart.setState(state => ({refreshFlag: state.refreshFlag ^ -1}));
+                    if (cart.data) {
+                        Object.assign(cart.data, data);
+                        cart.setState(state => ({refreshFlag: state.refreshFlag ^ -1}));
+                    }
+                    else cart.refresh();
                 }
             }
         });

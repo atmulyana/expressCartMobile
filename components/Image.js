@@ -77,7 +77,7 @@ class ImageWraper extends LessPureComponent {
             this.setState({newStyle});
         }
         else if (typeof(source) == 'object' && source.uri) { //For remote image, usually one of width or height of space hasn't been known (zero)
-            //If it so then calculate the unknown measure
+            //If it's so then calculate the unknown measure
             Image.getSize(source.uri,
                 (actualWidth, actualHeight) => {
                     updateDim({width: actualWidth, height: actualHeight});
@@ -119,7 +119,7 @@ export default class AppImage extends LessPureComponent {
         const source = this.props.uri ? {uri: serverUrl(this.props.uri)} : imagePlaceholder;
 
         return <View style={style.view /** width/height may include border and/or padding */}>
-            <View style={styles.required /** has no border and padding (it will have the true dimension fro the Image) */}
+            <View style={styles.required /** has no border and padding (it will have the true dimension of the Image) */}
                 onLayout={ev => {
                     let coverDim = ev.nativeEvent.layout;
                     image.updateDimension(coverDim.width, coverDim.height);

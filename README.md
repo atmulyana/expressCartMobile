@@ -36,7 +36,7 @@ It's a mobile app for shopping cart which is developed using React Native.
 
 3. Download/clone this project.
 
-4. Edit common.js file in this project. Find the line
+4. Edit `server.js` file at the root of this project. Find the line
 
         const SERVER = 'http://192.168.56.1:1111';
    
