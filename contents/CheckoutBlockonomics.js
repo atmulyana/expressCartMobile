@@ -142,7 +142,7 @@ class PaymentPanel extends LessPureComponent {
               state = this.state;
         return <>
                 {paymentMessage && <Text center red para4>{paymentMessage}</Text>}
-                <Text large bold para4>{lang('lockonomics payment details')}</Text>
+                <Text large bold para4>{lang('Blockonomics payment details')}</Text>
                 
                 <Box style={rowBoxStyle}>
                     <Text style={{flex:1}}>{session.customerFirstname} {session.customerLastname} - {session.customerEmail}</Text>

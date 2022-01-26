@@ -21,7 +21,7 @@ SQLite.enablePromise(true);
 /*** Realm module makes this app dies on emulator. Memory problem??? You may try on bigger memory or on the real smartphone
 //=========================================================================================================================
 import Realm from 'realm';
-require('./setNativeEventListeners')('RNFSManager'); //'require' must be ended by ';' if not an error happens
+require('../setNativeEventListeners')('RNFSManager'); //'require' must be ended by ';' if not an error happens
 //must be using 'require', not 'import', to make the above line works
 const fs = require('react-native-fs');
 
