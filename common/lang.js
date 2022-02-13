@@ -60,7 +60,7 @@ class Lang extends Function {
     }
 
     async set(newLangCode) {
-        let langCode = keyLangCode; //default
+        let langCode;
         if (languages[newLangCode]) { //The user really chooses a language from the language menu
             langCode = newLangCode;
             await EncryptedStorage.setItem("lang", langCode); //save the user preference
@@ -96,6 +96,7 @@ class Lang extends Function {
         ***/
         
         let db;
+        if (!langCode) langCode = keyLangCode; //default
         try {
             db = await SQLite.openDatabase({name: "data.sqlite", createFromLocation: "~data.sqlite", readOnly: true});
             const [rs] = await db.executeSql(`SELECT ${keyLangCode} AS key, ${langCode} AS value FROM locales`);

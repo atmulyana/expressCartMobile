@@ -8,7 +8,7 @@
 import numeral from 'numeral';
 import moment from 'moment';
 
-export const formatAmount = amt => amt ? numeral(amt).format('0.00') : '0.00';
+export const formatAmount = amt => amt ? numeral(amt).format('0,000.00') : '0.00';
 export const currencySymbol = symbol => symbol || '$';
 export const formatDate = (date, format) => moment(date).format(format);
 export const timeAgo = date => moment(date).fromNow();
