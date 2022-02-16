@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 import React from 'react';
-import {StyleSheet, TouchableOpacity} from 'react-native';
+import {Pressable, StyleSheet} from 'react-native';
 import LessPureComponent from './LessPureComponent';
 import {appHelpers} from '../common';
 import routes from '../contents/routes';
@@ -22,9 +22,9 @@ export default class ContentLink extends LessPureComponent {
             const onClick = props.onPress;
             let url = route.url;
             if (typeof(url) == 'function') url = url();
-            props.onPress = () => {
+            props.onPress = ev => {
                 let proceed = true;
-                if (typeof(onClick) == 'function') proceed = onClick();
+                if (typeof(onClick) == 'function') proceed = onClick(ev);
                 if (proceed !== false) {
                     if (route == routes.home) {
                         if (!appHelpers.isAtHome()) appHelpers.goHome();
@@ -35,9 +35,9 @@ export default class ContentLink extends LessPureComponent {
             }
         }
         
-        return <TouchableOpacity {...props} style={[defaultStyle, style]}>
+        return <Pressable {...props} style={[defaultStyle, style]}>
             {this.props.children}
-        </TouchableOpacity>;
+        </Pressable>;
     }
 }
 

@@ -57,6 +57,7 @@ export default class Paypal extends PaymentComponent {
             <Text para4>{paymentConfig.paypal.description}</Text>
             <Button
                 style={[styles.buttonOutlineSuccess, {alignSelf:'flex-start'}]}
+                pressedStyle={styles.buttonOutlineSuccessPressed}
                 title={lang('Pay with PayPal')}
                 onPress={() => this.setState({isLoading: true, paypalVisible: true})}
             />

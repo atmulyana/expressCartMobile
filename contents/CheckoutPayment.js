@@ -59,6 +59,7 @@ class PaymentPanel extends Partial {
                         style={{flex:1, borderRightWidth:0, borderTopRightRadius:0, borderBottomRightRadius:0}}
                         validation={required} />
                     <Button style={[styles.buttonOutlineSuccess, {alignSelf: 'stretch', flex:0, borderRadius:0, borderRightWidth:0}]}
+                        pressedStyle={styles.buttonOutlineSuccessPressed}
                         title={lang('Apply')}
                         onPress={() => {
                             if (!discountInput.validator?.validate()) return;
@@ -66,10 +67,10 @@ class PaymentPanel extends Partial {
                                 .then(data => {
                                     Notification.success(data.message);
                                     appHelpers.refreshContent();
-                                })
-                                .catch(Notification.errorHandler);
+                                });
                         }} />
                     <Button style={[styles.buttonOutlineDanger, {alignSelf: 'stretch', flex:0, borderTopLeftRadius:0, borderBottomLeftRadius:0}]}
+                        pressedStyle={styles.buttonOutlineDangerPressed}
                         onPress={() => {
                             discountInput.validator?.clearValidation();
                             this.submitData('/checkout/removediscountcode')
@@ -77,12 +78,11 @@ class PaymentPanel extends Partial {
                                     //this.setState({discountCode:''})
                                     Notification.success(data.message);
                                     appHelpers.refreshContent();
-                                })
-                                .catch(Notification.errorHandler);
+                                });
                         }}
-                    >
-                        <Icon icon="X" stroke={styles.buttonOutlineDanger.color} height={styles.text.lineHeight} width={styles.text.lineHeight} />
-                    </Button>
+                    >{style =>
+                        <Icon icon="X" stroke={style.color} height={styles.text.lineHeight} width={styles.text.lineHeight} />
+                    }</Button>
                 </View>
                 }
 

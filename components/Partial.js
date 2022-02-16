@@ -46,8 +46,8 @@ export default class Partial extends LessPureComponent {
 
         const showResponseMessage = data => {
             if (/*data?.responseRedirected &&*/ data?.message && data?.messageType) {
-                if (data?.messageType == 'danger') Notification.error(data.message);
-                else if (data?.messageType == 'waning') Notification.warning(data.message);
+                if (data.messageType == 'danger') Notification.error(data.message);
+                else if (data.messageType == 'waning') Notification.warning(data.message);
                 else Notification.success(data.message);
             }
             return data;
@@ -89,7 +89,7 @@ export default class Partial extends LessPureComponent {
                     if (!silent) this.setState({isLoading:false, isStarting:false})
                 })
                 .then(data => (url && !this.contentData) /*If really just got response from server then*/ && showResponseMessage(data)
-                                                                                                          || data
+                              || data
                 );
         };
 
@@ -125,7 +125,7 @@ export default class Partial extends LessPureComponent {
                     })
                     .catch(err => {
                         Notification.errorHandler(err);
-                        if (typeof(err) != 'object' || !err?.handled || err?.handled && rejectIfHandled) {
+                        if (err !== undefined && typeof(err) != 'object' || !err?.handled || err?.handled && rejectIfHandled) {
                             if (!rejectIfHandled) console.log('submitData err: ', err)
                             reject(err);
                         }

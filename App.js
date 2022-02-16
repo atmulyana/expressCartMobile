@@ -80,6 +80,7 @@ export default function() {
         state = {
             cartTitle: 'Online Shop',
             headerBar: 'search',
+            headerBarFlag: 0,
         };
 
         constructor(props) {
@@ -120,7 +121,7 @@ export default function() {
                     let params = {headerBar, data};
                     if (url) params.url = url;
                     navigation.dispatch(StackActions[isReplace ? 'replace' : 'push'](name, params));
-                    this.setHeaderBar(headerBar);
+                    //this.setHeaderBar(headerBar); //called by `FocusEffect` handler in `Content` 
                 }
             }
         }
@@ -134,7 +135,10 @@ export default function() {
         }
 
         goto(route) {
-            navigation.navigate(route.name, {url: route.url ?? route.$url});
+            navigation.navigate(route.name, {
+                url: route.url ?? route.$url,
+                headerBar: routes.headerBar,
+            });
         }
 
         goHome() {
@@ -143,7 +147,10 @@ export default function() {
         }
 
         setHeaderBar(headerBar = routes.home.headerBar) {
-            this.setState({headerBar});
+            this.setState(state => ({
+                headerBar,
+                headerBarFlag: state.headerBarFlag ^ -1, //force update because `headerBar` may be the same as before
+            }));
         }
 
         openCart() {
@@ -242,7 +249,7 @@ export default function() {
             return (
                 <>
                     <BackHandlerHook canGoBack={() => this.props.navigation?.canGoBack() || appHelpers.contentCanGoBack} />
-                    <HeaderBar name={this.state.headerBar} />
+                    <HeaderBar name={this.state.headerBar} flag={this.state.headerBarFlag} />
                     
                     <Stack.Navigator initialRouteName={Contents.default} screenOptions={{
                         animationEnabled: Platform.OS == 'android', //On iOS, animation keeps issueing warning log

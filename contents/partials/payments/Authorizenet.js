@@ -40,7 +40,8 @@ export default class Authorizenet extends PaymentComponent {
                     return ccErrMessage;
                 })}
             />
-            <Button style={[styles.buttonOutlineSuccess, {alignSelf:'flex-start'}]} title={lang('Process Payment')}
+            <Button style={[styles.buttonOutlineSuccess, {alignSelf:'flex-start'}]} pressedStyle={styles.buttonOutlineSuccessPressed}
+                title={lang('Process Payment')}
                 onPress={() => {
                     ccErrMessage = null;
                     if (!ccValidator?.validate()) return;

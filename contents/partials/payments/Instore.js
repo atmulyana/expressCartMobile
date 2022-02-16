@@ -19,6 +19,7 @@
             <Text para4>{paymentConfig.instore.description}</Text>
             <Button
                 style={[styles.buttonOutlineSuccess, {alignSelf:'flex-start'}]}
+                pressedStyle={styles.buttonOutlineSuccessPressed}
                 title={paymentConfig.instore.buttonText}
                 onPress={() => {
                     pageSubmit('/instore/checkout_action')

@@ -175,6 +175,7 @@ class MockURL extends URL {
         if (this.#username) {
             parts.push(this.#username);
             if (this.#password) parts.push(':', this.#password);
+            parts.push('@');
         }
         parts.push(this.#host, this.#pathname, this.search, this.#hash);
         return parts.join('');

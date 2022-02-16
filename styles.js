@@ -57,10 +57,18 @@ StyleSheet.create({
         borderColor: red,
         color: red,
     },
+    buttonOutlineDangerPressed: {
+        backgroundColor: red,
+        color: 'white',
+    },
     buttonOutlineSuccess: {
         backgroundColor: 'transparent',
         borderColor: green,
         color: green,
+    },
+    buttonOutlineSuccessPressed: {
+        backgroundColor: green,
+        color: 'white',
     },
     buttonOutlinePrimary: {
         alignSelf:'stretch',

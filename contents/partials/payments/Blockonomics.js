@@ -18,6 +18,7 @@
             <Text para4>{paymentConfig.blockonomics.description}</Text>
             <Button
                 style={[styles.buttonOutlineSuccess, {alignSelf:'flex-start'}]}
+                pressedStyle={styles.buttonOutlineSuccessPressed}
                 title={lang('Pay with Bitcoin')}
                 onPress={() => {
                     pageSubmit('/blockonomics/checkout_action')

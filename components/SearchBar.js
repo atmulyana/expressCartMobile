@@ -20,9 +20,23 @@ import MainMenu from './MainMenu';
 import SearchText from './SearchText';
 
 
+function getSearchTextFromUrl() {
+    const url = appHelpers.currentRoute?.params?.url ?? '',
+          prefix = '/search/';
+    if (url.startsWith(prefix)) {
+        return decodeURIComponent( url.substring(prefix.length).replace(/\+/g, ' ') );
+    }
+    return '';
+}
+
 export default class SearchBar extends LessPureComponent {
     state = {
-        searchText: this.props.searchText ?? '',
+        searchText: '',
+    }
+
+    constructor(props) {
+        super(props);
+        this.state.searchText = getSearchTextFromUrl();
     }
 
     get searchText() {
@@ -31,6 +45,11 @@ export default class SearchBar extends LessPureComponent {
 
     set searchText(value) {
         this.setState({searchText: value});
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (this.props.flag != nextProps.flag) nextState.searchText = getSearchTextFromUrl();
+        return super.shouldComponentUpdate(nextProps, nextState);
     }
 
     render() {

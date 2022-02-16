@@ -182,7 +182,6 @@ export default class Content extends Partial {
         }
         if (data && this.#handleRedirection(data) === false) return false;
         if (!silent) {
-            appHelpers.setHeaderBar(this.props.route?.params?.headerBar);  
             this.#setTitle();
         }
     }
@@ -202,5 +201,11 @@ export default class Content extends Partial {
                 contentContainerStyle: scrollContentStyle,
             }
         };
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.lang != prevState.lang) { //languange has just changed
+            this.#setTitle(); //some titles are language-aware
+        }
     }
 }
