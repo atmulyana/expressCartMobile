@@ -115,7 +115,7 @@ export default class extends LessPureComponent {
          ** `valid` property is issued by `Form` component as the result of input validation */
         if (!err || !err.data || err.valid === false || err.handled) return;
         if (err.status == 400) {
-            if (typeof(err.data) == 'object' && (err.data?.message || err.data?.error || err.data?.err)) {
+            if (typeof(err.data) == 'object' && typeof(err.data?.message || err.data?.error || err.data?.err) == 'string') {
                 err.handled = true;
                 this.error(err.data.message || err.data.error || err.data.err);
             }

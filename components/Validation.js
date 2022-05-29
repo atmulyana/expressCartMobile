@@ -9,8 +9,8 @@ import React from 'react';
 import {
     StyleSheet,
     View,
-    ViewPropTypes,
 } from 'react-native';
+import {ViewPropTypes} from 'deprecated-react-native-prop-types';
 import PropTypes from 'prop-types';
 import LessPureComponent from './LessPureComponent';
 import Text from './Text';

@@ -10,6 +10,7 @@ import noop from './noop';
 
 const appHelpers = {
     contentCanGoBack: false,
+    contentFlag: -1 >>> 1,
     doLogout: () => {
         callServer('/customer/logout', {})
         .then(() => {
@@ -22,6 +23,5 @@ const appHelpers = {
     refreshContent: noop,
     setCartCount: noop,
     setMenu: noop,
-    winInsets: {left: 0, right: 0}
 };
 export default appHelpers;

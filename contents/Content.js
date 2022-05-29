@@ -19,7 +19,7 @@ import {contentCentered, p8 as scrollContentStyle, scrollView as scrollViewStyle
 import {appHelpers, lang} from '../common';
 import {Partial} from '../components';
 
-function ContentInit({ url, loader, refresher, submitter, nav }) {
+function ContentInit({ url, loader, refresher, submitter, refreshNoLoadData, nav }) {
     if (!nav) return null;
 
     useFocusEffect(
@@ -29,6 +29,7 @@ function ContentInit({ url, loader, refresher, submitter, nav }) {
                 appHelpers.submitData = submitter;
                 appHelpers.contentCanGoBack = nav.canGoBack();
                 appHelpers.setHeaderBar(appHelpers.currentRoute?.params?.headerBar);
+                refreshNoLoadData();
             }, 
             []
         )
@@ -130,11 +131,18 @@ export default class Content extends Partial {
     }
 
     _renderInits() {
+        let contentFlag = appHelpers.contentFlag;
         return <ContentInit
             url={this.props?.route?.params?.url}
             loader={this.loadData}
             refresher={this.refreshData.bind(this)}
             submitter={this.submitData.bind(this)}
+            refreshNoLoadData={() => {
+                if (contentFlag != appHelpers.contentFlag) {
+                    contentFlag = appHelpers.contentFlag;
+                    this.forceUpdate();
+                }
+            }}
             nav={this.props?.navigation}
         />;
     }

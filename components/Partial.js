@@ -9,9 +9,9 @@ import React from 'react';
 import {
     ActivityIndicator,
     StyleSheet,
-    View,
-    ViewPropTypes,
+    View
 } from 'react-native';
+import {ViewPropTypes} from 'deprecated-react-native-prop-types';
 import PropTypes from 'prop-types';
 import Notification from './Notification';
 import LessPureComponent from './LessPureComponent';
@@ -49,6 +49,7 @@ export default class Partial extends LessPureComponent {
                 if (data.messageType == 'danger') Notification.error(data.message);
                 else if (data.messageType == 'waning') Notification.warning(data.message);
                 else Notification.success(data.message);
+                data.message = null; //prevent showing a message more than once
             }
             return data;
         };
@@ -88,9 +89,7 @@ export default class Partial extends LessPureComponent {
                 .finally(() => {
                     if (!silent) this.setState({isLoading:false, isStarting:false})
                 })
-                .then(data => (url && !this.contentData) /*If really just got response from server then*/ && showResponseMessage(data)
-                              || data
-                );
+                .then(showResponseMessage);
         };
 
         this.loadData = silent =>

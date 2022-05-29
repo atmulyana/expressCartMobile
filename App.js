@@ -9,7 +9,6 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import {
     BackHandler,
-    Dimensions,
     Image,
     //LogBox,
     Platform,
@@ -29,7 +28,7 @@ const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
 import styles from './styles';
-import { appHelpers, lang, noop } from './common';
+import {addDimensionChangeListener, appHelpers, lang, noop, setWinInsets } from './common';
 //import lang from './lang';
 
 import * as Contents from './contents';
@@ -39,12 +38,21 @@ import {HeaderBar, Notification} from './components';
 
 const routeNames = Object.keys(Contents).filter(name => name != 'default');
 
+const _logError = console.error.bind(console);
+const _logWarning = console.warn.bind(console);
+
 /*** We do really need VirtualizedList (FlatList) inside ScrollView */
 //LogBox.ignoreLogs(['VirtualizedLists should never be nested']); //NOT working
-const _logError = console.error.bind(console);
 console.error = (message, ...optinalParams) => {
     if (typeof(message) == 'string' && message.startsWith('VirtualizedLists should never be nested')) return; 
     _logError(message, ...optinalParams);
+};
+
+/*** Some packages still use ViewPropTypes that is deprecated in latest react-native */
+//LogBox.ignoreLogs('ViewPropTypes');
+console.warn = (message, ...optinalParams) => {
+    if (typeof(message) == 'string' && message.startsWith('ViewPropTypes')) return; 
+    _logWarning(message, ...optinalParams);
 };
 
 function BackHandlerHook({canGoBack}) {
@@ -115,7 +123,7 @@ export default function() {
                 var {name, url, headerBar, data} = name;
 
             if (navigation) {
-                if (this.isOnRoute({name, url, headerBar}))
+                if (this.isOnRoute({name, url, headerBar}) && !data)
                     appHelpers.refreshContent();
                 else {
                     let params = {headerBar, data};
@@ -165,6 +173,10 @@ export default function() {
         forceUpdateContent() {
             //appHelpers.refreshContent();
             navigation?.setParams({timestamp: new Date().getTime()}); //to refresh content without reloading data (timestamp param is not used)
+            
+            let flag = appHelpers.contentFlag;
+            if (flag == 0) appHelpers.contentFlag = -1 >>> 1;
+            else appHelpers.contentFlag = --flag;
         }
 
         setLang(code) {
@@ -224,7 +236,7 @@ export default function() {
             this.setLang();
             lang.addChangeListeners(this.onLangChange);
             
-            this.#removeDimensionListener = Dimensions.addEventListener('change', //specially for rotating event. Some contents need to reposition/resize because they depend to window width
+            this.#removeDimensionListener = addDimensionChangeListener( //specially for rotating event. Some contents need to reposition/resize because they depend to window width
                 () => {
                     //use setTimeout to give time for SafeAreaInsetsContext to update all four side insets
                     if (this.#refreshTimer !== null) clearTimeout(this.#refreshTimer);
@@ -285,7 +297,7 @@ export default function() {
 
     return <SafeAreaProvider><SafeAreaInsetsContext.Consumer>
     {insets => {
-        appHelpers.winInsets = insets;
+        setWinInsets(insets);
         return <View
             style={{
                 flex: 1,

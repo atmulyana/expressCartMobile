@@ -6,14 +6,22 @@
  * @flow strict-local
  */
 import {Dimensions} from 'react-native';
-import appHelpers from "./appHelpers";
 
+let winInsets = {left: 0, right: 0};
 export const contentPadding = 8;
+
+export const setWinInsets = newInsets => winInsets = newInsets;
+
 export const contentWidth = () => {
-    const {winInsets} = appHelpers;
     return Dimensions.get('window').width - 2 * contentPadding - winInsets.left - winInsets.right;
 };
+
 export const correctWidth = width => {
     const maxWidth = contentWidth();
     return width > maxWidth ? maxWidth : width;
 }
+
+export const addChangeListener = handler => {
+    const listener = Dimensions.addEventListener('change', handler);
+    return () => listener.remove();
+};

@@ -31,8 +31,7 @@ It's a mobile app for shopping cart which is developed using React Native.
    Change the value of `maxAge` to `null`.
 
 2. You should have set up the React Native development environment as described [here](https://reactnative.dev/docs/environment-setup).
-   Follow "React Native CLI Quickstart".   
-   NOTE for android: I use jdk14 to run this project. I found error when tried to use jdk17 (the last version at that time).
+   Follow "React Native CLI Quickstart".
 
 3. Download/clone this project.
 

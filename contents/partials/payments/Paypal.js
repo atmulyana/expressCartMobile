@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import {Alert, Modal} from 'react-native';
+import {SafeAreaInsetsContext, SafeAreaProvider} from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import PaymentComponent from './PaymentComponent';
 import routes from '../../routes';
@@ -51,7 +52,6 @@ export default class Paypal extends PaymentComponent {
 
     render() {
         const {config, paymentConfig} = this.props;
-        const {winInsets: insets} = appHelpers;
         const rootUrl = serverUrl('');
         return <>
             <Text para4>{paymentConfig.paypal.description}</Text>
@@ -65,7 +65,7 @@ export default class Paypal extends PaymentComponent {
                 onDismiss={() => this.setState({inProcess: false})}
                 onShow={() => this.setState({inProcess: true})}
                 visible={this.state.paypalVisible}
-            >
+            ><SafeAreaProvider><SafeAreaInsetsContext.Consumer>{insets => <>
                 <WebView
                     cacheMode="LOAD_NO_CACHE"
                     onNavigationStateChange={(navState) => {
@@ -105,7 +105,7 @@ export default class Paypal extends PaymentComponent {
                         this._paymentStatus(PaymenStatus.Cancelled);
                     }}
                 />
-            </Modal>
+            </>}</SafeAreaInsetsContext.Consumer></SafeAreaProvider></Modal>
         </>;
     }
 }
