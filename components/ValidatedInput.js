@@ -5,32 +5,53 @@
  * @format
  * @flow strict-local
  */
+import React from 'react';
+import {setStatusStyleDefault, withValidation} from 'react-native-form-input-validator';
+import {ValidationRule} from 'react-native-form-input-validator/rules';
+import {lang, proxyClass} from '../common';
 import LessPureComponent from './LessPureComponent';
 
 export default class ValidatedInput extends LessPureComponent {
-    state = {
-        errorStyle: null,
+    static createProxy() {
+        return proxyClass(this, target => target.inputRef);
     };
 
-    get validator() {
-        return typeof(this.props.validator) == 'function' && this.props.validator() || null;
-    }
+    static defaultCreateOption = rules => ({
+        lang,
+        rules,
+        setStatusStyle: setStatusStyleDefault,
+    });
 
-    setErrorStyle(errorStyle) {
-        this.setState({errorStyle});
-    }
-
-    setValidationHandler(changeEventName, props) {
-        props = props ?? {...this.props};
-        let eventHandler = props[changeEventName];
-        if (typeof(props.validator) == 'function') {
-            props[changeEventName] = ev => {
-                if (this.state.errorStyle != null) {
-                    props.validator()?.clearValidation(); //dont worry about the validity of input value because it should be re-validated when re-submitted
-                }
-                eventHandler && eventHandler(ev);
-            };
+    constructor(props, InputComponent, createOption = ValidatedInput.defaultCreateOption) {
+        super(props)
+        if (InputComponent) {
+            const {validation} = this.props;
+            if (Array.isArray(validation) || (validation instanceof ValidationRule)) {
+                this.#element = withValidation(InputComponent, createOption(validation));
+            }
+            else {
+                this.#element = InputComponent;
+            }
         }
-        return props;
+    }
+
+    #element;
+    #inputRef = React.createRef();
+    get inputRef() {
+        return this.#inputRef.current;
+    }
+
+    inputElement(props) {
+        const Element = this.#element;
+        return <Element {...(props ?? this.props)} ref={this.#inputRef} />;
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (
+            this.state.lang != prevState.lang //languange has just changed
+            && typeof(this.inputRef?.validate) == 'function' //withValidation
+            && !this.inputRef.isValid //showing validation error message
+        )
+            this.inputRef.validate(); //refresh the message (change the language)
     }
 }

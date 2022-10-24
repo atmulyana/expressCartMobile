@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import {Animated, StyleSheet, Text, View} from 'react-native';
-//import {ViewPropTypes} from 'deprecated-react-native-prop-types';
+import {/*ViewPropTypes,*/ TextPropTypes} from 'deprecated-react-native-prop-types';
 import LessPureComponent from './LessPureComponent';
 import PropTypes from 'prop-types';
 
@@ -20,7 +20,7 @@ export default class LoadingMoreIndicator extends LessPureComponent {
         posAmp: PropTypes.number,
         bouncingTiming: PropTypes.number,
         seqDelay: PropTypes.number,
-        style: /*ViewPropTypes.style*/Text.propTypes.style,
+        style: /*ViewPropTypes.style*/TextPropTypes.style,
     };
 
     static defaultProps = {

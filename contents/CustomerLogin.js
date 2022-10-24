@@ -11,7 +11,7 @@ import Content from './Content';
 import routes from './routes';
 import {appHelpers, correctWidth, lang} from '../common';
 import styles from '../styles';
-import {email, required} from '../validations';
+import {email, required} from 'react-native-form-input-validator/rules';
 
 export default class CustomerLogin extends Content {
     static defaultParams = {

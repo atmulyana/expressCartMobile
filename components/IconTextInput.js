@@ -12,9 +12,11 @@ import {
     View,
 } from 'react-native';
 import PropTypes from 'prop-types';
-
+import {isDifferentStyle, withValidation} from 'react-native-form-input-validator';
+import {ValidationRule} from 'react-native-form-input-validator/rules';
 import ValidatedInput from './ValidatedInput';
-import {extractTextStyle, styleArrayToObject, isViewStyleProp} from '../styleProps';
+import {lang, shallowCompareExclude} from '../common';
+import {extractTextStyle, isViewStyleProp} from '../styleProps';
 import {textInput as textInputStyle} from '../styles';
 
 const defaultStyles = StyleSheet.create({
@@ -59,6 +61,17 @@ const iconStyleValidator = (propValue, key, componentName, location, propFullNam
     else if (!isViewStyleProp(key) && !iconProps[key])
         return new Error(`'${key}' is not valid property for ${propFullName} of ${componentName}`);
 };
+const getStyle = props => props.style.view;
+const setStatusStyle = (props, style) => {
+    const inputStyle = props.style.view;
+    if (style) {
+        props.style.view = [inputStyle, style];
+    }
+    else if (Array.isArray(inputStyle)) {
+        props.style.view = inputStyle[0];
+    }
+};
+const setStyle = (props, style) => props.style.view = style;
 
 export default class IconTextInput extends ValidatedInput {
     static propTypes = {
@@ -72,22 +85,18 @@ export default class IconTextInput extends ValidatedInput {
         ...TextInput.defaultProps,
     };
 
-    _txtInput = null;
-
-    blur() {
-        this._txtInput?.blur();
+    constructor(props) {
+        super(props, _TextInput, rules => ({
+            getStyle,
+            lang,
+            rules,
+            setStatusStyle,
+            setStyle,
+        }));
     }
 
-    clear() {
-        this._txtInput?.clear();
-    }
-
-    focus() {
-        this._txtInput?.focus();
-    }
-
-    isFocused() {
-        this._txtInput?.isFocused();
+    shouldComponentUpdate(nextProps, nextState) {
+        return shallowCompareExclude(this, nextProps, nextState, 'style', 'validation') || isDifferentStyle(this.props.style, nextProps.style);
     }
 
     getProps(props) {
@@ -106,15 +115,15 @@ export default class IconTextInput extends ValidatedInput {
     }
 
     render() {
-        const props = this.getProps(this.setValidationHandler('onChangeText'));
+        const props = this.getProps({...this.props});
         let {style = [], iconStyle = []} = props;
         delete props.style;
         delete props.iconStyle;
 
-        style = extractTextStyle([textInputStyle].concat(style).concat(this.state.errorStyle));
+        style = extractTextStyle([textInputStyle].concat(style));
         style.view = Object.assign(style.view, requiredStyles.container);
         
-        iconStyle =  styleArrayToObject([defaultStyles.iconContainer, iconStyle, requiredStyles.iconContainer]);
+        iconStyle =  StyleSheet.flatten([defaultStyles.iconContainer, iconStyle, requiredStyles.iconContainer]);
         
         const prefixIcon = this.renderPrefixIcon(iconStyle, style.text),
               suffixIcon = this.renderSuffixIcon(iconStyle, style.text);
@@ -125,18 +134,22 @@ export default class IconTextInput extends ValidatedInput {
         if (!iconStyle.width) delete iconStyle.width;
         delete iconStyle.height;
         
-        return <View style={style.view}>
-            {prefixIcon &&
-                <View style={iconStyle}>
-                    {prefixIcon}
-                </View>
-            }
-            <TextInput ref={inp => this._txtInput = inp} {...props} style={[style.text, requiredStyles.text]} />
-            {suffixIcon &&
-                <View style={iconStyle}>
-                    {suffixIcon}
-                </View>
-            }
-        </View>;
+        return this.inputElement({...props, iconStyle, prefixIcon, style, suffixIcon});
     }
 }
+
+const _TextInput = React.forwardRef(({iconStyle, prefixIcon, style, suffixIcon, ...props}, ref) => (
+    <View style={style.view}>
+        {prefixIcon &&
+            <View style={iconStyle}>
+                {prefixIcon}
+            </View>
+        }
+        <TextInput ref={ref} {...props} style={[style.text, requiredStyles.text]} />
+        {suffixIcon &&
+            <View style={iconStyle}>
+                {suffixIcon}
+            </View>
+        }
+    </View>
+));

@@ -35,7 +35,7 @@ const getDimension = (iconStyle, textStyle) => {
     return {height, width};
 };
 
-export default class SearchText extends IconTextInput {
+class SearchText extends IconTextInput {
     getIconContainerWidth(iconStyle, textStyle) {
         const dim = getDimension(iconStyle, textStyle);
         let width = typeof(dim.width) == 'number' ? dim.width :
@@ -53,3 +53,5 @@ export default class SearchText extends IconTextInput {
         return <Icon icon="Search" {...props} style={getDimension(iconStyle, textStyle)} />;
     }
 }
+
+export default SearchText.createProxy();

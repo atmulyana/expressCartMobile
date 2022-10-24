@@ -18,7 +18,8 @@ import {appHelpers, contentWidth, currencySymbol, formatAmount, lang} from '../c
 import styles from '../styles';
 
 const ProductItem = ({data, config, itemStyle, submit}) => {
-    const [variant, setVariant] = React.useState(config.showHomepageVariants && data.variants ? data.variants[0] : undefined);
+    const [variant, _setVariant] = React.useState(config.showHomepageVariants && data.variants ? data.variants[0] : undefined);
+    const setVariant = React.useCallback(variant => _setVariant(variant), []);
     const productRoute = routes.productInfo(data.productPermalink || data._id);
     return (
         <View style={itemStyle}>
@@ -37,13 +38,8 @@ const ProductItem = ({data, config, itemStyle, submit}) => {
                             }
                         ))}
                         value={variant}
-                        onValueChange={variant => setVariant(variant)}
-                        style={{
-                            inputIOS: styles.textGray,
-                            inputAndroid: styles.textGray,
-                            viewContainer: styles.para4,
-                            headlessAndroidContainer: styles.para4,
-                        }}
+                        onValueChange={setVariant}
+                        style={[styles.textGray, styles.para4]}
                       />
                     
                     : <Text style={[styles.para4, styles.productText, styles.textGray]}>
@@ -137,7 +133,7 @@ export default class ProductList extends ListContent {
             renderItem: ({item:row}) => {
                 return <View style={styles.productRow}>
                     {row.map((item, idx) => item != null
-                        ? <ProductItem {...{key:idx, data:item, config, itemStyle, submit: this.submitData}} />
+                        ? <ProductItem {...{key:item._id, data:item, config, itemStyle, submit: this.submitData}} />
                         : <View key={idx} style={[itemStyle, {backgroundColor:'transparent'}]} />
                     )}
                 </View>;

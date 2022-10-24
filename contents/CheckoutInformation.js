@@ -15,7 +15,7 @@ import Cart from './partials/Cart';
 import ShippingForm from './partials/ShippingForm';
 import {appHelpers, lang} from '../common';
 import styles from '../styles';
-import {email, required, rule, strlen} from '../validations';
+import {email, required, strlen} from 'react-native-form-input-validator/rules';
 
 
 class LoginForm extends LessPureComponent {
@@ -32,7 +32,8 @@ class LoginForm extends LessPureComponent {
                 <TextInput placeholder={lang('Email address')} value={state.loginEmail}
                     onChangeText={loginEmail => this.setState({loginEmail})}
                     keyboardType="email-address" fixHeight para8 validation={[required, email, strlen(5)]} />
-                <TextInput placeholder={lang('Password')} value={state.loginPassword} onChangeText={loginPassword => this.setState({loginPassword})}
+                <TextInput placeholder={lang('Password')} value={state.loginPassword}
+                    onChangeText={loginPassword => this.setState({loginPassword})}
                     secureTextEntry={true} fixHeight para8 validation={required} />
                 <View style={[styles.para8, {flexDirection:'row', justifyContent:'space-between'}]}>
                     <Button title={lang('Forgotten')} onPress={() => appHelpers.loadContent(routes.forgotten)} />
@@ -81,15 +82,14 @@ export default class CheckoutInformation extends Content {
                         {!appHelpers.isLoggedIn && <>
                             <Text gray para4>{lang('Enter a password to create an account for next time')}</Text>
                             <View style={[styles.para8, {flexDirection:'row'}]}>
-                                <TextInput placeholder={lang('Password')} value={state.password} onChangeText={password => this.setState({password})}
-                                    secureTextEntry={true} style={{flex:1}} fixHeight ref={inp => refs.pwdInput = inp}
-                                    validation={rule(
-                                        () => {
-                                            if (state.createAccount) return !!state.password.trim();
-                                            return true;
-                                        },
-                                        lang('required')
-                                    )}
+                                <TextInput
+                                    ref={inp => refs.pwdInput = inp}
+                                    placeholder={lang('Password')}
+                                    value={state.password}
+                                    onChangeText={password => this.setState({password})}
+                                    secureTextEntry={true}
+                                    style={{flex:1}} fixHeight
+                                    validation={required.if(() => this.state.createAccount)}
                                 />
                                 <View style={[styles.ml4, {flex:1, flexDirection:'row'}]}>
                                     <CheckBox 
@@ -97,7 +97,7 @@ export default class CheckoutInformation extends Content {
                                         value={state.createAccount}
                                         onValueChange={createAccount => {
                                             this.setState({createAccount});
-                                            if (!createAccount) refs.pwdInput.validator.clearValidation();
+                                            if (!createAccount) refs.pwdInput.clearValidation();
                                         }}
                                         tintColors={{false:styles.box.borderColor}} tintColor={styles.box.borderColor}
                                         onCheckColor={styles.button.color} onFillColor={styles.button.backgroundColor}

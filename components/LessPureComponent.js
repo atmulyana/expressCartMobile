@@ -13,7 +13,7 @@ export default class LessPureComponent extends React.Component /*React.PureCompo
     state = {};
 
     static getDerivedStateFromProps(props, state) {
-        state = {...(state??{})}
+        state = {...state};
         state.lang = currentLanguage(); //To update all texts if the language changes
         state.isLoggedIn = appHelpers.isLoggedIn; //To update display if it has different view between the status when logged in/out
         return state;

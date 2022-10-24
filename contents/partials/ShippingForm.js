@@ -19,7 +19,7 @@ import {
 } from '../../components';
 import {lang} from '../../common';
 import styles from '../../styles';
-import {email, required, strlen} from '../../validations';
+import {email, required, strlen} from 'react-native-form-input-validator/rules';
 
 const initState = (props, state) => {
     var data = props?.data?.session ?? {};
@@ -91,14 +91,11 @@ export default class extends LessPureComponent {
             <TextInput placeholder={`${lang("Address 2")} (${lang("optional")})`} value={state.address2} onChangeText={address2 => this.setState({address2})}
                 fixHeight para8 />
             <ComboBox
-                placeholder={{value: '', label: lang('Select Country')}}
+                placeholder={lang('Select Country')}
                 items={(this.props.data?.countryList ?? []).map(countryName => ({value: countryName, label: countryName}))}
                 value={state.country}
                 onValueChange={country => this.setState({country})}
-                style={{
-                    viewContainer: styles.para8,
-                    headlessAndroidContainer: styles.para8,
-                }}
+                style={styles.para8}
                 validation={required}
             />
             <View style={[styles.para8, {flexDirection:'row'}]}>

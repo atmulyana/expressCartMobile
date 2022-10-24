@@ -58,7 +58,7 @@ class Database {
     }
 }
 
-jest.mock('react-native-sqlite-storage-x', () => ({
+jest.mock('@mendix/react-native-sqlite-storage', () => ({
     __esModule: true,
     default: {
         enablePromise,

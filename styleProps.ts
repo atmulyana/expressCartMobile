@@ -5,6 +5,7 @@
  * @format
  * @flow strict-local
  */
+import {StyleSheet} from 'react-native';
 
 const layoutStyle = {
     alignContent: true,
@@ -152,11 +153,9 @@ export const isViewStyleValidProp = propName =>
 export const isTextStyleValidProp = propName => isViewStyleValidProp(propName) || isTextStyleProp(propName);
 export const isImageStyleValidProp = propName => isViewStyleValidProp(propName) || isImageStyleProp(propName);
 
-export const styleArrayToObject = style => Array.isArray(style) ? Object.assign({}, ...style.flat(Infinity)) : style??{};
-
 export const extractTextStyle = (style, paddingForText = true, attrName='style') => {
     const textStyle = {}, viewStyle = {};
-    style = styleArrayToObject(style);
+    style = StyleSheet.flatten(style);
     for (let propName in style) {
         if (!isTextStyleValidProp(propName))
             throw `${propName} is not valid property for ${attrName}`;
@@ -172,7 +171,7 @@ export const extractTextStyle = (style, paddingForText = true, attrName='style')
 
 export const extractImageStyle = (style, attrName='style') => {
     const imageStyle = {}, viewStyle = {};
-    style = styleArrayToObject(style);
+    style = StyleSheet.flatten(style);
     for (let propName in style) {
         if (!isImageStyleValidProp(propName))
             throw `${propName} is not valid property for ${attrName}`;

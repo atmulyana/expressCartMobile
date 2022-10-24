@@ -7,14 +7,14 @@
  */
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Box, Button, Icon, Notification, Partial, Text, TextInput, TwoPane, ValidationContainer} from '../components';
+import {Box, Button, Icon, Notification, Partial, Text, TextInput, TwoPane} from '../components';
 import Content from './Content';
 import routes from './routes';
 import {CartContent} from './partials/Cart';
 import * as payments from './partials/payments';
 import {appHelpers, currencySymbol, formatAmount, lang} from '../common';
 import styles from '../styles';
-import {required} from '../validations';
+import {required} from 'react-native-form-input-validator/rules';
 
 const {rowBoxStyle} = StyleSheet.create({
     rowBoxStyle: {
@@ -36,7 +36,7 @@ class PaymentPanel extends Partial {
     render() {
         const {config, session} = this.data;
         let discountInput = null;
-        return <ValidationContainer>
+        return <>
                 {this.data.paymentMessage && <Text center red para4>{this.data.paymentMessage}</Text>}
                 <Text large bold para4>{lang('Customer details')}</Text>
                 
@@ -53,26 +53,34 @@ class PaymentPanel extends Partial {
                 </Box>
                 
                 {config.modules.loaded.discount &&
-                <View style={[styles.textInputHeight, {flexDirection:'row'}]}>
+                <View style={{flexDirection:'row'}}>
                     <TextInput ref={inp => discountInput = inp} placeholder={lang('Discount code')}
                         value={this.state.discountCode} onChangeText={discountCode => this.setState({discountCode})}
-                        style={{flex:1, borderRightWidth:0, borderTopRightRadius:0, borderBottomRightRadius:0}}
+                        fixHeight style={{flex: 1, alignSelf:'flex-start', borderRightWidth:0, borderTopRightRadius:0, borderBottomRightRadius:0}}
                         validation={required} />
-                    <Button style={[styles.buttonOutlineSuccess, {alignSelf: 'stretch', flex:0, borderRadius:0, borderRightWidth:0}]}
+                    <Button style={[
+                            styles.buttonOutlineSuccess,
+                            styles.textInputHeight,
+                            {flex:0, alignSelf:'flex-start', borderRadius:0, borderRightWidth:0}
+                        ]}
                         pressedStyle={styles.buttonOutlineSuccessPressed}
                         title={lang('Apply')}
                         onPress={() => {
-                            if (!discountInput.validator?.validate()) return;
+                            if (!discountInput.validate()) return;
                             this.submitData('/checkout/adddiscountcode', {discountCode: this.state.discountCode})
                                 .then(data => {
                                     Notification.success(data.message);
                                     appHelpers.refreshContent();
                                 });
                         }} />
-                    <Button style={[styles.buttonOutlineDanger, {alignSelf: 'stretch', flex:0, borderTopLeftRadius:0, borderBottomLeftRadius:0}]}
+                    <Button style={[
+                            styles.buttonOutlineDanger,
+                            styles.textInputHeight,
+                            {flex:0, alignSelf:'flex-start', borderTopLeftRadius:0, borderBottomLeftRadius:0}
+                        ]}
                         pressedStyle={styles.buttonOutlineDangerPressed}
                         onPress={() => {
-                            discountInput.validator?.clearValidation();
+                            discountInput.clearValidation();
                             this.submitData('/checkout/removediscountcode')
                                 .then(data => {
                                     //this.setState({discountCode:''})
@@ -98,7 +106,7 @@ class PaymentPanel extends Partial {
                         />
                     </Box>;
                 })}
-        </ValidationContainer>;
+        </>;
     }
 }
 

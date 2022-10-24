@@ -109,7 +109,7 @@ class OrderItem extends LessPureComponent {
                     <Separator />
                     <RowText label="State" value={data.orderState} />
                     <Separator />
-                    <RowText label="Postcode" value={data.orderPostcode} />
+                    <RowText label="Post code" value={data.orderPostcode} />
                     <Separator />
                     <RowText label="Phone number" value={data.orderPhoneNumber} />
                     <Separator />

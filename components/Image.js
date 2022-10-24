@@ -108,8 +108,9 @@ class ImageWraper extends LessPureComponent {
     }
 }
 
-//The purpose of using this class, we do need to set width and height of an Image but just follows the layout rule
-export default class AppImage extends LessPureComponent {
+//The purpose of using this class, we don't need to set width and height of an Image but just follows the layout rule
+export default class extends LessPureComponent {
+    static displayName = "App.Image";
     static propTypes = propTypes;
     static defaultProps = defaultProps;
     

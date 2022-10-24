@@ -39,12 +39,11 @@ sjcl.codec.bytes = {
         return out;
     },
 };
+import CreditCardPayment from './CreditCardPayment';
 import PaymentComponent from './PaymentComponent';
 import routes from '../../routes';
-import {Button, CreditCard, Notification, Text, Validation} from '../../../components';
+import {Notification} from '../../../components';
 import {appHelpers, lang} from '../../../common';
-import styles from '../../../styles';
-import {rule} from '../../../validations';
 
 const ENCRYPT_DATE_FORMATTER = new JsSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 const ENCRYPT_PREFIX = 'adyenjs_';
@@ -142,60 +141,42 @@ export default class Adyen extends PaymentComponent {
     // }
 
     render() {
-        const {paymentConfig, pageSubmit} = this.props;
-        let cc = null, ccValidator, ccErrMessage;
-        return <>
-            <Text para4>{paymentConfig.adyen.description}</Text>
-            {/* {typeof(this.state.holderNameVisible) == 'boolean' &&
-                <CreditCard ref={comp => cc = comp} showCardHolder={this.state.holderNameVisible} style={styles.para4} validator={() => ccValidator} />} */}
-            <CreditCard ref={comp => cc = comp} style={styles.para4} validator={() => ccValidator} />
-            <Validation ref={comp => ccValidator = comp}
-                input={() => cc}
-                rule={rule(() => {
-                    if (!cc?.isValid) return false;
-                    if (!ccErrMessage) return true;
-                    return ccErrMessage;
-                })}
-            />
-            <Button style={[styles.buttonOutlineSuccess, {alignSelf:'flex-start'}]} pressedStyle={styles.buttonOutlineSuccessPressed}
-                title={lang('Process Payment')}
-                onPress={() => {
-                    ccErrMessage = null;
-                    if (!ccValidator?.validate()) return;
-
-                    let rsa;
-                    try {
-                        rsa = Encryption.createRsa(paymentConfig.adyen.clientKey);
-                    }
-                    catch {
-                        Notification.error(lang('Wrong public key'));
-                        return;
-                    }
-                    
-                    const ccData = cc.value;
-                    const payment = {
-                        type: 'scheme',
-                        [EncryptedFields.number]: new Encryption(rsa, {number: ccData.number}).encrypt(),
-                        [EncryptedFields.expiryMonth]: new Encryption(rsa, {expiryMonth: ccData.expired.month}).encrypt(),
-                        [EncryptedFields.expiryYear]: new Encryption(rsa, {
-                            expiryYear: ccData.expired.year < 100 ? ccData.expired.year + 2000 : ccData.expired.year
-                        }).encrypt(),
-                        [EncryptedFields.cvc]: new Encryption(rsa, {expiryYear: ccData.cvc}).encrypt(),
-                    };
-                    
-                    pageSubmit(
-                        `/adyen/checkout_action`, 
-                        {payment: JSON.stringify(payment)},
-                    )
-                    .then(data => {
-                        appHelpers.replaceContent(routes.payment(data.paymentId));
-                    })
-                    .catch(err => {
-                        Notification.error(lang('Failed to complete transaction'));
-                        err.handled = true;
-                    });
-                }}
-            />
-        </>;
+        return <CreditCardPayment {...this.props}
+            ccProps={{showCardHolder: typeof(this.state.holderNameVisible) == 'boolean' && this.state.holderNameVisible}}
+            onSubmit={({cc, pageSubmit, paymentConfig}) => {
+                let rsa;
+                try {
+                    rsa = Encryption.createRsa(paymentConfig.clientKey);
+                }
+                catch {
+                    Notification.error(lang('Wrong public key'));
+                    return;
+                }
+                
+                const ccData = cc.input.value;
+                const payment = {
+                    type: 'scheme',
+                    [EncryptedFields.number]: new Encryption(rsa, {number: ccData.number}).encrypt(),
+                    [EncryptedFields.expiryMonth]: new Encryption(rsa, {expiryMonth: ccData.expired.month}).encrypt(),
+                    [EncryptedFields.expiryYear]: new Encryption(rsa, {
+                        expiryYear: ccData.expired.year < 100 ? ccData.expired.year + 2000 : ccData.expired.year
+                    }).encrypt(),
+                    [EncryptedFields.cvc]: new Encryption(rsa, {expiryYear: ccData.cvc}).encrypt(),
+                };
+                
+                pageSubmit(
+                    `/adyen/checkout_action`, 
+                    {payment: JSON.stringify(payment)},
+                )
+                .then(data => {
+                    appHelpers.replaceContent(routes.payment(data.paymentId));
+                })
+                .catch(err => {
+                    Notification.error(lang('Failed to complete transaction'));
+                    err.handled = true;
+                });
+            }}
+            paymentConfig={this.props.paymentConfig.adyen}
+        />;
     }
 }

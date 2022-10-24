@@ -37,6 +37,7 @@ export default class extends LessPureComponent {
         animationType: "fade",
         visible: false,
         onSubmit: noop,
+        supportedOrientations: ['landscape', 'portrait'],
     };
 
     _form;

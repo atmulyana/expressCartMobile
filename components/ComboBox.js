@@ -6,85 +6,141 @@
  * @flow strict-local
  */
 import React from 'react';
-import {View} from 'react-native';
-import RNPickerSelect from 'react-native-picker-select';
+import {Modal, Platform, StyleSheet, TextInput, TouchableWithoutFeedback, View} from 'react-native';
+import isEqual from 'lodash.isequal';
 import PropTypes from 'prop-types';
+import {Picker} from '@react-native-picker/picker';
 import Icon from './Icon';
 import ValidatedInput from './ValidatedInput';
+import {lang, shallowCompareExclude} from '../common';
 import styles from '../styles';
-
-const inputStyle = [styles.textInput, styles.textInputHeight, { marginHorizontal: 2 }];
-
-const defaultProps = {
-    placeholder: {},
-    style: {
-        inputIOS: inputStyle,
-        inputAndroid: inputStyle,
-        iconContainer: {
-            right: styles.textInput.borderWidth + 2,
-            top: styles.textInput.paddingVertical + styles.textInput.borderWidth
-        },
-    },
-    Icon: () => <Icon icon="ChevronDown" width={styles.text.fontSize} height={styles.text.fontSize} />,
-};
+import {extractTextStyle} from '../styleProps';
 
 export default class ComboBox extends ValidatedInput {
     static propTypes = {
-        ...RNPickerSelect.propTypes,
-        onLayout: PropTypes.func,
+        items: PropTypes.arrayOf(
+            PropTypes.shape({
+                value: PropTypes.any.isRequired,
+                label: PropTypes.string,
+            })
+        ).isRequired,
     };
-    // static defaultProps = {
-    //     ...RNPickerSelect.defaultProps,
-    // };
 
-    #input;
-    #inputLayout;
+    constructor(props) {
+        super(props, _ComboBox);
+    }
 
-    focus() {
-        this.#input?.inputRef?.focus();
+    shouldComponentUpdate(nextProps, nextState) {
+        return shallowCompareExclude(this, nextProps, nextState, 'validation', 'onValueChange');
     }
 
     render() {
-        let props = this.setValidationHandler('onValueChange'),
-            containerProps = {},
-            {errorStyle} = this.state,
-            {style} = defaultProps;
-
-        if (props.style) {
-            style = {...props.style};
-            style.inputIOS = inputStyle.concat(style.inputIOS).concat(errorStyle);
-            style.inputAndroid = inputStyle.concat(style.inputAndroid).concat(errorStyle);
-            style.iconContainer = [defaultProps.style.iconContainer].concat(style.iconContainer);
-            if (style.viewContainer) {
-                containerProps.style = style.viewContainer;
-                delete style.viewContainer;
-            }
-        }
-        
-        props = {
-            ...defaultProps,
-            ...props,
-            style,
-            useNativeAndroidPickerStyle: false, //Always headless on android to make tiny height combobox
-        };
-        
-        if (typeof(props.onLayout) == 'function') {
-            props.textInputProps = props.textInputProps ?? {};
-            props.textInputProps.onLayout = ev => this.#inputLayout = ev.nativeEvent.layout;
-            containerProps.onLayout = ev => {
-                if (this.#inputLayout) {
-                    ev.nativeEvent.layout = {
-                        ...ev.nativeEvent.layout,
-                        height: this.#inputLayout.height,
-                        width: this.#inputLayout.width,
-                    };
-                }
-                props.onLayout(ev);
-            };
-        }
-        
-        return <View {...containerProps}>
-            <RNPickerSelect {...props} ref={input => this.#input = input} />
-        </View>;
+        return this.inputElement();
     }
 }
+
+const _style = StyleSheet.create({
+    arrowContainer: {
+        alignItems: 'center',
+        flex: 0,
+        height: styles.textInputHeight.height,
+        justifyContent: 'center',
+        width: styles.textInput.fontSize + 6,
+    },
+    arrow: {
+        color: styles.textInput.borderColor,
+        height: styles.textInput.fontSize,
+        strokeWidth: 8,
+        width: styles.textInput.fontSize,
+    },
+    container: {
+        flexDirection: 'row',
+        overflow: 'hidden',
+    },
+    input: Object.assign({}, styles.textInput, styles.textInputHeight),
+    selectIOSClose: {
+        color: styles.textInput.borderColor,
+        position: 'absolute',
+        right: styles.box.borderRadius,
+        top: styles.box.borderRadius,
+        strokeWidth: 3,
+    },
+    selectIOSBackdrop: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'black',
+        opacity: 0.6,
+    },
+    selectIOSContainer: {
+        ...StyleSheet.absoluteFillObject,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    selectIOS: {
+        ...styles.box,
+        backgroundColor: '#eee',
+        borderColor: styles.textInput.borderColor,
+        borderWidth: 1,
+        height: 210,
+        maxHeight: '95%',
+        maxWidth: 400,
+        overflow: 'hidden',
+        shadowColor: 'gray',
+        shadowOffset: 2,
+        width: '80%',
+    },
+    text: {
+        flex: 1
+    },
+    touch: {
+        ...StyleSheet.absoluteFillObject,
+        color: 'transparent',
+        opacity: 0,
+    },
+});
+
+const Select = Platform.OS != 'ios'
+    ? props => <Picker {...props} style={_style.touch} />
+    : ({children, itemStyle, style, ...props}) => {
+        const [visible, showList] = React.useState(false);
+        return <>
+            <TouchableWithoutFeedback onPress={() => showList(true)}><View style={_style.touch} /></TouchableWithoutFeedback>
+            <Modal visible={visible} supportedOrientations={['landscape', 'portrait']} transparent={true}>
+                <View style={_style.selectIOSContainer}>
+                    <TouchableWithoutFeedback onPress={() => showList(false)}><View style={_style.selectIOSBackdrop} /></TouchableWithoutFeedback>
+                    <View style={_style.selectIOS}>
+                        <Picker {...props} itemStyle={[styles.text, styles.textBold, itemStyle]} style={[style, StyleSheet.absoluteFill]}>
+                            {children}
+                        </Picker>
+                        <TouchableWithoutFeedback onPress={() => showList(false)}>
+                            <Icon icon="X" style={_style.selectIOSClose} />
+                        </TouchableWithoutFeedback>
+                    </View>
+                </View>
+            </Modal>
+        </>;
+    };
+
+const _ComboBox = React.forwardRef((props, ref) => {
+    let {items, onValueChange, style, value: selectedValue, ...props2} = props,
+        selectedLabel;
+    style = extractTextStyle([_style.input, style]);
+    const children = items.map(item => {
+        const label = lang(item.label ?? item.value+'');
+        if (isEqual(item.value, selectedValue)) {
+            selectedValue = item.value; //for Object, it's necessary (`selectedValue` and `item.value` may have different reference, especially on iOS)
+            selectedLabel = label;
+        }
+        return <Picker.Item {...item} key={item.value} label={label} />
+    });
+    if (!selectedLabel) {
+        children.unshift(<Picker.Item key={null} label="" value={undefined} />)
+    }
+
+    return <View style={[style.view, _style.container]}>
+        <TextInput {...props2} editable={false} ref={ref} style={[style.text, _style.text]} value={selectedLabel} />
+        <View style={_style.arrowContainer}>
+            <Icon icon="ChevronDown" style={_style.arrow} />
+        </View>
+        <Select {...{children, onValueChange, selectedValue}} />
+    </View>;
+});

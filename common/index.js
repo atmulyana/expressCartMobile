@@ -5,13 +5,12 @@
  * @format
  * @flow strict-local
  */
-export {callServer, serverUrl} from './server';
-export {default as noop} from './noop';
+export {confirmModal} from './alert';
 export {default as appHelpers} from './appHelpers';
 export {addChangeListener as addDimensionChangeListener, contentPadding, contentWidth, correctWidth, setWinInsets} from './dimension';
 export {default as lang, availableLanguages, currentLanguage} from './lang';
-export {confirmModal} from './alert';
+export {default as noop} from './noop';
 export {currencySymbol, digitCount, formatAmount, formatDate, timeAgo} from './number-datetime';
-export {str} from './string';
-export {default as updateSubtreeElements} from './updateSubtreeElements';
-export {default as joinRefHandler} from './joinRefHandler';
+export {proxyClass, proxyObject} from './proxy';
+export {callServer, serverUrl} from './server';
+export {default as shallowCompareExclude} from './shallowCompareExclude';

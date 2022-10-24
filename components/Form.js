@@ -5,10 +5,11 @@
  * @format
  * @flow strict-local
  */
+import {setRef} from 'react-native-form-input-validator';
 import Notification from './Notification';
 import Partial from './Partial';
 import ValidationContainer from './ValidationContainer';
-import {joinRefHandler, lang} from '../common';
+import {lang} from '../common';
 
 //To be applied to the Promise object returned by submitData method of Form.
 //It will mute the failure because of validation so that it won't produce warning message.
@@ -31,14 +32,14 @@ Promise.prototype.valid = function(onSuccess) {
 const isAlreadyHandledError = err => typeof(err) == 'object' && (err?.valid === false || err?.handled);
 
 export default class Form extends Partial {
-    _validation;
+    #validation;
 
     constructor(props) {
         super(props);
 
         this.submitDataWithoutValidation = this.submitData;
         this.submitData = (url, data = {}) => {
-            if (this._validation && !this._validation.validate()) {
+            if (this.#validation && !this.#validation.validate()) {
                 Notification.error(lang('One or more inputs are invalid'));
                 return Promise.reject({valid:false});
             }
@@ -49,19 +50,21 @@ export default class Form extends Partial {
     componentDidUpdate(prevProps, prevState, snapshot) {
         super.componentDidUpdate(prevProps, prevState, snapshot);
         if (prevState.isLoading === true && this.state.isLoading === false) //data just (re)loaded from database
-            this._validation?.clearValidation(); //remove validation messages from the invalid edited inputs because data just refreshed from database
+            this.#validation?.clearValidation(); //remove validation messages from the invalid edited inputs because data just refreshed from database
     }
 
     render() {
         //children will be contained in View prepared by Partial component
-        let {children} = this.props;
+        const {children} = this.props,
+              ref =  children.ref;
+
         return children?.type === ValidationContainer //has the only one child of type ValidationContainer
             ? {
                 ...children,
-                ref: joinRefHandler(
-                    comp => this._validation = comp,
-                    children.ref
-                ),
+                ref: comp => {
+                    this.#validation = comp;
+                    setRef(ref, comp);
+                },
             }
             : children;
     }

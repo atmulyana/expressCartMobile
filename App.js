@@ -10,7 +10,7 @@ import React from 'react';
 import {
     BackHandler,
     Image,
-    //LogBox,
+    LogBox,
     Platform,
     StatusBar,
     Text,
@@ -29,7 +29,6 @@ const Stack = createStackNavigator();
 
 import styles from './styles';
 import {addDimensionChangeListener, appHelpers, lang, noop, setWinInsets } from './common';
-//import lang from './lang';
 
 import * as Contents from './contents';
 import routes from './contents/routes';
@@ -38,21 +37,14 @@ import {HeaderBar, Notification} from './components';
 
 const routeNames = Object.keys(Contents).filter(name => name != 'default');
 
-const _logError = console.error.bind(console);
-const _logWarning = console.warn.bind(console);
+LogBox.ignoreLogs(['RCTBridge required dispatch_sync to load REAModule']); //iOS - react-native-reanimated 2.11.0, warning that only happens in dev mode
 
 /*** We do really need VirtualizedList (FlatList) inside ScrollView */
 //LogBox.ignoreLogs(['VirtualizedLists should never be nested']); //NOT working
+const _logError = console.error.bind(console);
 console.error = (message, ...optinalParams) => {
     if (typeof(message) == 'string' && message.startsWith('VirtualizedLists should never be nested')) return; 
     _logError(message, ...optinalParams);
-};
-
-/*** Some packages still use ViewPropTypes that is deprecated in latest react-native */
-//LogBox.ignoreLogs('ViewPropTypes');
-console.warn = (message, ...optinalParams) => {
-    if (typeof(message) == 'string' && message.startsWith('ViewPropTypes')) return; 
-    _logWarning(message, ...optinalParams);
 };
 
 function BackHandlerHook({canGoBack}) {

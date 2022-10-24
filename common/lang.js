@@ -15,7 +15,7 @@ const languages = {
     it: 'Italiano',
 };
 
-import SQLite from 'react-native-sqlite-storage-x';
+import SQLite from '@mendix/react-native-sqlite-storage';
 SQLite.enablePromise(true);
 
 /*** Realm module makes this app dies on emulator. Memory problem??? You may try on bigger memory or on the real smartphone

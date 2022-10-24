@@ -6,8 +6,7 @@
  * @flow strict-local
  */
 import React from 'react';
-import { View } from 'react-native';
-import { SliderBox } from 'react-native-image-slider-box';
+import {View} from 'react-native';
 import RenderHtml from 'react-native-render-html';
 import {
     Button,
@@ -15,7 +14,7 @@ import {
     ContentLink,
     Icon,
     Image,
-    imagePlaceholder,
+    ImageSlider,
     IntegerSpinner,
     LessPureComponent,
     Modal,
@@ -26,9 +25,10 @@ import {
 } from '../components';
 import Content from './Content';
 import routes from './routes'; 
-import {appHelpers, contentWidth, currencySymbol, digitCount, formatAmount, lang, timeAgo, serverUrl} from '../common';
+import {appHelpers, contentWidth, currencySymbol, digitCount, formatAmount, lang, timeAgo} from '../common';
 import styles from '../styles';
-import {min, required} from '../validations';
+import {Validation} from 'react-native-form-input-validator';
+import {min, required} from 'react-native-form-input-validator/rules';
 
 class ReviewForm extends LessPureComponent {
     state = {
@@ -51,7 +51,7 @@ class ReviewForm extends LessPureComponent {
         const {productId} = this.props;
         
         return <Modal ref={modal => this._modal = modal} title={lang("Product review")} buttonDone={lang('Add review')}
-            style={{height: 270}}
+            style={{height: 300}}
             onSubmit={() => {
                 this._modal.submitData('/product/addreview', {
                     product: productId,
@@ -79,7 +79,8 @@ class ReviewForm extends LessPureComponent {
             <TextInput placeholder={lang('Product is great. Does everything it said it can do.')} value={state.description}
                 onChangeText={description => this.setState({description})} multiline numberOfLines={3} para4 validation={required} />
             
-            <Text value={state.rating} validation={min(1)}>{lang('Rating')}:  <Text bold>{state.rating}</Text></Text>
+            <Text value={state.rating}>{lang('Rating')}:  <Text bold>{state.rating}</Text></Text>
+            <Validation rules={min(1)} value={state.rating} />
             <RatingStars rating={state.rating} size={16} onRate={rating => this.setState({rating})} />
 
             <View style={styles.para8} />
@@ -125,27 +126,23 @@ export default class Product extends Content {
             colWidth = cntWidth;
             imageStyle.alignSelf = 'center';
         }
-        let relImageWidth = Math.round(imageWidth / 5);
 
+        const relImageWidth = Math.round(imageWidth / 5),
+              isSingleColumn = colWidth * 2 > cntWidth;
+        
         const imageLocations = [];
         for (let i in images) {
-            if (images[i].productImage) imageLocations.unshift(serverUrl(images[i].path)); //Make sure the main image to be shown first
-            else imageLocations.push(serverUrl(images[i].path));
+            if (images[i].productImage) imageLocations.unshift(images[i].path); //Make sure the main image to be shown first
+            else imageLocations.push(images[i].path);
         }
-        //If having no image, set the default image
-        if (imageLocations.length < 1) imageLocations.push(imagePlaceholder);
         
         return <>
             <ReviewForm ref={form => this.#reviewForm = form} productId={result._id} />
 
             <View style={[styles.productRow, styles.productInfoRow]}>
                 <View style={[styles.productInfoCol, {width: colWidth}]}>
-                    <SliderBox images={imageLocations}
-                               parentWidth={colWidth}
-                               ImageComponentStyle={[styles.productImage, imageStyle]}
-                               dotColor="#888"
-                               inactiveDotColor="#aaa"
-                    />
+                    <ImageSlider imageStyle={[styles.productImage, imageStyle]} uris={imageLocations} />
+                    {!isSingleColumn && <RelatedProducts config={config} imageSize={relImageWidth} products={relatedProducts} />}
                 </View>
 
                 <View style={[styles.productInfoCol, {width: colWidth}]}>
@@ -167,10 +164,7 @@ export default class Product extends Content {
                                 ))}
                                 value={state.variant}
                                 onValueChange={variant => this.setState({variant})}
-                                style={{
-                                    viewContainer: styles.para8,
-                                    headlessAndroidContainer: styles.para8,
-                                }}
+                                style={styles.para8}
                             />
                         </>)
                         : (
@@ -267,26 +261,27 @@ export default class Product extends Content {
                         </View>
                     </>}
                     
+                    {isSingleColumn && <RelatedProducts config={config} imageSize={relImageWidth} products={relatedProducts} />}
                 </View>
             </View>
-
-            {config.showRelatedProducts && relatedProducts && relatedProducts.length > 0 &&
-            <View style={[styles.productRow, styles.productInfoRow, styles.productRelatedRow]}>
-                <Text para8 bold style={{width:'100%'}}>{lang("Related products")}</Text>
-                {relatedProducts.map((item, idx) => 
-                    <ContentLink key={idx}
-                                 route={routes.productInfo(item.productPermalink || item._id)}
-                                 style={[styles.para8, styles.productRelatedImageContainer, {width: relImageWidth}]}
-                    >
-                        <Image uri={item.productImage} style={[styles.para4, styles.productImage, {height: relImageWidth}]} />
-                        <Text para4 style={styles.productText}>{item.productTitle}</Text>
-                        <Text style={[styles.productText, styles.textGray]}>
-                            {currencySymbol(config.currencySymbol)}{formatAmount(item.productPrice)}
-                        </Text>
-                    </ContentLink>
-                )}
-            </View>
-            }
         </>;
     }
 }
+
+const RelatedProducts = ({config, imageSize, products}) => config.showRelatedProducts && products && products.length > 0 && (
+    <View style={styles.productRelatedRow}>
+        <Text para8 bold style={styles.productRelatedTitle}>{lang("Related products")}</Text>
+        {products.map((item, idx) => 
+            <ContentLink key={idx}
+                        route={routes.productInfo(item.productPermalink || item._id)}
+                        style={[styles.para8, styles.productRelatedImageContainer, {width: imageSize}]}
+            >
+                <Image uri={item.productImage} style={[styles.para4, styles.productImage, {height: imageSize}]} />
+                <Text para4 style={styles.productText}>{item.productTitle}</Text>
+                <Text style={[styles.productText, styles.textGray]}>
+                    {currencySymbol(config.currencySymbol)}{formatAmount(item.productPrice)}
+                </Text>
+            </ContentLink>
+        )}
+    </View>
+);

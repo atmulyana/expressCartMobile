@@ -49,7 +49,7 @@ const intVal = strValue => {
     return val;
 };
 
-export default class IntegerSpinner extends IconTextInput {
+class IntegerSpinner extends IconTextInput {
     static propTypes = {
         ...super.propTypes,
         max: PropTypes.number,
@@ -121,7 +121,8 @@ export default class IntegerSpinner extends IconTextInput {
         return (textStyle.fontSize ?? styles.button.fontSize ?? defaultStyles.button.fontSize) + 2 * PADDING_BUTTON;
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        super.componentDidUpdate(prevProps, prevState, snapshot);
         const state = this.state, props = this.props;
         
         if (props.onValueChange && prevState.value !== state.value)
@@ -147,3 +148,5 @@ export default class IntegerSpinner extends IconTextInput {
         />;
     }
 }
+
+export default IntegerSpinner.createProxy();

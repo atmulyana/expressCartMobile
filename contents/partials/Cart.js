@@ -95,16 +95,18 @@ export class CartContent extends ListPartial {
         Object.assign(this.state, {refreshFlag: 0});
     }
 
-    refresh = () => this.refreshData(true)
+    refresh = isNotToSync => this.refreshData(true)
         .then(data => {
             this.setState(state => ({refreshFlag: state.refreshFlag ^ -1}));
+            if (isNotToSync) return;
             for (let cart of cartContents) {
                 if (cart != this) {
                     if (cart.data) {
+                        if (!('cart' in data)) data.cart = undefined;
                         Object.assign(cart.data, data);
                         cart.setState(state => ({refreshFlag: state.refreshFlag ^ -1}));
                     }
-                    else cart.refresh();
+                    else cart.refresh(true);
                 }
             }
         });

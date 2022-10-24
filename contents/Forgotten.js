@@ -11,7 +11,7 @@ import Content from './Content';
 import routes from './routes';
 import {correctWidth, lang} from '../common';
 import styles from '../styles';
-import {required, email} from '../validations';
+import {required, email} from 'react-native-form-input-validator/rules';
 
 export default class Forgotten extends Content {
     static defaultParams = {

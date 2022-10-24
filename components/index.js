@@ -11,6 +11,7 @@ export {default as HeaderBar} from './HeaderBar';
 export {default as Icon} from './Icon';
 export {default as IconTextInput} from './IconTextInput';
 export {default as Image, imagePlaceholder} from './Image';
+export {default as ImageSlider} from './ImageSlider';
 export {default as IntegerSpinner} from './IntegerSpinner';
 export {default as LessPureComponent} from './LessPureComponent';
 export {default as ListPartial} from './ListPartial';

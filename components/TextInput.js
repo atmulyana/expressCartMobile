@@ -8,9 +8,12 @@
  * To make 'style' writing shorter and handle validation
  */
 import React from 'react';
-import { TextInput } from 'react-native';
+import {TextInput} from 'react-native';
 import PropTypes from 'prop-types';
+import {setStatusStyleDefault, withValidation} from 'react-native-form-input-validator';
+import {ValidationRule} from 'react-native-form-input-validator/rules';
 import ValidatedInput from './ValidatedInput';
+import {lang, shallowCompareExclude} from '../common';
 import styles from '../styles';
 
 const propStyles = {
@@ -26,7 +29,8 @@ const propStyles = {
     m8: 'm8',
 };
 
-export default class extends ValidatedInput {
+export default (class extends ValidatedInput {
+    static displayName = "App.TextInput";
     static propTypes = {
         ...TextInput.propTypes,
         ...Object.fromEntries( Object.keys(propStyles).map(key => [ key, PropTypes.bool ]) ),
@@ -35,30 +39,19 @@ export default class extends ValidatedInput {
         ...TextInput.defaultProps,
     };
     
-    _txtInput = null;
-
-    blur() {
-        this._txtInput?.blur();
+    constructor(props) {
+        super(props, TextInput);
     }
 
-    clear() {
-        this._txtInput?.clear();
-    }
-
-    focus() {
-        this._txtInput?.focus();
-    }
-
-    isFocused() {
-        this._txtInput?.isFocused();
+    shouldComponentUpdate(nextProps, nextState) {
+        return shallowCompareExclude(this, nextProps, nextState, 'validation', 'onChangeText');
     }
 
     render() {
-        const props = this.setValidationHandler('onChangeText');
+        const props = this.props;
         let style = [styles.textInput];
         for (let key in propStyles) if (props[key]) style.push( styles[ propStyles[key] ] );
-        if (props.style) style = style.concat(props.style);
-        if (this.state.errorStyle) style = style.concat(this.state.errorStyle);
-        return <TextInput ref={inp => this._txtInput = inp} {...props} style={style} />;
+        style = style.concat(props.style);
+        return this.inputElement({...props, style});
     }
-}
+}).createProxy();

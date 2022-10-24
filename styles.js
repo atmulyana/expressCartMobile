@@ -126,15 +126,11 @@ StyleSheet.create({
         color: gray,
     },
     textInputHeight: {
-        height: textBase.lineHeight + 2 * (4 + boxBase.borderWidth), //textInput.lineHeight + 2 * (textInput.paddingVertical + textInput.borderWidth)
+        //textInput.lineHeight + 2 * (textInput.paddingVertical + textInput.borderWidth). Plus 1 is to avoid _, y, g and j clipped at bottom, especially on iOS
+        height: textBase.lineHeight + 2 * (4 + boxBase.borderWidth) + 1,
     },
     textArea: {
         textAlignVertical: 'top',
-    },
-    inputError: {
-        ...boxBase,
-        borderColor: red,
-        color: red,
     },
     
     para4: {
@@ -292,7 +288,13 @@ StyleSheet.create({
         flexWrap: 'wrap',
     },
     productRelatedRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
         justifyContent: 'flex-start',
+        marginTop: 8,
+    },
+    productRelatedTitle: {
+        width: '100%',
     },
     productInfoCol: {
         flex: 0,

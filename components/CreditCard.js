@@ -12,8 +12,7 @@ const validator = require("card-validator");
 import Icon from './Icon';
 import LessPureComponent from './LessPureComponent';
 import TextInput from './TextInput';
-import ValidatedInput from './ValidatedInput';
-import {lang, noop} from '../common';
+import {lang, noop, proxyClass} from '../common';
 import styles from '../styles';
 
 const ARROW_COLOR = '#ddd';
@@ -47,19 +46,24 @@ const unknownCard = {
 const justNumbers = s => s.replace(/\D/g,'');
 
 const createInput = (field, fnFormat = justNumbers) => {
-    return class _TextInput extends LessPureComponent {
+    return (class extends LessPureComponent {
         static propTypes = {
             nextInput: PropTypes.func,
-            onValidate: PropTypes.func,
+            onChangeText: PropTypes.func,
             prevInput: PropTypes.func,
         };
         static defaultProps = {
             nextInput: noop,
-            onValidate: noop,
+            onChangeText: noop,
             prevInput: noop,
         };
-        
-        #input;
+        static displayName = `CreaditCard[${field}]`;
+
+        static createProxy() {
+            return proxyClass(this, self => self.#inputRef.current)
+        }
+
+        #inputRef = React.createRef();
         #prevTextLength = 0;
         #validatorParams = [];
         #validity;
@@ -87,15 +91,6 @@ const createInput = (field, fnFormat = justNumbers) => {
             return this.state.text;
         }
 
-        
-        blur() {
-            this.#input?.blur();
-        }
-
-        focus() {
-            this.#input?.focus();
-        }
-
         nextFocus() {
             this.props.nextInput()?.focus();
         }
@@ -111,7 +106,7 @@ const createInput = (field, fnFormat = justNumbers) => {
             if (isNotValidated) validate();
             this.#prevTextLength = this.state.text.length;
             this.setState({text});
-            this.props.onValidate(this.#validity);
+            this.props.onChangeText(this.#validity);
         }
 
         onKeyPress = ({ nativeEvent: { key} }) => {
@@ -136,12 +131,12 @@ const createInput = (field, fnFormat = justNumbers) => {
                 onChangeText={this.onChangeText}
                 onKeyPress={this.onKeyPress}
                 onSelectionChange={this.onSelectionChange}
-                ref={inp => this.#input = inp}
+                ref={this.#inputRef}
                 style={textBaseStyle.concat(this.props.style)}
                 value={this.state.text}
             />;
         }
-    }
+    }).createProxy();
 }
 
 const CardNumber = createInput('number', (text, validate) => {
@@ -169,7 +164,7 @@ const CardCVC = createInput('cvv');
 const CardHolder = createInput('cardholderName', s => s);
 const CardZIP = createInput('postalCode');
 
-export default class CreditCard extends ValidatedInput {
+export default class CreditCard extends LessPureComponent {
     static propTypes = {
         showCardHolder: PropTypes.bool,
         showPostalCode: PropTypes.bool,
@@ -184,6 +179,7 @@ export default class CreditCard extends ValidatedInput {
         Object.assign(this.state, {
             card: unknownCard,
             scrollStat: -1, //-1: at the beginning, 0: at the middle, 1: at the end
+            validationError: false,
         });
     }
 
@@ -198,15 +194,17 @@ export default class CreditCard extends ValidatedInput {
     #scrollStep = 0;
     
     get isValid() {
-        return this.#number?.isValid
+        return (
+            this.#number?.isValid
             && this.#expired?.isValid
             && this.#cvc?.isValid
             && (!this.props.showCardHolder || this.#cardHolder?.isValid)
-            && (!this.#zip?.value || this.#zip?.isValid); 
+            && (!this.#zip?.value || this.#zip?.isValid)
+        ) ? true : false; 
     }
 
     get value() {
-        return {
+        const val = {
             number: this.#number?.value?.replace(/\s/g, ''),
             expired: {
                 month: parseInt(this.#expired?.validity?.month) || 0,
@@ -216,16 +214,33 @@ export default class CreditCard extends ValidatedInput {
             cardHolder: this.#cardHolder?.value,
             zip: this.#zip?.value,
         };
+        if (!val.number) return null;
+        return val;
     }
 
-    handleCardValidation = validity => {
+    get validator() {
+        return typeof(this.props.validator) == 'function' && this.props.validator() || null;
+    }
+
+    #handleChangeCardNumber = validity => {
         let card = validity.card ?? unknownCard;
         if (this.#cvc) this.#cvc.validatorParams = card.code.size;
         this.setState({card});
+        this.#handleChangeText();
     }
 
-    handleFocus = () => {
+    #handleChangeText = () => {
+        if (this.state.validationError) this.#handleFocus();
+    }
+
+    #handleFocus = () => {
+        this.setValidationError(false);
         this.validator?.clearValidation();
+    }
+
+    setValidationError(isError) {
+        this.setState({validationError: isError});
+        return isError;
     }
 
     scroll = dir => {
@@ -239,22 +254,21 @@ export default class CreditCard extends ValidatedInput {
     }
 
     render() {
-        const {card, errorStyle, scrollStat} = this.state;
+        const {card, scrollStat, validationError} = this.state;
         const icon = icons[card.type] ?? icons[unknownCard.type];
-        //if (!icons[card.type]) console.log(card.type);
         const oneWidth = styles.textInput.fontSize,
               iconStyle = {flex:0, height:textBaseStyle[0].height},
               arrowStyle = {backgroundColor: styles.box.borderColor, color: ARROW_COLOR, height: '100%', width: ARROW_WIDTH},
               inputStyle = (isValid, widthUnits) => [
                 {flex:0, width: oneWidth * widthUnits},
-                isValid || !errorStyle ? null : {color: errorStyle.color}
+                isValid || !validationError ? null : {color: styles.red},
               ],
-              placeholderTextColor = isValid => isValid ? styles.gray : errorStyle?.color ?? styles.gray;
+              placeholderTextColor = isValid => isValid || !validationError ? styles.gray : styles.red;
         return <View style={[
             styles.box,
             this.props.style,
             {alignItems:'center', flexDirection:'row'},
-            errorStyle ? {borderColor: errorStyle.borderColor} : null,
+            !validationError ? null : {borderColor: styles.red},
         ]}>
             <Image
                 source={icon}
@@ -294,8 +308,8 @@ export default class CreditCard extends ValidatedInput {
                 <CardNumber
                     maxLength={card.lengths[card.lengths.length - 1] + card.gaps.length}
                     nextInput={() => this.#expired}
-                    onFocus={this.handleFocus}
-                    onValidate={this.handleCardValidation}
+                    onFocus={this.#handleFocus}
+                    onChangeText={this.#handleChangeCardNumber}
                     placeholder={lang('Card number')}
                     placeholderTextColor={placeholderTextColor(this.#number?.isValid)}
                     ref={comp => this.#number = comp}
@@ -304,7 +318,8 @@ export default class CreditCard extends ValidatedInput {
                 <CardExpiry
                     maxLength={5}
                     nextInput={() => this.#cvc}
-                    onFocus={this.handleFocus}
+                    onChangeText={this.#handleChangeText}
+                    onFocus={this.#handleFocus}
                     placeholder="MM/YY"
                     placeholderTextColor={placeholderTextColor(this.#expired?.isValid)}
                     prevInput={() => this.#number}
@@ -314,7 +329,8 @@ export default class CreditCard extends ValidatedInput {
                 <CardCVC
                     maxLength={card.code.size}
                     nextInput={() => this.#cardHolder ?? this.#zip}
-                    onFocus={this.handleFocus}
+                    onChangeText={this.#handleChangeText}
+                    onFocus={this.#handleFocus}
                     placeholder={card.code.name}
                     placeholderTextColor={placeholderTextColor(this.#cvc?.isValid)}
                     prevInput={() => this.#expired}
@@ -325,7 +341,8 @@ export default class CreditCard extends ValidatedInput {
                     keyboardType="default"
                     maxLength={255}
                     nextInput={() => this.#zip}
-                    onFocus={this.handleFocus}
+                    onChangeText={this.#handleChangeText}
+                    onFocus={this.#handleFocus}
                     placeholder={lang("Card holder name")}
                     placeholderTextColor={placeholderTextColor(this.#cardHolder?.isValid)}
                     prevInput={() => this.#cvc}
@@ -334,7 +351,8 @@ export default class CreditCard extends ValidatedInput {
                 />}
                 {this.props.showPostalCode && <CardZIP
                     maxLength={6}
-                    onFocus={this.handleFocus}
+                    onChangeText={this.#handleChangeText}
+                    onFocus={this.#handleFocus}
                     placeholder={lang("Postal code")}
                     placeholderTextColor={placeholderTextColor(!this.#zip?.value || this.#zip?.isValid)}
                     prevInput={() => this.#cardHolder ?? this.#cvc}
