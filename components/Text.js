@@ -44,10 +44,19 @@ export default class extends LessPureComponent {
     };
 
     render() {
-        const props = this.props;
-        let style = [styles.text];
-        for (let key in propStyles) if (props[key]) style.push( styles[ propStyles[key] ] );
-        if (props.style) style = style.concat(props.style);
+        const {style:oriStyle, ...props} = this.props;
+        const style = [styles.text];
+        for (let key of Object.keys(props)) {
+            if (props[key] === true && propStyles[key]) {
+                style.push( styles[ propStyles[key] ] );
+                
+                //Must delete from `props` because it may have meaning for RN `Text` component
+                //For example: `right`, even if not documented it seems it has effect because the app can crash if we set `right` prop
+                //to RN `Text` component especially on Android
+                delete props[key];
+            }
+        }
+        if (oriStyle) style.push(oriStyle);
         return <Text {...props} style={style}>{props.children}</Text>;
     }
 }

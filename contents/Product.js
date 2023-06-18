@@ -141,7 +141,7 @@ export default class Product extends Content {
 
             <View style={[styles.productRow, styles.productInfoRow]}>
                 <View style={[styles.productInfoCol, {width: colWidth}]}>
-                    <ImageSlider imageStyle={[styles.productImage, imageStyle]} uris={imageLocations} />
+                    <ImageSlider srcSet={imageLocations} style={[styles.productImage, imageStyle]} />
                     {!isSingleColumn && <RelatedProducts config={config} imageSize={relImageWidth} products={relatedProducts} />}
                 </View>
 

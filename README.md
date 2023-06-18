@@ -54,7 +54,16 @@ It's a mobile app for shopping cart which is developed using React Native.
 
    For iOS, the above command must be followed by
 
-        cd ios && pod install && cd ..
+        cd ios
+        pod install
+        cd ..
+
+   If `pod install` has the problem then replace with the following commands. But before executing the commands, you seem to need to install
+   a [Ruby Version Manager](https://reactnative.dev/docs/environment-setup#ruby) and update the Ruby version. Then, executing the following
+   commands
+
+        bundle install
+        bundle exec pod install
 
 6. Ready to run project    
    Start Metro server by issueing command

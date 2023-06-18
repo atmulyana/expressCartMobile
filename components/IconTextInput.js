@@ -12,8 +12,7 @@ import {
     View,
 } from 'react-native';
 import PropTypes from 'prop-types';
-import {isDifferentStyle, withValidation} from 'react-native-form-input-validator';
-import {ValidationRule} from 'react-native-form-input-validator/rules';
+import {isDifferentStyle} from 'react-native-form-input-validator';
 import ValidatedInput from './ValidatedInput';
 import {lang, shallowCompareExclude} from '../common';
 import {extractTextStyle, isViewStyleProp} from '../styleProps';

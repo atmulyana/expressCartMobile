@@ -48,7 +48,7 @@ class OrderItem extends LessPureComponent {
             <RowBox style={{backgroundColor:'rgba(0,0,0,.03)', flexDirection:'row'}}>
                 <View style={{flex:1}}>
                     <Text>OrderId: {data._id}</Text>
-                    <Text>Date: {formatDate(data.orderDate, "DD/MM/YYYY hh:mmA")}</Text>
+                    <Text>Date: {formatDate(data.orderDate)}</Text>
                 </View>
                 <Button style={buttonOutlineSuccess} title={lang(state.open ? 'Close' : 'View')}
                     onPress={() => this.setState(state => ({open: !state.open}))}
@@ -62,7 +62,7 @@ class OrderItem extends LessPureComponent {
                         value={<Text style={{color:statusColor}}>{data.orderStatus}</Text>}
                     />
                     <Separator />
-                    <RowText label="Order date" value={formatDate(data.orderDate, "DD/MM/YYYY hh:mmA")} />
+                    <RowText label="Order date" value={formatDate(data.orderDate)} />
                     <Separator />
                     <RowText label="Order ID" value={data._id} />
                     {data.orderExpectedBtc && <>

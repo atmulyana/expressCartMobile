@@ -171,15 +171,13 @@ export default function() {
             else appHelpers.contentFlag = --flag;
         }
 
-        setLang(code) {
-            lang.set(code).then(() => {
-                this.forceUpdate();
-                this.forceUpdateContent();
-            });
+        async setLang(code) {
+            await lang.set(code);
         }
 
         onLangChange = () => {
-            this.setLang();
+            this.forceUpdate();
+            this.forceUpdateContent();
         }
 
         login(email, password) {
@@ -225,8 +223,11 @@ export default function() {
         }
 
         componentDidMount() {
-            this.setLang();
             lang.addChangeListeners(this.onLangChange);
+            this.setLang().then(() => {
+                /** Makes sure change event happens after the first setting of lang, after the app mounted (Android really needs this) */
+                lang.emitChangeEvent()
+            });
             
             this.#removeDimensionListener = addDimensionChangeListener( //specially for rotating event. Some contents need to reposition/resize because they depend to window width
                 () => {
@@ -244,6 +245,7 @@ export default function() {
         }
 
         componentWillUnmount() {
+            lang.stopChangeEvent();
             lang.removeChangeListeners(this.onLangChange);
             typeof(this.#removeDimensionListener) == 'function' && this.#removeDimensionListener();
             this.#removeDimensionListener = null;

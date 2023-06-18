@@ -91,7 +91,7 @@ export default class Paypal extends PaymentComponent {
                         return true;
                     }}
                     sharedCookiesEnabled={true}
-                    source={this.state.inProcess ? {uri: `${rootUrl}/paypal/checkout_action`, method: 'POST'} : {uri: null}}
+                    source={this.state.inProcess ? {uri: `${rootUrl}/paypal/checkout_action`, method: 'POST'} : {html: '<html></html>' }}
                     // startInLoadingState={true}
                     // renderLoading={() => <SubmittingIndicator visible={true} />}
                     style={[{position: 'absolute'}, insets]}
@@ -99,7 +99,7 @@ export default class Paypal extends PaymentComponent {
                 />
                 <SubmittingIndicator visible={this.state.isLoading} />
                 <Icon icon="X" strokeWidth={4} height={16} width={16}
-                    style={{opacity: 0.3, position:'absolute', right: insets.right + 2, top: insets.top + 2}}
+                    style={{opacity: 0.3, position:'absolute', right: insets.right + 2, top: insets.top + 2/*, zIndex:300001*/}}
                     onPress={() => {
                         this.setState({paypalVisible: false});
                         this._paymentStatus(PaymenStatus.Cancelled);

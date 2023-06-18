@@ -4,6 +4,9 @@
  *
  * @format
  */
+import '../_includes/localize-mock';
+import '../_includes/encrypted-storage-mock';
+import '../_includes/sqlite-mock';
 import {
     currencySymbol,
     digitCount,
