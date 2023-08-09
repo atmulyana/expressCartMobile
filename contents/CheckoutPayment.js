@@ -12,7 +12,7 @@ import Content from './Content';
 import routes from './routes';
 import {CartContent} from './partials/Cart';
 import * as payments from './partials/payments';
-import {appHelpers, currencySymbol, formatAmount, lang} from '../common';
+import {appHelpers, currencySymbol, emptyString, formatAmount, lang} from '../common';
 import styles from '../styles';
 import {required} from 'react-native-form-input-validator/rules';
 
@@ -25,7 +25,7 @@ const {rowBoxStyle} = StyleSheet.create({
 
 class PaymentPanel extends Partial {
     state = Object.assign(this.state, {
-        discountCode: '',
+        discountCode: emptyString,
     });
 
     async onDataReady(silent, data) {
@@ -83,7 +83,7 @@ class PaymentPanel extends Partial {
                             discountInput.clearValidation();
                             this.submitData('/checkout/removediscountcode')
                                 .then(data => {
-                                    //this.setState({discountCode:''})
+                                    //this.setState({discountCode: emptyString})
                                     Notification.success(data.message);
                                     appHelpers.refreshContent();
                                 });
@@ -118,10 +118,10 @@ export default class CheckoutPayment extends Content {
 
     render() {
         return <TwoPane
-            left={<Box style={styles.mr4}>
+            left={<Box>
                 <PaymentPanel data={this.data} pageSubmit={this.submitData} />
             </Box>}
-            right={<Box style={styles.ml4}>
+            right={<Box>
                 <CartContent data={this.data} />
             </Box>}
         />;

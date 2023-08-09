@@ -11,6 +11,7 @@
  import Content from './Content';
  import layoutHtml from './web/layout';
  import {LessPureComponent} from "../components";
+ import {emptyString} from '../common';
  
 
  class WebContainer extends LessPureComponent {
@@ -34,9 +35,9 @@
 
  export default class WebPage extends Content {
     getScroller() {
-        let html = '';
+        let html = emptyString;
         if (this.data) {
-            html = this.data.page?.pageContent ?? '';
+            html = this.data.page?.pageContent ?? emptyString;
             html = layoutHtml.replace('{{{page.pageContent}}}', html);
         }
         

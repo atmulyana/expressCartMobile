@@ -10,6 +10,7 @@ import {StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import IconTextInput from './IconTextInput';
 import Button from './Button';
+import {emptyString} from '../common';
 import styles from '../styles';
 
 const PADDING_BUTTON = 4;
@@ -77,9 +78,9 @@ class IntegerSpinner extends IconTextInput {
             state.internalUpdate = false;
         }
         else {
-            state.value = props.value ?? '';
+            state.value = props.value ?? emptyString;
         }
-        state.value = (state.value+'').trim();
+        state.value = (state.value+emptyString).trim();
         
         let value = parseInt(state.value) || 0;
         state.valueEntered = value;
@@ -91,7 +92,7 @@ class IntegerSpinner extends IconTextInput {
             const max = Math.floor(props.max);
             if (value > max) value = max;
         }
-        state.value = value + '';
+        state.value = value + emptyString;
         return state;
     }
 

@@ -20,8 +20,14 @@ export default class TwoPane extends LessPureComponent {
     render() {
         const props = this.props;
         const cntWidth = contentWidth();
+        const paneWidth = Math.floor((cntWidth - styles.twoPane.columnGap) / 2);
         const paneStyle = [styles.paneOfTwo];
-        if (cntWidth < styles.paneOfTwo.minWidth) paneStyle.push({minWidth: cntWidth});
+        let minWidth = styles.paneOfTwo.minWidth;
+        if (cntWidth < minWidth) {
+            minWidth = cntWidth;
+            paneStyle.push({minWidth: cntWidth});
+        }
+        paneStyle.push({width: minWidth > paneWidth ? cntWidth : paneWidth})
         return <View style={styles.twoPane}>
             <View style={paneStyle}>
                 {props.left}

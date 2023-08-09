@@ -17,25 +17,25 @@ import {
     TextInput,
     ValidationContainer,
 } from '../../components';
-import {lang} from '../../common';
+import {emptyString, lang} from '../../common';
 import styles from '../../styles';
 import {email, required, strlen} from 'react-native-form-input-validator/rules';
 
 const initState = (props, state) => {
     var data = props?.data?.session ?? {};
     Object.assign(state, {
-        email: data.customerEmail ?? '',
-        company: data.customerCompany ?? '',
-        firstName: data.customerFirstname ??'',
-        lastName: data.customerLastname ?? '',
-        address1: data.customerAddress1 ?? '',
-        address2: data.customerAddress2 ?? '',
-        country: data.customerCountry ?? '',
-        state: data.customerState ?? '',
-        postcode: data.customerPostcode ?? '',
-        phone: data.customerPhone ?? '',
-        password: '',
-        orderComment: data.orderComment ?? '',
+        email: data.customerEmail ?? emptyString,
+        company: data.customerCompany ?? emptyString,
+        firstName: data.customerFirstname ?? emptyString,
+        lastName: data.customerLastname ?? emptyString,
+        address1: data.customerAddress1 ?? emptyString,
+        address2: data.customerAddress2 ?? emptyString,
+        country: data.customerCountry ?? emptyString,
+        state: data.customerState ?? emptyString,
+        postcode: data.customerPostcode ?? emptyString,
+        phone: data.customerPhone ?? emptyString,
+        password: emptyString,
+        orderComment: data.orderComment ?? emptyString,
     });
 }
 
@@ -92,12 +92,13 @@ export default class extends LessPureComponent {
                 fixHeight para8 />
             <ComboBox
                 placeholder={lang('Select Country')}
-                items={(this.props.data?.countryList ?? []).map(countryName => ({value: countryName, label: countryName}))}
                 value={state.country}
                 onValueChange={country => this.setState({country})}
                 style={styles.para8}
                 validation={required}
-            />
+            >{
+                (this.props.data?.countryList ?? []).sort().map(countryName => <ComboBox.Item key={countryName} value={countryName} label={countryName} />)
+            }</ComboBox>
             <View style={[styles.para8, {flexDirection:'row'}]}>
                 <TextInput placeholder={lang("State")} value={state.state} onChangeText={state => this.setState({state})}
                     fixHeight style={{flex:1}} validation={required} />

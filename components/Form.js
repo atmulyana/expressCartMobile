@@ -5,7 +5,7 @@
  * @format
  * @flow strict-local
  */
-import {setRef} from 'react-native-form-input-validator';
+import {setRef} from 'reactjs-common';
 import Notification from './Notification';
 import Partial from './Partial';
 import ValidationContainer from './ValidationContainer';

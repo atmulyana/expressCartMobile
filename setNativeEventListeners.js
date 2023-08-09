@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import noop from './common/noop';
+import {noop} from './common';
 
 module.exports = nativeModuleName => {
     /** This function exists in order to avoid warning message:

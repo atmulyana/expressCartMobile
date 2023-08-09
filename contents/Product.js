@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 import React from 'react';
-import {View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import RenderHtml from 'react-native-render-html';
 import {
     Button,
@@ -25,15 +25,21 @@ import {
 } from '../components';
 import Content from './Content';
 import routes from './routes'; 
-import {appHelpers, contentWidth, currencySymbol, digitCount, formatAmount, lang, timeAgo} from '../common';
+import {appHelpers, contentWidth, currencySymbol, digitCount, emptyString, formatAmount, lang, timeAgo} from '../common';
 import styles from '../styles';
 import {Validation} from 'react-native-form-input-validator';
 import {min, required} from 'react-native-form-input-validator/rules';
 
+const {descStyle} = StyleSheet.create({
+    descStyle: {
+        height: styles.textInputHeight.height + 2 * styles.textInput.lineHeight, //iOS doesn't support `numberOfLines` prop
+    }
+});
+
 class ReviewForm extends LessPureComponent {
     state = {
-        title: '',
-        description: '',
+        title: emptyString,
+        description: emptyString,
         rating: 0,
     };
     _modal = null;
@@ -77,7 +83,7 @@ class ReviewForm extends LessPureComponent {
             
             <Text>{lang('Description')}:</Text>
             <TextInput placeholder={lang('Product is great. Does everything it said it can do.')} value={state.description}
-                onChangeText={description => this.setState({description})} multiline numberOfLines={3} para4 validation={required} />
+                onChangeText={description => this.setState({description})} multiline numberOfLines={3} para4 style={descStyle} validation={required} />
             
             <Text value={state.rating}>{lang('Rating')}:  <Text bold>{state.rating}</Text></Text>
             <Validation rules={min(1)} value={state.rating} />
@@ -94,7 +100,7 @@ export default class Product extends Content {
     constructor(props) {
         super(props);
         Object.assign(this.state, {
-            comment: '',
+            comment: emptyString,
             quantity: 1,
             reviewsShow: false,
             variant: null,
@@ -156,16 +162,18 @@ export default class Product extends Content {
 
                             <Text>{lang('Options')}</Text>
                             <ComboBox
-                                items={variants.map(variant => (
-                                    {
-                                        value: variant,
-                                        label: variant.title
-                                    }
-                                ))}
                                 value={state.variant}
                                 onValueChange={variant => this.setState({variant})}
                                 style={styles.para8}
-                            />
+                            >{
+                                variants.map(variant => (
+                                    <ComboBox.Item
+                                        key={variant._id}
+                                        value={variant}
+                                        label={variant.title}
+                                    />
+                                ))
+                            }</ComboBox>
                         </>)
                         : (
                             <Text para8 gray>

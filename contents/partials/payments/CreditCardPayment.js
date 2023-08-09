@@ -8,34 +8,53 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {required, rule} from 'react-native-form-input-validator/rules';
-import {Button, CreditCard, Text, Validation} from '../../../components';
+import CreditCard from 'rn-cc-input';
+import {Button, Text, Validation} from '../../../components';
 import {lang} from '../../../common';
 import styles from '../../../styles';
 
+const ccInputStyle = [styles.textInput, styles.textInputHeight, styles.para4],
+      ccInputStyleError = {borderColor: styles.red};
+
 export default function CreditCardPayment({ccProps, onSubmit, pageSubmit, paymentConfig, submitData}) {
-    const cc = {
+    const {current: cc} = React.useRef({
         input: null,
         validator: null,
         errMessage: null,
-    };
+    });
+    cc.invalidMessage = lang('Invalid Credit Card');
+    const inputRef = React.useCallback(comp => cc.input = comp, []),
+          inputValue = React.useCallback(() => cc.input?.value, []),
+          validatorRef = React.useCallback(comp => cc.validator = comp, []),
+          validatorRef2 = React.useCallback(() => cc.validator, []);
 
     return <>
         <Text para4>{paymentConfig.description}</Text>
-        <CreditCard  {...ccProps} ref={comp => cc.input = comp} style={styles.para4} validator={() => cc.validator} />
+        <CreditCard {...ccProps}
+            cardHolderText={lang('Card holder')}
+            ifValidNumberNext={true}
+            numberText={lang('Card number')}
+            placeholderTextColorError={styles.red}
+            postalCodeText={lang('Post code')}
+            ref={inputRef}
+            style={ccInputStyle}
+            styleError={ccInputStyleError}
+            validator={validatorRef2}
+        />
         <Validation
             errorTextStyle={[{marginTop: 0}, styles.para4]}
-            ref={comp => cc.validator = comp}
+            ref={validatorRef}
             rules={[
                 required,
                 rule(() => {
                     let status;
-                    if (!cc.input?.isValid) status = lang('Invalid Credit Card');
+                    if (!cc.input?.isValid) status = cc.invalidMessage;
                     else if (!cc.errMessage) status = true;
                     else status = cc.errMessage;
                     return status;
                 })
             ]}
-            value={() => cc.input?.value}
+            value={inputValue}
         />
         <Button
             onPress={() => {

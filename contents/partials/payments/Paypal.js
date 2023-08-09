@@ -12,7 +12,7 @@ import WebView from 'react-native-webview';
 import PaymentComponent from './PaymentComponent';
 import routes from '../../routes';
 import {Button, Icon, SubmittingIndicator, Text} from '../../../components';
-import {appHelpers, lang, serverUrl} from '../../../common';
+import {appHelpers, emptyString, lang, serverUrl} from '../../../common';
 import styles from '../../../styles';
 
 const PaymenStatus = {
@@ -34,7 +34,7 @@ export default class Paypal extends PaymentComponent {
         switch (code) {
             case PaymenStatus.Success:
                 let queryIdx = url.indexOf('?');
-                let query = queryIdx >= 0 ? url.substr(queryIdx) : ''; 
+                let query = queryIdx >= 0 ? url.substr(queryIdx) : emptyString; 
                 this.props.pageSubmit(`/paypal/checkout_return${query}`, null);
                 break;
             case PaymenStatus.Cancelled:
@@ -52,7 +52,7 @@ export default class Paypal extends PaymentComponent {
 
     render() {
         const {config, paymentConfig} = this.props;
-        const rootUrl = serverUrl('');
+        const rootUrl = serverUrl(emptyString);
         return <>
             <Text para4>{paymentConfig.paypal.description}</Text>
             <Button

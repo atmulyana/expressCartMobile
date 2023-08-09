@@ -10,7 +10,7 @@ import {Buffer} from 'buffer';
 import CreditCardPayment from './CreditCardPayment';
 import PaymentComponent from './PaymentComponent';
 import {Notification} from '../../../components';
-import {lang} from '../../../common';
+import {emptyString, lang} from '../../../common';
  
 
 /* NOTE: In server (web) app, in the file 'lib/payments/payway.js', please remove `customerIpAddress`, it shouldn't be sent to payment gateway */
@@ -49,7 +49,7 @@ export default class Payway extends PaymentComponent {
                     else if (err.status == 422) {
                         cc.errMessage = lang('Invalid Credit Card');
                         if (err.data && Array.isArray(err.data.data) && err.data.data[0]?.message) {
-                            let field = '';
+                            let field = emptyString;
                             switch (err.data.data[0]?.fieldName) {
                                 case 'cardNumber': field = lang('Card number'); break;
                                 case 'cvn': field = 'CVC'; break;

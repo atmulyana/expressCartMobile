@@ -31,16 +31,18 @@ const ProductItem = ({data, config, itemStyle, submit}) => {
                 ? config.showHomepageVariants 
                     
                     ? <ComboBox
-                        items={data.variants.map(variant => (
-                            {
-                                value: variant,
-                                label: currencySymbol(config.currencySymbol) + formatAmount(variant.price) + ' (' + variant.title + ')'
-                            }
-                        ))}
                         value={variant}
                         onValueChange={setVariant}
                         style={[styles.textGray, styles.para4]}
-                      />
+                      >{
+                        data.variants.map(variant => (
+                            <ComboBox.Item
+                                key={variant._id}
+                                value={variant}
+                                label={currencySymbol(config.currencySymbol) + formatAmount(variant.price) + ' (' + variant.title + ')'}
+                            />
+                        ))
+                      }</ComboBox>
                     
                     : <Text style={[styles.para4, styles.productText, styles.textGray]}>
                         {currencySymbol(config.currencySymbol)}{formatAmount(data.variants[0].price)}

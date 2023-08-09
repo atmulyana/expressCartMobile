@@ -7,13 +7,10 @@
  * 
  * To make 'style' writing shorter and handle validation
  */
-import React from 'react';
 import {TextInput} from 'react-native';
 import PropTypes from 'prop-types';
-import {setStatusStyleDefault, withValidation} from 'react-native-form-input-validator';
-import {ValidationRule} from 'react-native-form-input-validator/rules';
 import ValidatedInput from './ValidatedInput';
-import {lang, shallowCompareExclude} from '../common';
+import {shallowCompareExclude} from '../common';
 import styles from '../styles';
 
 const propStyles = {

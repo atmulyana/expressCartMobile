@@ -8,13 +8,13 @@
  import React from 'react';
  import {Button, Text} from '../components';
  import Content from './Content';
- import {appHelpers, lang} from '../common';
+ import {appHelpers, emptyString, lang} from '../common';
  import {buttonOutlinePrimary, green, yellow, red} from '../styles';
 
  export default class PaymentComplete extends Content {
     render() {
         const {config, result} = this.data, status = result.orderStatus;
-        let message = '', color = green;
+        let message = emptyString, color = green;
         switch(status) {
             case 'Paid':
                 message = lang('Your payment has been successfully processed.');

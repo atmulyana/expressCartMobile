@@ -13,7 +13,7 @@ import LessPureComponent from './LessPureComponent';
 
 export default class ValidatedInput extends LessPureComponent {
     static createProxy() {
-        return proxyClass(this, target => target.inputRef);
+        return proxyClass(this, target => target.inputRef, true);
     };
 
     static defaultCreateOption = rules => ({

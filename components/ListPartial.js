@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Partial from './Partial';
+import {emptyString} from '../common';
 import {scrollView as scrollViewStyle} from '../styles';
 
 export default class ListPartial extends Partial {
@@ -78,7 +79,7 @@ export default class ListPartial extends Partial {
                 contentContainerStyle: {padding:0},
                 data: this.data?.results ?? [],
                 extraData: this.state.lastPageUrl,
-                keyExtractor: (_, idx) => idx+'',
+                keyExtractor: (_, idx) => idx + emptyString,
                 //scrollEnabled: false,
             },
         };

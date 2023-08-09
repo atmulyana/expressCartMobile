@@ -28,7 +28,7 @@ const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
 import styles from './styles';
-import {addDimensionChangeListener, appHelpers, lang, noop, setWinInsets } from './common';
+import {addDimensionChangeListener, appHelpers, emptyString, lang, noop, setWinInsets } from './common';
 
 import * as Contents from './contents';
 import routes from './contents/routes';
@@ -264,7 +264,7 @@ export default function() {
                         headerStyle: styles.navHeader,
                         headerTitleAlign: 'center',
                         headerTitleStyle: styles.navHeaderTitle,
-                        title: '',
+                        title: emptyString,
                     }}>
                         {routeNames.map((name, idx) =>
                             <Stack.Screen
@@ -315,7 +315,7 @@ export default function() {
                             },
                             drawerType: 'front',
                             headerShown: false,
-                            title: ''
+                            title: emptyString
                         }}
                     >
                         <Drawer.Screen name="root" component={App}

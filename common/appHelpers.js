@@ -5,8 +5,8 @@
  * @format
  * @flow strict-local
  */
+import noop from 'javascript-common';
 import {callServer} from './server';
-import noop from './noop';
 
 const appHelpers = {
     contentCanGoBack: false,

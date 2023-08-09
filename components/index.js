@@ -5,7 +5,6 @@ export {default as Button} from './Button';
 export {default as CartButton} from './CartButton';
 export {default as ComboBox} from './ComboBox';
 export {default as ContentLink} from './ContentLink';
-export {default as CreditCard} from './CreditCard';
 export {default as Form} from './Form';
 export {default as HeaderBar} from './HeaderBar';
 export {default as Icon} from './Icon';

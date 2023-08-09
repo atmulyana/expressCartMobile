@@ -8,7 +8,7 @@
 import React from 'react';
 import {Platform, View} from 'react-native';
 
-import {appHelpers, lang} from '../common';
+import {appHelpers, emptyString, lang} from '../common';
 import styles from '../styles';
 import {home, search} from '../contents/routes';
 import AccountMenu from './AccountMenu';
@@ -21,17 +21,17 @@ import SearchText from './SearchText';
 
 
 function getSearchTextFromUrl() {
-    const url = appHelpers.currentRoute?.params?.url ?? '',
+    const url = appHelpers.currentRoute?.params?.url ?? emptyString,
           prefix = '/search/';
     if (url.startsWith(prefix)) {
         return decodeURIComponent( url.substring(prefix.length).replace(/\+/g, ' ') );
     }
-    return '';
+    return emptyString;
 }
 
 export default class SearchBar extends LessPureComponent {
     state = {
-        searchText: '',
+        searchText: emptyString,
     }
 
     constructor(props) {
@@ -62,7 +62,7 @@ export default class SearchBar extends LessPureComponent {
                 </ContentLink>
                 <ContentLink route={home}
                              onPress={() => {
-                                 this.setState({searchText:''});
+                                 this.setState({searchText: emptyString});
                                  txtSearch?.blur();
                              }}
                              style={[styles.ml4, {display: isSearching ? 'flex' : 'none'}]}>

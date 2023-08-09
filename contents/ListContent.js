@@ -9,7 +9,7 @@ import React from 'react';
 import {FlatList} from 'react-native';
 import Content from './Content';
 import {LoadingMoreIndicator} from '../components';
-import {callServer} from '../common';
+import {callServer, emptyString} from '../common';
 import {p8 as scrollContentStyle} from '../styles';
 
 export default class ListContent extends Content {
@@ -60,7 +60,7 @@ export default class ListContent extends Content {
             props: {
                 contentContainerStyle: scrollContentStyle,
                 data: this.data?.results ?? [],
-                keyExtractor: (item, idx) => idx+'',
+                keyExtractor: (item, idx) => idx + emptyString,
                 ListFooterComponent: <LoadingMoreIndicator />,
                 ListFooterComponentStyle: {
                     //display: this.state.isLoadingMore ? 'flex' : 'none',

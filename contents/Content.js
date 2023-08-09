@@ -16,7 +16,7 @@ import {
 import {useFocusEffect} from '@react-navigation/native';
 import {customerLogin, home, getRouteByUrl} from './routes';
 import {contentCentered, p8 as scrollContentStyle, scrollView as scrollViewStyle} from '../styles';
-import {appHelpers, lang} from '../common';
+import {appHelpers, emptyString, lang} from '../common';
 import {Partial} from '../components';
 
 function ContentInit({ url, loader, refresher, submitter, refreshNoLoadData, nav }) {
@@ -79,7 +79,7 @@ export default class Content extends Partial {
         if (this.data?.filtered && this.data?.paginateUrl == 'search') {
             return `${lang('Search results')}: ${this.data?.searchTerm}`
         }
-        return this.data?.title ?? this.props.route?.params?.title ?? '';
+        return this.data?.title ?? this.props.route?.params?.title ?? emptyString;
     }
 
     _render(content, submittingIndicator) {
@@ -148,7 +148,7 @@ export default class Content extends Partial {
     }
     
     #setTitle = () => {
-        let cartTitle = this.data?.config?.cartTitle ?? '';
+        let cartTitle = this.data?.config?.cartTitle ?? emptyString;
         if (cartTitle) appHelpers.setCartTitle(cartTitle);
         this.props.navigation?.setOptions({title: this.contentTitle});
     };

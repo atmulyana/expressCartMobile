@@ -10,7 +10,7 @@ import {View} from 'react-native';
 import PropTypes from 'prop-types';
 import {Box, Button, ContentLink, Icon, Image, IntegerSpinner, LessPureComponent, ListPartial, Notification, Text} from '../../components';
 import routes from '../routes';
-import {appHelpers, callServer, confirmModal, currencySymbol, digitCount, formatAmount, lang} from '../../common';
+import {appHelpers, callServer, confirmModal, currencySymbol, digitCount, formatAmount, lang, noChange} from '../../common';
 import styles from '../../styles';
 
 const renderItem = (cartId, data, isReadOnly, currency, maxQty, qtyLength, submitData, refresh) =>
@@ -23,7 +23,7 @@ const renderItem = (cartId, data, isReadOnly, currency, maxQty, qtyLength, submi
                 <Text>{data.title}</Text>
             </ContentLink>
             {!!data.variantId &&
-                <Text para4><Text bold>{lang("Option")}:</Text> {data.variantTitle}</Text>
+                <Text para4><Text bold>{lang("Options")}:</Text> {data.variantTitle}</Text>
             }
             <View style={{alignItems:'center', flexDirection:'row'}}>
             {!isReadOnly && <>
@@ -132,7 +132,7 @@ export class CartContent extends ListPartial {
         const elm = super.getListComponent();
         Object.assign(elm.props, {
             data: cartIds,
-            keyExtractor: cartId => cartId,
+            keyExtractor: noChange,
             ListEmptyComponent: isLoading ? null : <Text>{lang('Empty cart')}</Text>,
             ListHeaderComponent: <Text large bold para8>{lang('Cart contents')}</Text>,
             ListFooterComponent: cartIds.length > 0 && <CartTotal session={session} currency={currency} />,

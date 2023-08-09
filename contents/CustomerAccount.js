@@ -12,7 +12,7 @@ import Content from './Content';
 import routes from './routes';
 import ShippingForm from './partials/ShippingForm';
 import {appHelpers, currencySymbol, formatAmount, formatDate, lang} from '../common';
-import {buttonOutlineSuccess, gray, green, ml4, mr4, p8, red, yellow} from '../styles';
+import {buttonOutlineSuccess, gray, green, p8, red, yellow} from '../styles';
 
 const RowBox = props => <View style={[p8, props.style]}>
     {props.children}
@@ -171,7 +171,7 @@ export default class CustomerAccount extends Content {
 
     render() {
         return <TwoPane
-            left={<Box style={mr4}>
+            left={<Box>
                 <ShippingForm ref={comp => this._shipping = comp}
                     data={this.data}
                     footer={<Button title={lang('Save details')}
@@ -180,7 +180,7 @@ export default class CustomerAccount extends Content {
                     />}
                 />
             </Box>}
-            right={<Box style={ml4}>
+            right={<Box>
                 <Orders orders={this.data.orders} config={this.data.config} />
             </Box>}
         />;

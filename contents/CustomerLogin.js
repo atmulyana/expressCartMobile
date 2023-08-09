@@ -9,7 +9,7 @@ import React from 'react';
 import {Button, Form, Text, TextInput, ValidationContainer} from '../components';
 import Content from './Content';
 import routes from './routes';
-import {appHelpers, correctWidth, lang} from '../common';
+import {appHelpers, correctWidth, emptyString, lang} from '../common';
 import styles from '../styles';
 import {email, required} from 'react-native-form-input-validator/rules';
 
@@ -22,8 +22,8 @@ export default class CustomerLogin extends Content {
     constructor(props) {
         super(props);
         Object.assign(this.state, {
-            email: '',
-            password: '',
+            email: emptyString,
+            password: emptyString,
         });
     }
 

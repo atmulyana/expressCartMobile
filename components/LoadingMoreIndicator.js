@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 import React from 'react';
-import {Animated, StyleSheet, Text, View} from 'react-native';
+import {Animated, StyleSheet, View} from 'react-native';
 import {/*ViewPropTypes,*/ TextPropTypes} from 'deprecated-react-native-prop-types';
 import LessPureComponent from './LessPureComponent';
 import PropTypes from 'prop-types';

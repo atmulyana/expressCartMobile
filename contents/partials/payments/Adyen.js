@@ -43,7 +43,7 @@ import CreditCardPayment from './CreditCardPayment';
 import PaymentComponent from './PaymentComponent';
 import routes from '../../routes';
 import {Notification} from '../../../components';
-import {appHelpers, lang} from '../../../common';
+import {appHelpers, emptyString, lang} from '../../../common';
 
 const ENCRYPT_DATE_FORMATTER = new JsSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 const ENCRYPT_PREFIX = 'adyenjs_';
@@ -87,7 +87,7 @@ class Encryption {
     }
 
     static createRsa(publicKey) {
-        const [exponent, modulus] = (publicKey+'').split('|', 2);
+        const [exponent, modulus] = (publicKey + emptyString).split('|', 2);
         let rsa = new RSAKey();
 		rsa.setPublic(modulus, exponent);
 		return rsa;

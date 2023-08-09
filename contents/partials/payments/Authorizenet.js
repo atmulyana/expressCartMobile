@@ -10,7 +10,7 @@ import CreditCardPayment from './CreditCardPayment';
 import PaymentComponent from './PaymentComponent';
 import routes from '../../routes';
 import {Notification} from '../../../components';
-import {appHelpers, lang} from '../../../common';
+import {appHelpers, emptyString, lang} from '../../../common';
 
 /***
  * This function is taken from https://jstest.authorize.net/v1/AcceptCore.js
@@ -39,9 +39,9 @@ export default class Authorizenet extends PaymentComponent {
                                 type: "TOKEN",
                                 id: newGuid(),
                                 token: {
-                                    cardNumber: ccData.number.replace(/ /g, ''),
-                                    expirationDate: `00${ccData.expired.month||''}`.match(lastTwoDigits)[0]
-                                        + `00${ccData.expired.year||''}`.match(lastTwoDigits)[0],
+                                    cardNumber: ccData.number.replace(/ /g, emptyString),
+                                    expirationDate: `00${ccData.expired.month || emptyString}`.match(lastTwoDigits)[0]
+                                        + `00${ccData.expired.year || emptyString}`.match(lastTwoDigits)[0],
                                     cardCode: ccData.cvc,
                                 },
                             },

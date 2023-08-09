@@ -17,7 +17,7 @@ import LessPureComponent from './LessPureComponent';
 import Notification from './Notification';
 import Text from './Text';
 import ValidationContainer from './ValidationContainer';
-import {lang, noop} from '../common';
+import {emptyString, lang, noop} from '../common';
 import styles from '../styles';
 
 export default class extends LessPureComponent {
@@ -95,7 +95,7 @@ export default class extends LessPureComponent {
                 <Form ref={elm => this._form = elm} style={[styles.modal, props.style]}>
                 <ValidationContainer>
                     <View style={[styles.p8, styles.bb, {flexDirection:'row'}]}>
-                        <Text large red style={{flex:1}}>{props.title ?? ''}</Text>
+                        <Text large red style={{flex:1}}>{props.title ?? emptyString}</Text>
                         <Icon icon="X" strokeWidth={4} height={16} width={16} onPress={() => this.hide()} />
                     </View>
                     <ScrollView style={[styles.p8, {flex:1}]}>

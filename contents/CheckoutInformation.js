@@ -13,15 +13,15 @@ import Content from './Content';
 import routes from './routes';
 import Cart from './partials/Cart';
 import ShippingForm from './partials/ShippingForm';
-import {appHelpers, lang} from '../common';
+import {appHelpers, emptyString, lang} from '../common';
 import styles from '../styles';
 import {email, required, strlen} from 'react-native-form-input-validator/rules';
 
 
 class LoginForm extends LessPureComponent {
     state = {
-        loginEmail: '',
-        loginPassword: '',
+        loginEmail: emptyString,
+        loginPassword: emptyString,
     }
     render() {
         const state = this.state;
@@ -61,7 +61,7 @@ export default class CheckoutInformation extends Content {
 
     state = Object.assign(this.state, {
         createAccount: false,
-        password: '',
+        password: emptyString,
     });
     
     render() {
@@ -71,7 +71,7 @@ export default class CheckoutInformation extends Content {
             shipping: null,
         }
         return <TwoPane
-            left={<Box style={styles.mr4}>
+            left={<Box>
                 <ShippingForm ref={comp => refs.shipping = comp}
                     data={this.data}
                     header={appHelpers.isLoggedIn

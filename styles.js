@@ -5,8 +5,8 @@
  * @format
  * @flow strict-local
  */
-import { StyleSheet } from 'react-native';
-import { contentPadding } from './common';
+import {StyleSheet} from 'react-native';
+import {contentPadding} from './common';
 
 const gray = '#aaa';
 const green = '#28a745';
@@ -347,6 +347,7 @@ StyleSheet.create({
         alignSelf: 'stretch',
         alignContent: 'flex-end',
         alignItems: 'flex-end',
+        columnGap: contentPadding,
         flexDirection: 'row',
         flexWrap: 'wrap-reverse',
         justifyContent: 'center',

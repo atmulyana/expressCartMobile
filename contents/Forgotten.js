@@ -9,7 +9,7 @@ import React from 'react';
 import {Button, Form, Notification, Text, TextInput, ValidationContainer} from '../components';
 import Content from './Content';
 import routes from './routes';
-import {correctWidth, lang} from '../common';
+import {correctWidth, emptyString, lang} from '../common';
 import styles from '../styles';
 import {required, email} from 'react-native-form-input-validator/rules';
 
@@ -23,7 +23,7 @@ export default class Forgotten extends Content {
     constructor(props) {
         super(props);
         Object.assign(this.state, {
-            email: '',
+            email: emptyString,
         });
     }
 

@@ -22,7 +22,7 @@ export default class Stripe extends PaymentComponent {
                 postData.append('card[exp_month]', ccData.expired.month);
                 postData.append('card[exp_year]', ccData.expired.year);
                 postData.append('card[cvc]', ccData.cvc);
-                postData.append('card[address_zip]', ccData.zip ? ccData.zip : null);
+                postData.append('card[address_zip]', ccData.postalCode ? ccData.postalCode : null);
                 
                 submitData(
                     `https://api.stripe.com/v1/tokens`, 

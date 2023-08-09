@@ -12,8 +12,7 @@ import {Box, LessPureComponent, Notification, Text, TwoPane} from '../components
 import Content from './Content';
 import routes from './routes';
 import {CartContent} from './partials/Cart';
-import {appHelpers, currencySymbol, formatAmount, lang} from '../common';
-import styles from '../styles';
+import {appHelpers, currencySymbol, emptyString, formatAmount, lang} from '../common';
 
 //It seems to need more memories on emulator for Clipboard operation 
 require('../setNativeEventListeners')('RNCClipboard'); //'require' must be ended by ';' if not an error happens
@@ -158,7 +157,7 @@ class PaymentPanel extends LessPureComponent {
                     <Text style={{flex:3}}>{lang('Send BTC amount')}</Text>
                     <Text bold style={{flex:2}}>{expectedBtc}</Text>
                     <Text right link style={{flex:1}} onPress={() => {
-                        Clipboard.setString(expectedBtc+'');
+                        Clipboard.setString(expectedBtc+emptyString);
                         Notification.success(lang('Amount copied to clipboard'));
                     }}>{lang('Copy')}</Text>
                 </Box>
@@ -217,10 +216,10 @@ export default class CheckoutBlockonomics extends Content {
 
     render() {
         return <TwoPane
-            left={<Box style={styles.mr4}>
+            left={<Box>
                 <PaymentPanel data={this.data} pageSubmit={this.submitData} />
             </Box>}
-            right={<Box style={styles.ml4}>
+            right={<Box>
                 <CartContent data={this.data} />
             </Box>}
         />;
