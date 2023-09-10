@@ -15,6 +15,7 @@ module.exports = {
             + "|@react-native-picker"
             + "|react-native-reanimated"
             + "|react-native-webview"
+            + "|rn-cc-input"
             + "|rn-flex-image"
             + "|rn-images-slider"
             + "|rn-select-option"
