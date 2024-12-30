@@ -3,6 +3,7 @@ export {default as AccountMenu} from './AccountMenu';
 export {default as Box} from './Box';
 export {default as Button} from './Button';
 export {default as CartButton} from './CartButton';
+export {default as CheckBox} from './CheckBox';
 export {default as ComboBox} from './ComboBox';
 export {default as ContentLink} from './ContentLink';
 export {default as Form} from './Form';

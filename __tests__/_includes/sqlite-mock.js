@@ -52,7 +52,7 @@ class Database {
                         item: idx => rows[idx],
                     },
                 };
-                resolve([rs]);
+                resolve([null, rs]);
             });
         });
     }

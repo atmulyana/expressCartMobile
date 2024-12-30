@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
-import RenderHtml from 'react-native-render-html';
+import RenderHtml from '@builder.io/react-native-render-html';
 import {
     Button,
     ComboBox,
@@ -19,6 +19,7 @@ import {
     LessPureComponent,
     Modal,
     Notification,
+    Partial,
     RatingStars,
     Text,
     TextInput
@@ -94,6 +95,66 @@ class ReviewForm extends LessPureComponent {
     }
 }
 
+class Reviews extends Partial {
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: props.data,
+        };
+    }
+
+    onDataSubmitted(data) {
+        this.setState({data});
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        let should = super.shouldComponentUpdate(nextProps, nextState);
+        if (nextProps.data != this.props.data) nextState.data = nextProps.data;
+        return should;
+    }
+    
+    render() {
+        const {productId} = this.props;
+        const {reviews, isNext, page = 1} = this.state.data;
+        const pageNo = parseInt(page) || 1;
+        return <>
+            {reviews.map((item, idx) => <View key={idx} style={[styles.para8, styles.review]}>
+                <Text para4 style={styles.reviewTime}>{timeAgo(item.date)}</Text>
+                <Text para4>
+                    <Text bold>{lang("Rating")}: </Text>
+                    {item.rating}
+                </Text>
+                <Text para4>
+                    <Text bold>{lang("Title")}: </Text>
+                    {item.title}
+                </Text>
+                <Text para4>
+                    <Text bold>{lang("Description")}: </Text>
+                    {item.description}
+                </Text>
+            </View>)}
+            {(isNext || pageNo > 1) && <View style={styles.orderButtons}>
+                <Button disabled={pageNo < 2} style={buttonOutlinePrimary}
+                    onClick={() => this.submitData(`/product/${productId}/reviews/${pageNo - 1}`, null)}
+                >
+                    <Icon icon="ChevronsLeft"
+                        width={textStyle.fontSize}
+                        height={textStyle.fontSize}
+                    />
+                </Button>
+                <Button disabled={!isNext} style={buttonOutlinePrimary}
+                    onClick={() => this.submitData(`/customer/account/orders/${pageNo + 1}`, null)}
+                >
+                    <Icon icon="ChevronsRight"
+                        width={textStyle.fontSize}
+                        height={textStyle.fontSize}
+                    />
+                </Button>
+            </View>}
+        </>;
+    }
+}
+
 export default class Product extends Content {
     #reviewForm = null;
     
@@ -115,7 +176,7 @@ export default class Product extends Content {
 
     render() {
         const state = this.state;
-        const { config, images, relatedProducts, reviews, result, variants } = this.data;
+        const { config, images, relatedProducts, reviews, result, session, variants } = this.data;
         
         //Recalculate the image width in the case the screen width is too small
         const imageStyle = {...styles.productInfoImage};
@@ -251,21 +312,7 @@ export default class Product extends Content {
                             </View>}
                         </View>
                         <View style={{display: state.reviewsShow ? 'flex' : 'none'}}>
-                            {reviews.reviews.map((item, idx) => <View key={idx} style={[styles.para8, styles.review]}>
-                                <Text para4 style={styles.reviewTime}>{timeAgo(item.date)}</Text>
-                                <Text para4>
-                                    <Text bold>{lang("Rating")}: </Text>
-                                    {item.rating}
-                                </Text>
-                                <Text para4>
-                                    <Text bold>{lang("Title")}: </Text>
-                                    {item.title}
-                                </Text>
-                                <Text para4>
-                                    <Text bold>{lang("Description")}: </Text>
-                                    {item.description}
-                                </Text>
-                            </View>)}
+                            <Reviews productId={result._id} data={{...reviews, session}} />
                         </View>
                     </>}
                     

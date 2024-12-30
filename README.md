@@ -30,9 +30,9 @@ It's a mobile app for shopping cart which is developed using React Native.
 
    Change the value of `maxAge` to `null`.
 
-2. You should have set up the React Native development environment as described [here](https://reactnative.dev/docs/environment-setup).
+2. You should have set up the React Native development environment as described [here](https://reactnative.dev/docs/set-up-your-environment).
    Follow "React Native CLI Quickstart".    
-   Note for Android: you should install SDK (compile) and NDK version written in `android/build.gradle` and also install CMake version 3.18.1
+   Note for Android: you should install SDK (compile) and NDK version written in `android/build.gradle` and also install CMake version 3.22.1
 
 3. Download/clone this project.
 
@@ -75,3 +75,6 @@ It's a mobile app for shopping cart which is developed using React Native.
    6.2. For iOS   
 
         npx react-native run-ios
+
+     If you fail to run the app for iOS, please try rebuilding with XCode by opening **ios/expressCartMobile.xcworkspace**.
+     After succeeding building, (you may close XCode and) please try to re-execute `npx react-native run-ios`

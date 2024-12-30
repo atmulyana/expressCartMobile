@@ -7,8 +7,7 @@
  */
 import React from 'react';
 import {View} from 'react-native';
-import CheckBox from '@react-native-community/checkbox';
-import {Box, Button, LessPureComponent, Form, Text, TextInput, TwoPane, ValidationContainer} from '../components';
+import {Box, Button, CheckBox, LessPureComponent, Form, Text, TextInput, TwoPane, ValidationContainer} from '../components';
 import Content from './Content';
 import routes from './routes';
 import Cart from './partials/Cart';

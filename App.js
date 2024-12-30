@@ -28,7 +28,7 @@ const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
 import styles from './styles';
-import {addDimensionChangeListener, appHelpers, emptyString, lang, noop, setWinInsets } from './common';
+import {addDimensionChangeListener, appHelpers, emptyString, lang, noop, setWinInsets, setCookie} from './common';
 
 import * as Contents from './contents';
 import routes from './contents/routes';
@@ -105,14 +105,19 @@ export default function() {
             if (header1 === undefined) header1 = routes.home.headerBar;
             if (header2 === undefined) header2 = routes.home.headerBar;
             return currentRoute?.name == route?.name
-                && currentRoute?.params?.url == route?.url
+                && currentRoute?.params?.url == (route?.url ?? route?.$url)
                 && header1 == header2;
         }
 
         loadContent(name, url, headerBar, isReplace = false) {
             var data;
-            if (typeof(name) == 'object')
+            if (typeof(name) == 'object') {
+                if (name == routes.home) {
+                    this.goHome();
+                    return;
+                }
                 var {name, url, headerBar, data} = name;
+            }
 
             if (navigation) {
                 if (this.isOnRoute({name, url, headerBar}) && !data)
@@ -135,15 +140,28 @@ export default function() {
         }
 
         goto(route) {
-            navigation.navigate(route.name, {
-                url: route.url ?? route.$url,
-                headerBar: routes.headerBar,
-            });
+            if (route == routes.home) {
+                this.goHome();
+            }
+            else {
+                navigation.navigate(route.name, {
+                    url: route.url ?? route.$url,
+                    headerBar: routes.headerBar,
+                });
+            }
         }
 
         goHome() {
-            //this.loadContent(routes.home);
-            this.goto(routes.home);
+            const {name, url, headerBar} = routes.home;
+            navigation.reset({
+                index: 0,
+                routes: [
+                    {
+                        name,
+                        params: {url, headerBar},
+                    },
+                ],
+            });
         }
 
         setHeaderBar(headerBar = routes.home.headerBar) {
@@ -173,6 +191,7 @@ export default function() {
 
         async setLang(code) {
             await lang.set(code);
+            await setCookie('locale', code);
         }
 
         onLangChange = () => {
@@ -258,8 +277,9 @@ export default function() {
                     <HeaderBar name={this.state.headerBar} flag={this.state.headerBarFlag} />
                     
                     <Stack.Navigator initialRouteName={Contents.default} screenOptions={{
-                        animationEnabled: Platform.OS == 'android', //On iOS, animation keeps issueing warning log
-                        headerBackTitleVisible: false,
+                        animation: Platform.OS == 'ios' ? 'none' : 'default', //On iOS, animation raises an error
+                        headerBackButtonDisplayMode: 'minimal',
+                        headerMode: 'screen',
                         headerStatusBarHeight: 0,
                         headerStyle: styles.navHeader,
                         headerTitleAlign: 'center',

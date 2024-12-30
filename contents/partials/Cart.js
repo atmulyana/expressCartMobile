@@ -35,7 +35,7 @@ const renderItem = (cartId, data, isReadOnly, currency, maxQty, qtyLength, submi
                             productId: data.productId,
                             quantity
                         })
-                        .then(refresh)
+                        .then(() => refresh())
                         .catch(Notification.errorHandler)
                     }}
                     onExceedMax={() => Notification.warning(`Exceeds maximum quantity: ${maxQty}`)}

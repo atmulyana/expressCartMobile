@@ -7,6 +7,7 @@
  */
 import {Alert} from 'react-native'
 import {URL} from 'react-native-url-polyfill'
+import CookieManager from '@react-native-cookies/cookies'
 import lang from './lang'
 
 const SERVER = 'http://192.168.56.1:1111'
@@ -103,3 +104,6 @@ export const callServer = async (url, data, headers={}) => {
     return promise
 }
 
+export const setCookie = async (name, value) => {
+    return await CookieManager.set(SERVER, {name, value})
+}

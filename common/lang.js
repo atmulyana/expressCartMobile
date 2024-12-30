@@ -17,7 +17,6 @@ const languages = {
 };
 
 import SQLite from '@mendix/react-native-sqlite-storage';
-SQLite.enablePromise(true);
 
 /*** Realm module makes this app dies on emulator. Memory problem??? You may try on bigger memory or on the real smartphone
 //=========================================================================================================================
@@ -112,7 +111,7 @@ class Lang extends Function {
         if (isToLoad) {
             try {
                 db = await SQLite.openDatabase({name: "data.sqlite", createFromLocation: "~data.sqlite", readOnly: true});
-                const [rs] = await db.executeSql(`SELECT ${keyLangCode} AS key, ${langCode} AS value FROM locales`);
+                const [_, rs] = await db.executeSql(`SELECT ${keyLangCode} AS key, ${langCode} AS value FROM locales`);
                 const map = {};
                 rs.rows.raw().forEach(row => map[row.key] = row.value);
                 this._texts = map;

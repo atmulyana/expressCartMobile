@@ -6,13 +6,21 @@
  * @flow strict-local
  */
 import React from 'react';
-import {View} from 'react-native';
-import {Box, Button, LessPureComponent, Text, TwoPane} from '../components';
+import {StyleSheet, View} from 'react-native';
+import {Box, Button, Icon, LessPureComponent, Partial, Text, TwoPane} from '../components';
 import Content from './Content';
 import routes from './routes';
 import ShippingForm from './partials/ShippingForm';
 import {appHelpers, currencySymbol, formatAmount, formatDate, lang} from '../common';
-import {buttonOutlineSuccess, gray, green, p8, red, yellow} from '../styles';
+import {buttonOutlinePrimary, buttonOutlineSuccess, gray, green, p8, red, text as textStyle, yellow} from '../styles';
+
+const styles = StyleSheet.create({
+    orderButtons: {
+        flexDirection: 'row',
+        gap: 8,
+        justifyContent: 'center',
+    }
+});
 
 const RowBox = props => <View style={[p8, props.style]}>
     {props.children}
@@ -141,9 +149,27 @@ class OrderItem extends LessPureComponent {
     }
 }
 
-class Orders extends LessPureComponent {
+class Orders extends Partial {
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: props.data
+        };
+    }
+
+    onDataSubmitted(data) {
+        this.setState({data});
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        let should = super.shouldComponentUpdate(nextProps, nextState);
+        if (nextProps.data != this.props.data) nextState.data = nextProps.data;
+        return should;
+    }
+    
     render() {
-        const {config, orders} = this.props;
+        const {config, orders, isNext, page = 1} = this.state.data;
+        const pageNo = parseInt(page) || 1;
         return <>
             <Text large bold para4>{lang('Orders')}</Text>
             {orders && orders.length > 0
@@ -152,6 +178,24 @@ class Orders extends LessPureComponent {
                     <Text green link onPress={() => appHelpers.goHome()}>{lang('Order here')}</Text>
                   </Text>
             }
+            {(isNext || pageNo > 1) && <View style={styles.orderButtons}>
+                <Button disabled={pageNo < 2} style={buttonOutlinePrimary}
+                    onClick={() => this.submitData(`/customer/account/orders/${pageNo - 1}`, null)}
+                >
+                    <Icon icon="ChevronsLeft"
+                        width={textStyle.fontSize}
+                        height={textStyle.fontSize}
+                    />
+                </Button>
+                <Button disabled={!isNext} style={buttonOutlinePrimary}
+                    onClick={() => this.submitData(`/customer/account/orders/${pageNo + 1}`, null)}
+                >
+                    <Icon icon="ChevronsRight"
+                        width={textStyle.fontSize}
+                        height={textStyle.fontSize}
+                    />
+                </Button>
+            </View>}
         </>;
     }
 }
@@ -181,7 +225,7 @@ export default class CustomerAccount extends Content {
                 />
             </Box>}
             right={<Box>
-                <Orders orders={this.data.orders} config={this.data.config} />
+                <Orders data={this.data} />
             </Box>}
         />;
     }

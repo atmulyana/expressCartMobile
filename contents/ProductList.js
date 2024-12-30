@@ -135,7 +135,13 @@ export default class ProductList extends ListContent {
             renderItem: ({item:row}) => {
                 return <View style={styles.productRow}>
                     {row.map((item, idx) => item != null
-                        ? <ProductItem {...{key:item._id, data:item, config, itemStyle, submit: this.submitData}} />
+                        ? <ProductItem
+                            key={item._id} 
+                            data={item}
+                            config={config}
+                            itemStyle={itemStyle}
+                            submit={this.submitData}
+                        />
                         : <View key={idx} style={[itemStyle, {backgroundColor:'transparent'}]} />
                     )}
                 </View>;
