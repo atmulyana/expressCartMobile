@@ -48,8 +48,7 @@ export default class Forgotten extends Content {
                     onPress={() => {
                         form.submitData('/customer/forgotten_action', {
                             email: this.state.email,
-                        })
-                        .valid(data => Notification.success(data.message));
+                        });
                     }}
                 />
             </ValidationContainer>

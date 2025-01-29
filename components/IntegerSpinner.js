@@ -127,7 +127,7 @@ class IntegerSpinner extends IconTextInput {
         const state = this.state, props = this.props;
         
         if (props.onValueChange && prevState.value !== state.value)
-            props.onValueChange(intVal(state.value), intVal(prevState.value));
+            props.onValueChange(intVal(state.value), intVal(prevState.value), prevProps.value !== props.value);
         
         if (state.valueEntered !== undefined) {
             if (props.min !== undefined && props.onLessMin && props.min > state.valueEntered)

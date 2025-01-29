@@ -27,21 +27,20 @@ export default class Stripe extends PaymentComponent {
                 submitData(
                     `https://api.stripe.com/v1/tokens`, 
                     postData,
-                    { Authorization: `Bearer ${paymentConfig.publicKey}` }
+                    { Authorization: `Bearer ${paymentConfig.publicKey}` },
+                    undefined,
+                    true
                 )
                 .then(token => {
-                    //console.log(JSON.stringify(token, null, '\t'))
                     pageSubmit(
                         '/stripe/checkout_action',
                         {token: token.id}
                     )
                     .then(data => {
-                        appHelpers.replaceContent(routes.payment(data.paymentId));
+                        if (data) appHelpers.replaceContent(routes.payment(data.paymentId));
                     });
                 })
                 .catch(err => {
-                    //console.log(JSON.stringify(err, null, '\t'))
-                    err.handled = true;
                     if (err.status == 401) {
                         Notification.error(lang('Wrong public key'));
                     }
@@ -49,9 +48,10 @@ export default class Stripe extends PaymentComponent {
                         cc.errMessage = err.data && err.data.error && err.data.error.message || lang('Invalid Credit Card');
                         cc.validator?.validate();
                     }
-                    else {
+                    else if (!err.handled) {
                         Notification.error(lang('Failed to complete transaction'));
                     }
+                    err.handled = true;
                 });
             }}
             paymentConfig={this.props.paymentConfig.stripe}

@@ -29,14 +29,15 @@ const renderItem = (cartId, data, isReadOnly, currency, maxQty, qtyLength, submi
             {!isReadOnly && <>
                 <IntegerSpinner min={1} max={maxQty} maxLength={qtyLength} value={data.quantity} //editable={false}
                     style={[styles.textInputHeight, {flex:3}]}
-                    onValueChange={quantity => {
+                    onValueChange={(quantity, _, changeFromProp) => {
+                        if (changeFromProp) return;
                         callServer('/product/updatecart', {
                             cartId,
                             productId: data.productId,
                             quantity
                         })
-                        .then(() => refresh())
-                        .catch(Notification.errorHandler)
+                        .catch(err => Notification.errorHandler(err))
+                        .finally(() => refresh())
                     }}
                     onExceedMax={() => Notification.warning(`Exceeds maximum quantity: ${maxQty}`)}
                 />
@@ -221,9 +222,8 @@ export default class Cart extends LessPureComponent {
                     onPress={() => {
                         confirmModal(() => {
                             this._content?.submitData('/product/emptycart')
-                            .then(data => {
+                            .then(() => {
                                 this._content.refresh();
-                                Notification.success(data.message);
                                 appHelpers.setCartCount(0);//appHelpers.refreshContent();
                             });
                         });

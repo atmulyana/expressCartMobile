@@ -45,7 +45,7 @@ export default class Partial extends LessPureComponent {
         });
 
         const showResponseMessage = data => {
-            if (/*data?.responseRedirected &&*/ data?.message && data?.messageType) {
+            if (/*data?.responseRedirected &&*/ data?.message) {
                 if (data.messageType == 'danger') Notification.error(data.message);
                 else if (data.messageType == 'waning') Notification.warning(data.message);
                 else Notification.success(data.message);
@@ -60,7 +60,12 @@ export default class Partial extends LessPureComponent {
             let dataLoadingProcess = url && !this.contentData ? callServer(url) : NULL;
             return dataLoadingProcess
                 .then(async data => {
-                    _data = data || this.contentData || { $cartCount: null };
+                    _data = data || this.contentData || {
+                        $cartCount: null, //don't change the cart count
+                        session: {
+                            customerPresent: appHelpers.isLoggedIn //prevent to relogin
+                        }
+                    };
                     if (await this.onDataReady(silent, data) === false)
                         throw {status:-1, handled: true};
                     return _data;
@@ -73,23 +78,25 @@ export default class Partial extends LessPureComponent {
                         if (appHelpers.isLoggedIn != (data.session?.customerPresent ?? false)) {
                             data.session?.customerPresent ? appHelpers.login() : await appHelpers.relogin(data);
                         }
-                        if (typeof(data.session?.totalCartItems) == 'number') { //we get valid session
-                            const cart = data.session.cart;
-                            appHelpers.setCartCount( //data.session.totalCartItems
-                                cart ? Object.keys(cart).length : 0    //Sometimes, totalCartItems is not synchronized
-                            );
-                        }
-                        else if (data.$cartCount !== null) {
-                            appHelpers.setCartCount(0);
-                        }
+                    }
+                    if (typeof(data.session?.cartItemCount || data.session?.totalCartItems) == 'number') { //we get valid session
+                        const cart = data.session.cart;
+                        appHelpers.setCartCount(
+                            data.session.cartItemCount //nextCart
+                            || /*data.session.totalCartItems*/ (cart && Object.keys(cart).length) //Sometimes, totalCartItems is not synchronized
+                            || 0
+                        );
+                    }
+                    else if (data.$cartCount !== null) {
+                        appHelpers.setCartCount(0);
                     }
                     return data;
                 })
-                .catch(Notification.errorHandler)
                 .finally(() => {
                     if (!silent) this.setState({isLoading:false, isStarting:false})
                 })
-                .then(showResponseMessage);
+                .then(showResponseMessage)
+                .catch(err => Notification.errorHandler(err));
         };
 
         this.loadData = silent =>
@@ -114,6 +121,7 @@ export default class Partial extends LessPureComponent {
             return new Promise((resolve, reject) => {
                 const submit = () => callServer(url, data, httpHeaders)
                     .then(data => {
+                        if (url == '/blockonomics/checkout_action') console.log(data);
                         if (this.onDataSubmitted(data) === false)
                             throw {status:-1, handled: true};
                         return data;
@@ -122,15 +130,15 @@ export default class Partial extends LessPureComponent {
                         resolve(data);
                         return data;
                     })
+                    .finally(() => _submittingIndicator?.hide())
+                    .then(showResponseMessage)
                     .catch(err => {
                         Notification.errorHandler(err);
                         if (err !== undefined && typeof(err) != 'object' || !err?.handled || err?.handled && rejectIfHandled) {
-                            if (!rejectIfHandled) console.log('submitData err: ', err)
+                            if (!rejectIfHandled) console.log(`submitData error for ${url}: `, err)
                             reject(err);
                         }
-                    })
-                    .finally(() => _submittingIndicator?.hide())
-                    .then(showResponseMessage);
+                    });
                 _submittingIndicator ? _submittingIndicator.show(submit, message) : submit();
             });
         };

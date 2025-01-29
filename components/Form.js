@@ -21,7 +21,8 @@ Promise.prototype.valid = function(onSuccess) {
             //So, always use this method in the chain of handlers of Promise returned by 'submitData' method of Form in order for
             //no mishandling
             if (isAlreadyHandledError(data)) return data;
-            onSuccess(data);
+            const ret = onSuccess(data);
+            return typeof(ret) == 'undefined' ? data : ret;
         },
         err => {
             if (isAlreadyHandledError(err)) return err;
@@ -43,7 +44,20 @@ export default class Form extends Partial {
                 Notification.error(lang('One or more inputs are invalid'));
                 return Promise.reject({valid:false});
             }
-            return this.submitDataWithoutValidation(url, data);
+            return this.submitDataWithoutValidation(url, data)
+            .then(data => {
+                if (!this.#validation) return;
+                const val = data.__validation__;
+                if (val?.success === false) {
+                    for (let name in val.inputMessages) {
+                        this.#validation.setErrorMessage(name, val.inputMessages[name]);
+                    }
+                    if (val.message) Notification.error(val.message);
+                    else Notification.error(lang('One or more inputs are invalid'));
+                    throw {valid: false};
+                }
+                return data;
+            });
         };
     }
 
@@ -57,7 +71,6 @@ export default class Form extends Partial {
         //children will be contained in View prepared by Partial component
         const {children} = this.props,
               ref =  children.ref;
-
         return children?.type === ValidationContainer //has the only one child of type ValidationContainer
             ? {
                 ...children,

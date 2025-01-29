@@ -25,9 +25,11 @@ export default class ValidatedInput extends LessPureComponent {
     constructor(props, InputComponent, createOption = ValidatedInput.defaultCreateOption) {
         super(props)
         if (InputComponent) {
-            const {validation} = this.props;
+            const {name, validation} = this.props;
             if (Array.isArray(validation) || (validation instanceof ValidationRule)) {
-                this.#element = withValidation(InputComponent, createOption(validation));
+                const opt = createOption(validation);
+                if (name) opt.name = name;
+                this.#element = withValidation(InputComponent, opt);
             }
             else {
                 this.#element = InputComponent;

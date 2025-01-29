@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Box, Button, Icon, Notification, Partial, Text, TextInput, TwoPane} from '../components';
+import {Box, Button, Icon, Partial, Text, TextInput, TwoPane} from '../components';
 import Content from './Content';
 import routes from './routes';
 import {CartContent} from './partials/Cart';
@@ -68,8 +68,7 @@ class PaymentPanel extends Partial {
                         onPress={() => {
                             if (!discountInput.validate()) return;
                             this.submitData('/checkout/adddiscountcode', {discountCode: this.state.discountCode})
-                                .then(data => {
-                                    Notification.success(data.message);
+                                .then(() => {
                                     appHelpers.refreshContent();
                                 });
                         }} />
@@ -82,9 +81,8 @@ class PaymentPanel extends Partial {
                         onPress={() => {
                             discountInput.clearValidation();
                             this.submitData('/checkout/removediscountcode')
-                                .then(data => {
+                                .then(() => {
                                     //this.setState({discountCode: emptyString})
-                                    Notification.success(data.message);
                                     appHelpers.refreshContent();
                                 });
                         }}

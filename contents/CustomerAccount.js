@@ -12,15 +12,7 @@ import Content from './Content';
 import routes from './routes';
 import ShippingForm from './partials/ShippingForm';
 import {appHelpers, currencySymbol, formatAmount, formatDate, lang} from '../common';
-import {buttonOutlinePrimary, buttonOutlineSuccess, gray, green, p8, red, text as textStyle, yellow} from '../styles';
-
-const styles = StyleSheet.create({
-    orderButtons: {
-        flexDirection: 'row',
-        gap: 8,
-        justifyContent: 'center',
-    }
-});
+import {buttonOutlinePrimary, buttonOutlineSuccess, gray, green, p8, red, pagingButtons, text as textStyle, yellow} from '../styles';
 
 const RowBox = props => <View style={[p8, props.style]}>
     {props.children}
@@ -168,31 +160,43 @@ class Orders extends Partial {
     }
     
     render() {
-        const {config, orders, isNext, page = 1} = this.state.data;
+        const {config, orders = this.state.data.list, isNext, page = 1} = this.state.data;
         const pageNo = parseInt(page) || 1;
         return <>
             <Text large bold para4>{lang('Orders')}</Text>
             {orders && orders.length > 0
-                ? orders.map((item, idx) => <OrderItem key={idx} data={item} config={config} />)
+                ? orders.map(item  => <OrderItem key={item._id} data={item} config={config} />)
                 : <Text>{lang('There are no orders for this account')}{'. '}
                     <Text green link onPress={() => appHelpers.goHome()}>{lang('Order here')}</Text>
                   </Text>
             }
-            {(isNext || pageNo > 1) && <View style={styles.orderButtons}>
-                <Button disabled={pageNo < 2} style={buttonOutlinePrimary}
-                    onClick={() => this.submitData(`/customer/account/orders/${pageNo - 1}`, null)}
+            {(isNext || pageNo > 1) && <View style={pagingButtons}>
+                <Button
+                    disabled={pageNo < 2}
+                    style={[
+                        buttonOutlinePrimary,
+                        pageNo < 2 ? {opacity: 0.5} : null,
+                    ]}
+                    onPress={() => this.submitData(`/customer/account/orders/${pageNo - 1}`, null)}
                 >
                     <Icon icon="ChevronsLeft"
                         width={textStyle.fontSize}
                         height={textStyle.fontSize}
+                        stroke={buttonOutlinePrimary.borderColor}
                     />
                 </Button>
-                <Button disabled={!isNext} style={buttonOutlinePrimary}
-                    onClick={() => this.submitData(`/customer/account/orders/${pageNo + 1}`, null)}
+                <Button
+                    disabled={!isNext}
+                    style={[
+                        buttonOutlinePrimary,
+                        isNext ? null : {opacity: 0.5},
+                    ]}
+                    onPress={() => this.submitData(`/customer/account/orders/${pageNo + 1}`, null)}
                 >
                     <Icon icon="ChevronsRight"
                         width={textStyle.fontSize}
                         height={textStyle.fontSize}
+                        stroke={buttonOutlinePrimary.borderColor}
                     />
                 </Button>
             </View>}

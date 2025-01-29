@@ -64,7 +64,6 @@ const ProductItem = ({data, config, itemStyle, submit}) => {
                             productVariant: variant?._id,
                         }).then(data => {
                             appHelpers.setCartCount(data.totalCartItems);
-                            Notification.success(data.message);
                         });
                     }
                 }}

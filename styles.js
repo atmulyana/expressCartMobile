@@ -76,6 +76,11 @@ StyleSheet.create({
         borderColor:'#007bff',
         color:'#007bff'
     },
+    pagingButtons: {
+        flexDirection: 'row',
+        gap: 8,
+        justifyContent: 'center',
+    },
 
     text: {
         ...textBase,

@@ -71,23 +71,27 @@ class ReviewForm extends LessPureComponent {
                     }
                     throw err;
                 })
-                .valid(data => {
+                .valid(({message}) => {
                     this.hide();
-                    Notification.success(data.message);
+                    if (message) {
+                        //Using `setTimeout` because waiting `Modal` to close. If `Modal` is still open then the notification is shown inside
+                        //`Modal` whereas it will be closed. Therefore, the notification is never shown.
+                        setTimeout(() => Notification.success(message), 10);
+                    }
                     appHelpers.refreshContent();
                 })
             }}
         >
             <Text>{lang('Title')}:</Text>
-            <TextInput placeholder={lang('Love it.')} value={state.title} onChangeText={title => this.setState({title})} 
+            <TextInput placeholder={lang('Love it.')} name='title' value={state.title} onChangeText={title => this.setState({title})} 
                 fixHeight para4 validation={required} />
             
             <Text>{lang('Description')}:</Text>
-            <TextInput placeholder={lang('Product is great. Does everything it said it can do.')} value={state.description}
+            <TextInput placeholder={lang('Product is great. Does everything it said it can do.')} name='description' value={state.description}
                 onChangeText={description => this.setState({description})} multiline numberOfLines={3} para4 style={descStyle} validation={required} />
             
             <Text value={state.rating}>{lang('Rating')}:  <Text bold>{state.rating}</Text></Text>
-            <Validation rules={min(1)} value={state.rating} />
+            <Validation rules={min(1)} name='rating' value={state.rating} />
             <RatingStars rating={state.rating} size={16} onRate={rating => this.setState({rating})} />
 
             <View style={styles.para8} />
@@ -133,21 +137,33 @@ class Reviews extends Partial {
                     {item.description}
                 </Text>
             </View>)}
-            {(isNext || pageNo > 1) && <View style={styles.orderButtons}>
-                <Button disabled={pageNo < 2} style={buttonOutlinePrimary}
-                    onClick={() => this.submitData(`/product/${productId}/reviews/${pageNo - 1}`, null)}
+            {(isNext || pageNo > 1) && <View style={styles.pagingButtons}>
+                <Button
+                    disabled={pageNo < 2}
+                    style={[
+                        styles.buttonOutlinePrimary,
+                        pageNo < 2 ? {opacity: 0.5} : null,
+                    ]}
+                    onPress={() => this.submitData(`/product/${productId}/reviews/${pageNo - 1}`, null)}
                 >
                     <Icon icon="ChevronsLeft"
-                        width={textStyle.fontSize}
-                        height={textStyle.fontSize}
+                        width={styles.text.fontSize}
+                        height={styles.text.fontSize}
+                        stroke={styles.buttonOutlinePrimary.borderColor}
                     />
                 </Button>
-                <Button disabled={!isNext} style={buttonOutlinePrimary}
-                    onClick={() => this.submitData(`/customer/account/orders/${pageNo + 1}`, null)}
+                <Button
+                    disabled={!isNext}
+                    style={[
+                        styles.buttonOutlinePrimary,
+                        isNext ? null : {opacity: 0.5},
+                    ]}
+                    onPress={() => this.submitData(`/product/${productId}/reviews/${pageNo + 1}`, null)}
                 >
                     <Icon icon="ChevronsRight"
-                        width={textStyle.fontSize}
-                        height={textStyle.fontSize}
+                        width={styles.text.fontSize}
+                        height={styles.text.fontSize}
+                        stroke={styles.buttonOutlinePrimary.borderColor}
                     />
                 </Button>
             </View>}
@@ -202,7 +218,7 @@ export default class Product extends Content {
             if (images[i].productImage) imageLocations.unshift(images[i].path); //Make sure the main image to be shown first
             else imageLocations.push(images[i].path);
         }
-        
+
         return <>
             <ReviewForm ref={form => this.#reviewForm = form} productId={result._id} />
 
@@ -271,7 +287,6 @@ export default class Product extends Content {
                                 })
                                 .then(data => {
                                     appHelpers.setCartCount(data.totalCartItems);
-                                    Notification.success(data.message);
                                 });
                             };
 
@@ -292,7 +307,7 @@ export default class Product extends Content {
                                     this.submitData('/customer/check', undefined, undefined, undefined, true)
                                     .then(() => this.#reviewForm.show())
                                     .catch(err => {
-                                        if (err.status == 400) {
+                                        if (err.handled) {
                                             appHelpers.loadContent(routes.customerLogin);
                                         }
                                     })

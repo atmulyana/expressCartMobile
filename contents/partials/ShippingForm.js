@@ -53,11 +53,7 @@ export default class extends LessPureComponent {
     }
 
     submit(url = '/customer/update', extraData = {}) {
-        return this._form.submitData(url, Object.assign({}, this.state, extraData))
-            .valid(data => {
-                if (url == '/customer/update') Notification.success(lang('Customer saved'));
-                return data;
-            });
+        return this._form.submitData(url, Object.assign({}, this.state, extraData));
     }
 
     shouldComponentUpdate(nextProps, nextState) {

@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import {Alert, Modal} from 'react-native';
+import CookieManager from '@react-native-cookies/cookies';
 import {SafeAreaInsetsContext, SafeAreaProvider} from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import PaymentComponent from './PaymentComponent';
@@ -23,14 +24,30 @@ const PaymenStatus = {
 };
 
 export default class Paypal extends PaymentComponent {
+    #cookies = [];
+
     state = {
         inProcess: false,
         isLoading: false,
         paypalVisible: false,
     };
 
+    constructor(props) {
+        super(props);
+        CookieManager.get(serverUrl(emptyString)).then(cookies => {
+            this.#cookies = Object.values(cookies);
+        });
+    }
+
     async _paymentStatus(code, url) {
         this.setState({paypalVisible: false});
+
+        /* Resets cookies because after `WebView` closes, the cookies are gone */
+        const roootUrl = serverUrl(emptyString);
+        for (let cookie of this.#cookies) {
+            await CookieManager.set(roootUrl, cookie);
+        }
+
         switch (code) {
             case PaymenStatus.Success:
                 let queryIdx = url.indexOf('?');
@@ -69,7 +86,7 @@ export default class Paypal extends PaymentComponent {
                 <WebView
                     cacheMode="LOAD_NO_CACHE"
                     onNavigationStateChange={(navState) => {
-                        if (navState.url?.includes('paypal.com') && !navState.loading) this.setState({isLoading: false});
+                        if (navState.url?.includes('paypal.com') /*&& !navState.loading*/) this.setState({isLoading: false});
                     }}
                     onShouldStartLoadWithRequest={(request) => {
                         if (request.url == `${rootUrl}/checkout/payment`) {

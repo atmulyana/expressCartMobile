@@ -114,7 +114,7 @@ export default class extends LessPureComponent {
         /** `handled` property is primaryly used by error handler of `callServer`
          ** `valid` property is issued by `Form` component as the result of input validation */
         if (!err || !err.data || err.valid === false || err.handled) return;
-        if (err.status == 400) {
+        if (400 <= err.status && err.status <= 499) {
             if (typeof(err.data) == 'object' && typeof(err.data?.message || err.data?.error || err.data?.err) == 'string') {
                 err.handled = true;
                 this.error(err.data.message || err.data.error || err.data.err);
