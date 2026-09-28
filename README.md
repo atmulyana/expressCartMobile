@@ -30,18 +30,19 @@ It's a mobile app for shopping cart which is developed using React Native.
 
    Change the value of `maxAge` to `null`.
 
+   Alternative to *expressCart*, you may use [nextCart](https://github.com/atmulyana/nextcart). To set session
+   expiration, open `src/config/session.json` file.
+
 2. You should have set up the React Native development environment as described [here](https://reactnative.dev/docs/set-up-your-environment).
-   Follow "React Native CLI Quickstart".    
-   Note for Android: you should install SDK (compile) and NDK version written in `android/build.gradle` and also install CMake version 3.22.1
 
 3. Download/clone this project.
 
-4. Edit `common/server.js` file. Find the line
+4. Edit `src/libs/server.ts` file. Find the line
 
-        const SERVER = 'http://192.168.56.1:1111';
+        const SERVER: HttpUrl = 'http://192.168.56.1:3000';
    
-   This is the root URL of the web application you just installed in step 1. Change the IP/Host to the one of your own. Don't use
-   `localhost` for it because `localhost` means the web application runs on device (HP) emulator. Use one of your LAN/WAN IPs.
+   This is the root URL of the web application you just installed in step 1. Change the IP/Host and/or port
+   to the one of your own. Don't use `localhost` for it because `localhost` means the web application runs on device / HP emulator. Use one of your LAN/WAN IPs.
 
 5. Install the required modules for this project   
    Open Terminal/Command console then make the project directory is the active directory of the console
@@ -61,20 +62,13 @@ It's a mobile app for shopping cart which is developed using React Native.
         cd ..
 
 6. Ready to run project    
-   Start Metro server by issueing command
-
-        npx react-native start
-
-   Open another Terminal/Command console and go to the project directory too as the before one. At new console, type
-   the following command
-
    6.1. For Android     
 
-        npx react-native run-android
+        npm run android
 
    6.2. For iOS   
 
-        npx react-native run-ios
+        npm run ios
 
      If you fail to run the app for iOS, please try rebuilding with XCode by opening **ios/expressCartMobile.xcworkspace**.
-     After succeeding building, (you may close XCode and) please try to re-execute `npx react-native run-ios`
+     After succeeding building, (you may close XCode and) please try to re-execute `npm run ios`
