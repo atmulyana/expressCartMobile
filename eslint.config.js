@@ -7,7 +7,7 @@ module.exports = defineConfig([
         ignores: [
             "dist/*",
             "src/app/**/example*.tsx",
-            'node_modules/**/*',
+            "node_modules/**/*",
         ],
     },
     expoConfig,

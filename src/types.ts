@@ -1,6 +1,7 @@
 /**
  * https://github.com/atmulyana/expressCartMobile
  */
+import type { InputRef, Rules, ValidationOption } from "@react-input-validator/native";
 import type { ExternalPathString, Href, HrefObject, RelativePathString } from "expo-router";
 
 export type Config = {
@@ -46,6 +47,7 @@ export type HttpError = {
     data?: any,
     handled: boolean,
     status: number,
+    valid?: boolean,
 };
 export type HttpReject = (reason: HttpError) => void;
 export type HttpUrl = `http://${string}` | `https://${string}`;
@@ -58,14 +60,18 @@ export type InputChangeValueCallback<T> = (
     val: T,
     ...args: any[]
 ) => void | {newValue: T};
-export type InputProps<T = any> = {
+export type InputProps<Instance = unknown, Value = any> = {
     name?: string | true,
-    ref?: React.Ref<InputValueRef<T>>,
+    onValueChange?: InputChangeValue<Value>,
+    ref?: React.Ref<InputValueRef<Value> & Omit<Instance, keyof InputValueRef<Value>>>,
+    value?: Value,
 };
+export type InputValidationProps<Props, Instance = unknown, TValue = any> = Omit<InputProps<Instance, TValue>, 'ref'>
+    & ValidationProps<Props, Instance, TValue>;
 export type InputValueReducer<T> =  (oldVal?: T) => T;
-export type InputValueRef<T> = {
-    value?: T,
-    setValue: InputChangeValue<T>,
+export type InputValueRef<Value> = {
+    value?: Value,
+    setValue: InputChangeValue<Value>,
 };
 
 export type LinkHref = RelativePathString | UrlPathLocal;
@@ -237,6 +243,14 @@ export type TNotification = {
     type?: 'success' | 'warning' | 'error' | 'info',
     duration?: Duration,
 };
+
+export type ValidationProps<Props, Instance = unknown, Value = any> = {
+    ref?: React.Ref<ValidationValueRef<Instance, Value>>,
+    rules?: Rules,
+    validationOptions?: Omit<ValidationOption<Props>, 'lang' | 'name' | 'rules'>,
+};
+export type ValidationRef<Instance> = Omit<Instance, keyof InputRef> & InputRef;
+export type ValidationValueRef<Instance, Value = any> = Omit<ValidationRef<Instance>, keyof InputValueRef<Value>> & InputValueRef<Value>;
 
 export type Variant = {
     _id: string,

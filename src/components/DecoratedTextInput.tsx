@@ -73,7 +73,7 @@ export default function DecoratedTextInput({
     Suffix,
     value,
     ...props
-}: DecorInputProps & InputProps & ProcessProps) {
+}: DecorInputProps & InputProps<TextInput> & ProcessProps) {
     //@ts-ignore: makes sure no `multiline`
     delete props.multiline;
     const colors = useColors();
@@ -96,7 +96,7 @@ export default function DecoratedTextInput({
         };
     }, [decorStyle, style, styles]);
 
-    const [_value, _onChangeText] = useFormInputValue(name, value, onChangeText, ref);
+    const [_value, _onChangeText, _ref] = useFormInputValue<TextInput>(name, value, onChangeText, ref);
     
     return <ProcessIndicator loadingAware={loadingAware} submittingAware={submittingAware}>
         <View style={styleProps.view} onLayout={onLayout}>
@@ -109,6 +109,7 @@ export default function DecoratedTextInput({
                 placeholderTextColor={colors.disabled}
                 {...props}
                 onChangeText={_onChangeText}
+                ref={_ref}
                 style={styleProps.textInput}
                 value={_value}
             />

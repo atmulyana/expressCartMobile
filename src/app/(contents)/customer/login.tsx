@@ -4,17 +4,18 @@
 import { Button, Content, Text, TextInput } from '@/components';
 import { useCorrectWidth, useForm, useLang, useSession, useStyles } from '@/hooks';
 import { login } from '@/libs/session';
+import { email, required } from '@react-input-validator/rules';
 import { Redirect } from 'expo-router';
 import { emptyString } from 'javascript-common';
 import React from 'react';
 
 export default function CustomerLogin() {
-    const [email, setEmail] = React.useState(emptyString);
+    const [loginEmail, setLoginEmail] = React.useState(emptyString);
     const [password, setPassword] = React.useState(emptyString);
    
     const formWidth = useCorrectWidth(300);
     const [Form, submit] = useForm(async () => {
-        await login(email, password);
+        await login(loginEmail, password);
     });
     const lang = useLang();
     const session = useSession();
@@ -36,21 +37,23 @@ export default function CustomerLogin() {
                 autoCorrect={false} 
                 keyboardType="email-address"
                 name="loginEmail"
-                onChangeText={email => setEmail(email)}
+                onValueChange={email => setLoginEmail(email)}
                 placeholder={lang("Email address")}
                 spellCheck={false} 
                 returnKeyType="done"
+                rules={[email, required]}
                 style={styles.array('textInputHeight', 'para8')}
                 underlineColorAndroid="transparent"
-                value={email}
+                value={loginEmail}
             />
             <TextInput
                 autoComplete="off"
                 autoCorrect={false}
                 name="loginPassword"
-                onChangeText={pwd => setPassword(pwd)}
+                onValueChange={pwd => setPassword(pwd)}
                 placeholder={lang("Password")}
                 returnKeyType="done"
+                rules={required}
                 secureTextEntry
                 spellCheck={false}
                 style={styles.array('textInputHeight', 'para8')}

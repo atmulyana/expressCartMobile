@@ -135,7 +135,7 @@ class Lang extends Function {
 }
 
 const lang = new Lang();
-export default lang;
+export default (lang as any) as Lang['getText'];
 
 export async function initLang() {
     let code: LangCode | null = await getStoredData('lang') as LangCode | null;

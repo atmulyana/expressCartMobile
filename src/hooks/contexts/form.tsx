@@ -2,12 +2,20 @@
  * https://github.com/atmulyana/expressCartMobile
  */
 import SubmittingIndicator from '@/components/SubmittingIndicator';
+import Text from '@/components/TextApp';
 import { createHookStore } from '@/libs/hook';
-import { errorHandler, showResponseMessage } from '@/libs/notification';
+import lang from '@/libs/lang';
+import {
+    errorHandler,
+    pushNotification,
+    showResponseMessage
+} from '@/libs/notification';
 import { callServer, decomposeData } from '@/libs/server';
+import baseStyles from '@/styles';
 import type {
     DataReadyCallback,
     HookListener,
+    HttpError,
     HttpUrl,
     InputChangeValue,
     InputChangeValueCallback,
@@ -18,15 +26,32 @@ import type {
     SubmitParams,
     UrlPath
 } from '@/types';
-import { emptyObject, emptyString, isPlainObject, noop } from 'javascript-common';
+import {
+    ValidationContext,
+    type ContextProps,
+    type ContextRef,
+} from '@react-input-validator/native';
+import {
+    emptyObject,
+    emptyString,
+    isPlainObject,
+    noop
+} from 'javascript-common';
 import React from 'react';
 import {
     View,
     type StyleProp,
     type ViewStyle,
 } from 'react-native';
+import { extRefCallback } from 'reactjs-common';
+import useLang from '../lang';
 import { useNavHelpers } from '../navigation';
-import { useEffectEvent, useMount, useRefData } from '../react';
+import {
+    useCopyRef,
+    useEffectEvent,
+    useMount,
+    useRefData
+} from '../react';
 
 type SubmitParamsWithId = SubmitParams & {submitId: number};
 
@@ -34,7 +59,9 @@ type FormProps = {
     children?: React.ReactNode,
     fragment?: boolean,
     loading?: React.ReactNode,
+    ref?: React.Ref<ContextRef>,
     style?: StyleProp<ViewStyle>,
+    validationProps?: Partial<Omit<ContextProps, 'lang'>> | null,
 };
 
 type FormContextValue = {
@@ -43,6 +70,7 @@ type FormContextValue = {
     inputs: {
         [name: string]: any,
     },
+    mounted?: boolean,
     submit: SubmitFunction,
     submitState: {
         isOn: () => boolean,
@@ -50,6 +78,7 @@ type FormContextValue = {
         subscribe: (listener: HookListener) => (() => void),
         update: (submitId: number, message?: string | null) => void,
     },
+    validationRef: React.RefObject<ContextRef | null>,
 };
 
 type ContextValue = {
@@ -57,6 +86,23 @@ type ContextValue = {
     forms: {[id: string]: FormContextValue},
 }
 
+const invalidResponse: HttpError = {
+    handled: false,
+    status: -1,
+    valid: false,
+};
+
+const defaultValidationRef: ContextRef = {
+    clearValidation: noop,
+    getErrorMessage: noop,
+    getInput: noop,
+    get isValid() { return true; },
+    refreshMessage: noop,
+    setErrorMessage: noop,
+    validate: noop,
+    validateAsync: noop,
+};
+    
 const Context = React.createContext<ContextValue>({
     currentId: emptyString,
     forms: emptyObject,
@@ -91,15 +137,19 @@ export function useForm(onSubmitted?: DataReadyCallback, onError?: SubmitParams[
 
         ctx.forms[id] = { //eslint-disable-line react-hooks/immutability
             data: null,
-            Form: createForm(id),
+            Form: React.Fragment,
             inputs: {},
+            validationRef: {
+                current: defaultValidationRef,
+            },
             submit: noop,
             submitState: {
                 isOn() {
                     return Object.keys(getSubmitData()).length > 0;
                 },
                 get message() {
-                    return Object.values(getSubmitData())[0];
+                    const messages = Object.values(getSubmitData());
+                    return messages[messages.length - 1];
                 },
                 subscribe: subscribeSubmitState,
                 update(submitId, message) {
@@ -121,6 +171,7 @@ export function useForm(onSubmitted?: DataReadyCallback, onError?: SubmitParams[
                 },
             },
         };
+        ctx.forms[id].Form = createForm(id, ctx.forms[id]);  //eslint-disable-line react-hooks/immutability
     }
     
     const [, doSubmit, isSubmitting] = React.useActionState(submit, ctx.forms[id]);
@@ -165,6 +216,16 @@ export function useForm(onSubmitted?: DataReadyCallback, onError?: SubmitParams[
                 }
             };
 
+            const validation = ctx.forms[id].validationRef?.current;
+            if (validation && !validation.validate()) {
+                pushNotification({
+                    message: lang('One or more inputs are invalid'),
+                    type: 'error',
+                });
+                params.onError(invalidResponse);
+                return;
+            }
+
             if (!('data' in params)) params.data = emptyObject;
 
             ctx.forms[id].submitState.update(submitId, params.message ?? null);
@@ -189,40 +250,42 @@ export function useForm(onSubmitted?: DataReadyCallback, onError?: SubmitParams[
     ];
 }
 
-export function useFormInputValue<T>(
-    name: InputProps['name'],
-    value?: T,
-    setValue?: InputChangeValueCallback<T>,
-    ref?: React.Ref<InputValueRef<T>>
+export function useFormInputValue<Instance = unknown, Value = any>(
+    name?: InputProps<Instance, Value>['name'],
+    value?: Value,
+    setValue?: InputChangeValueCallback<Value>,
+    ref?: InputProps<Instance, Value>['ref'],
+    refCallback?: (ref: (InputValueRef<Value> & Omit<Instance, keyof InputValueRef<Value>>) | null) => any
 ) {
     type RetType = [
-        T | undefined,
-        InputChangeValue<T> | undefined
+        Value | undefined,
+        InputChangeValue<Value> | undefined,
+        React.RefCallback<Instance>
     ];
-    type TReducer = InputValueReducer<T>;
+    type TReducer = InputValueReducer<Value>;
 
     const ctx = React.useContext(Context);
     const id = React.useContext(IdContext);
     const inputs = ctx.forms[id]?.inputs;
-    const [val, setVal] = React.useState<T | undefined>(value);
+    const [val, setVal] = React.useState<Value | undefined>(value);
     const nameTrimmed = (name as any)?.trim?.();
     const isNameNotTrue = name !== true;
     
-    const changeValue: InputChangeValue<T> = React.useCallback((newVal, ...args) => {
+    const changeValue: InputChangeValue<Value> = React.useCallback((newVal, ...args) => {
         const isNamedInput = inputs && nameTrimmed;
         if (!isNamedInput && isNameNotTrue) {
             if (setValue) {
                 if (typeof(newVal) == 'function') {
                     newVal = (newVal as TReducer)(value);
                 }
-                setValue(newVal as T);
+                setValue(newVal as Value);
             }
             return;
         }
 
         let exec: (() => void) | undefined;
         setVal(oldVal => {
-            let newValue: T | undefined;
+            let newValue: Value | undefined;
             if (typeof(newVal) == 'function') {
                 newValue = (newVal as TReducer)(oldVal);
             }
@@ -237,7 +300,7 @@ export function useFormInputValue<T>(
                         args.push(oldVal);
                         //`setValue` may change some "state" value that may trigger another
                         //component rendering. So, don't execute it now to avoid an error.
-                        const confine = setValue(newValue as T, ...args);
+                        const confine = setValue(newValue as Value, ...args);
                         if (confine) {
                             newValue = confine.newValue;
                             valAltered = !Object.is(oldVal, newValue);
@@ -302,17 +365,24 @@ export function useFormInputValue<T>(
         [retVal, retSetter] = [val, changeValue];
     }
 
-    React.useImperativeHandle(ref, () => ({
-        get value() {
-            return retVal;
-        },
-        set value(val) {
-            retSetter?.(val);
-        },
-        setValue: retSetter ?? noop,
-    }), [retVal, retSetter]);
+    const refProp = React.useCallback( //eslint-disable-line react-hooks/exhaustive-deps
+        extRefCallback<Instance, InputValueRef<Value>>( //eslint-disable-line react-hooks/use-memo
+            ref,
+            {
+                get value() {
+                    return retVal;
+                },
+                set value(val) {
+                    retSetter?.(val);
+                },
+                setValue: retSetter ?? noop,
+            },
+            refCallback
+        ),
+        [retVal, retSetter, ref, refCallback]
+    );
 
-    return [retVal, retSetter] as RetType;
+    return [retVal, retSetter, refProp] as RetType;
 }
 
 export function useSubmitState(): [boolean, string | undefined | null] {
@@ -326,33 +396,88 @@ export function useSubmitState(): [boolean, string | undefined | null] {
     return [isSubmitting ?? false, formCtx?.submitState.message];
 }
 
-function createForm(id: string) {
+function createForm(id: string, ctx: FormContextValue) {
     return function Form({
         children,
+        validationProps = emptyObject,
         fragment,
         loading,
+        ref,
         style,
     }: FormProps) {
-        const [isSubmitting, submitMessage] = useSubmitState();
+        useCopyRef(ref, ctx.validationRef);
 
+        const onlyOnce = React.useRef(false);
+
+        useMount(() => {
+            const isFirst = !ctx.mounted;
+            if (isFirst) {
+                ctx.mounted = true;
+                onlyOnce.current = true;
+            }
+            return () => {
+                if (isFirst) ctx.mounted = false
+            };
+        });
+
+        if (ctx.mounted && !onlyOnce.current) return <Text style={baseStyles.textBold}>CANNOT MOUNT THE SAME FORM TWICE</Text>;
+
+        let content: React.ReactNode;
         if (fragment) {
-            return <IdContext.Provider value={id}>
+            content = children;
+        }
+        else {
+            content = <FormView loading={loading} style={style}>
                 {children}
-            </IdContext.Provider>;
+            </FormView>;
         }
 
-        return <View style={style}>
-            <IdContext.Provider value={id}>
-                {children}
-                {loading !== undefined ? loading : (
-                    <SubmittingIndicator visible={isSubmitting} message={submitMessage} />
-                )}
-            </IdContext.Provider>
-        </View>;
+        if (validationProps) {
+            content = <FormValidation validationProps={validationProps} formCtx={ctx}>
+                {content}
+            </FormValidation>;
+        }
+
+        return <IdContext.Provider value={id}>
+            {content}
+        </IdContext.Provider>;
     }
 }
 
+function FormView({
+    children,
+    loading,
+    style,
+}: Pick<FormProps, 'children' | 'loading' | 'style'>) {
+    const [isSubmitting, submitMessage] = useSubmitState();
+    
+    return <View style={style}>
+        {children}
+        {loading !== undefined ? loading : (
+            <SubmittingIndicator visible={isSubmitting} message={submitMessage} />
+        )}
+    </View>;
+}
+
+function FormValidation({
+    children,
+    validationProps,
+    formCtx,
+}: Pick<FormProps, 'children' | 'validationProps'> & {
+    formCtx: FormContextValue,
+}) {
+    const lang = useLang();
+    //eslint-disable-next-line react-hooks/immutability, react-hooks/refs
+    formCtx.validationRef = React.useRef<ContextRef>(null);
+
+    //eslint-disable-next-line react-hooks/refs
+    return <ValidationContext focusOnInvalid {...validationProps} lang={lang} ref={formCtx.validationRef}>
+        {children}
+    </ValidationContext>;
+}
+
 async function submit(ctx: FormContextValue, params: SubmitParamsWithId) {
+    const validation = ctx.validationRef?.current;
     const data: any = (Object.keys(ctx.inputs).length > 0 || params.data) ? {
         ...ctx.inputs,
         ...params.data,
@@ -377,8 +502,24 @@ async function submit(ctx: FormContextValue, params: SubmitParamsWithId) {
     else {
         promise = callServer(params.url, data, params.httpHeaders);
     }
-
-    await promise
+    
+    promise.then(data => {
+        if (!validation || !isPlainObject(data)) return data;
+        const validationData = data.__validation__;
+        delete data.__validation__;
+        if (validationData?.success === false) {
+            for (let name in validationData.inputMessages) {
+                validation.setErrorMessage(name, validationData.inputMessages[name]);
+            }
+            const message = validationData.message?.trim() ? validationData.message : lang('One or more inputs are invalid');
+            pushNotification({
+                message,
+                type: 'error',
+            });
+            throw invalidResponse;
+        }
+        return data;
+    })
     .then(async (data) => {
         const {newUrl, message, messageType, ...$} = decomposeData(data) || (emptyObject as any);
         if (await params.onSubmitted?.($, newUrl) === false)
@@ -407,7 +548,7 @@ async function submit(ctx: FormContextValue, params: SubmitParamsWithId) {
             || !err?.handled
             || err?.handled && params.rejectIfHandled
         ) {
-            if (!params.rejectIfHandled) console.error(`submit error for ${params.url}: `, err);
+            if (!params.rejectIfHandled || err?.valid !== false) console.error(`submit error for ${params.url}: `, err);
             throw err;
         }
     })

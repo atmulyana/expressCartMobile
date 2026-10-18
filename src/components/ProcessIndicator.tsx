@@ -28,6 +28,7 @@ import {
 } from 'react-native';
 import FlexImage from 'rn-flex-image';
 import ImageSlider from 'rn-images-slider'; //eslint-disable-line
+import ValidatedInput from './ValidatedInput';
 
 type ChildrenProps = {
     children?: React.ReactNode,
@@ -92,6 +93,7 @@ function SkeletonPlaceholder<P extends ChildrenProps>({
         },
         type: Component,
     } = children;
+    const component = Component === ValidatedInput ? (props as any).Component : Component;
     const isChildsElemet = typeof(childs) == 'object' && (
         typeof((childs as any).type) == 'function'
         || typeof((childs as any).type) == 'string'
@@ -108,13 +110,13 @@ function SkeletonPlaceholder<P extends ChildrenProps>({
         zIndex = 1;
 
         const style2 = (typeof(style) == 'function') ? style(emptyObject) : style;
-        if (Component === Text || Component === TextInput) {
+        if (component === Text || component === TextInput) {
             styles = extractTextStyle(style2, paddingForText);
         }
-        else if (Component === Image || Component === FlexImage || Component === ImageSlider) {
+        else if (component === Image || component === FlexImage || component === ImageSlider) {
             styles = extractImageStyle(style2);
-            if (Component === Image) styles.view = {alignSelf: 'flex-start', ...styles.view};
-            //if (Component === FlexImage) styles.image = {flex: 1, ...styles.image};
+            if (component === Image) styles.view = {alignSelf: 'flex-start', ...styles.view};
+            //if (component === FlexImage) styles.image = {flex: 1, ...styles.image};
         }
         else if (style2) {
             let view: ViewStyle, text: TextStyle, image: ImageStyle;
@@ -138,7 +140,7 @@ function SkeletonPlaceholder<P extends ChildrenProps>({
         }
 
         return [styles, zIndex];
-    }, [Component, style, paddingForText]);
+    }, [component, style, paddingForText]); //eslint-disable-line react-hooks/preserve-manual-memoization -- `component` is equivalent to `Component`
 
     const isReady = !useIsProcessing();
     const [layout, setLayout] = React.useState<LayoutRectangle | null>(null);
@@ -173,13 +175,13 @@ function SkeletonPlaceholder<P extends ChildrenProps>({
             </View>
         </React.Fragment>;
     }
-    else if (Component === Text || Component === TextInput) {
+    else if (component === Text || component === TextInput) {
         return <View key={key} style={styles.view}>
             <Component {...props} style={styles.text}>{childs}</Component> 
             <Indicator zIndex={zIndex} />
         </View>;
     }
-    else if (Component === Image || Component === FlexImage || Component === ImageSlider) {
+    else if (component === Image || component === FlexImage || component === ImageSlider) {
         return <View key={key} style={styles.view}>
             <Component {...props} style={styles.image} /> 
             <Indicator zIndex={zIndex} />

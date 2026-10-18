@@ -1,12 +1,13 @@
 /**
  * https://github.com/atmulyana/expressCartMobile
  */
-import { useRefCallback, useRefMemo } from '@/hooks';
+import { useCopyRef, useRefCallback, useRefMemo } from '@/hooks';
 import { InputChangeValueCallback, InputProps, InputValueRef, ProcessProps } from '@/types';
-import { emptyArray, emptyString, noop } from 'javascript-common';
+import { emptyString, noop } from 'javascript-common';
 import React from 'react';
 import {
     StyleSheet,
+    type TextInput,
     type TextInputEndEditingEvent,
     type TextInputProps,
     type TextStyle,
@@ -86,9 +87,10 @@ const IntegerSpinner = React.memo(function IntegerSpinner({
     textAlign = 'center',
     value,
     ...props
-}: Props & InputProps & ProcessProps) {
+}: Props & InputProps<TextInput> & ProcessProps) {
     const [raiseEvent, setRaiseEvent] = React.useState(() => noop);
-    const valRef = React.useRef<InputValueRef<string>>({setValue: noop});
+    const valRef = React.useRef<InputValueRef<string> & TextInput>(null);
+    useCopyRef(ref, valRef);
     const {current: vars} = React.useRef({
         exceedsMax: noop,
         lastVal: undefined as string | undefined,
@@ -106,12 +108,9 @@ const IntegerSpinner = React.memo(function IntegerSpinner({
     vars.onExceedMax = onExceedMax;
     vars.onLessMin = onLessMin;
     vars.onValueChange = onValueChange;
-
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-    React.useImperativeHandle(ref, () => valRef.current, emptyArray);
     
     const {StepDown, StepUp} = useRefMemo(() => {
-        const decreaseValue = () => valRef.current.setValue(
+        const decreaseValue = () => valRef.current?.setValue(
             value => {
                 const val = intVal(value);
                 return (val === undefined
@@ -121,7 +120,7 @@ const IntegerSpinner = React.memo(function IntegerSpinner({
             },
             valueChangeEvent
         );
-        const increaseValue = () => valRef.current.setValue(
+        const increaseValue = () => valRef.current?.setValue(
             value => {
                 const val = intVal(value);
                 return (val === undefined
@@ -208,7 +207,7 @@ const IntegerSpinner = React.memo(function IntegerSpinner({
     });
 
     const endEditingHandler = useRefCallback((ev: TextInputEndEditingEvent) => {
-        valRef.current.setValue(
+        valRef.current?.setValue(
             /* Using `new String` to force updating because when `onEndEditing` event happens,
             the value doesn't change (The change has been consumed by `onChangeText` event) */
             new String(ev.nativeEvent.text) as any,

@@ -48,6 +48,8 @@ import type {
     Variant
 } from '@/types';
 import { Duration } from '@/types';
+import { Validation } from '@react-input-validator/native';
+import { min, required } from '@react-input-validator/rules';
 import { emptyArray, emptyObject, emptyString, isPlainObject } from 'javascript-common';
 import React from 'react';
 import {
@@ -665,6 +667,7 @@ const ReviewForm = React.memo(function ReviewForm({
         <TextInput
             name='title'
             placeholder={lang('Love it.')}
+            rules={required}
             style={arrayStyle('textInputHeight', 'para4')}
         />
         
@@ -674,10 +677,12 @@ const ReviewForm = React.memo(function ReviewForm({
             name='description'
             numberOfLines={3}
             placeholder={lang('Product is great. Does everything it said it can do.')}
+            rules={required}
             style={baseStyles.para4}
         />
         
         <Text>{lang('Rating')}:  <Text style={baseStyles.textBold}>{rating}</Text></Text>
+        <Validation rules={min(1)} name='rating' value={rating} />
         <RatingStars onRate={onRate} rating={rating} size={16} showNumber={false} />
 
         <View style={baseStyles.para8} />
