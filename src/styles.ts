@@ -89,6 +89,9 @@ const baseStyles = StyleSheet.create({
         rowGap: contentPadding,
     },
 
+    m0: {
+        margin: 0,
+    },
     m8: {
         margin: 8,
     },
@@ -142,6 +145,9 @@ const baseStyles = StyleSheet.create({
         textAlignVertical: 'center',
     },
     
+    p0: {
+        padding: 0,
+    },
     p8: {
         padding: contentPadding,
     },

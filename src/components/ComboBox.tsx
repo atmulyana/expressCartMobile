@@ -24,6 +24,7 @@ type Props<T = ItemValue> = ComboProps<T> & InputValidationProps<ComboProps<T>, 
 const Input = React.forwardRef(function Input<T = ItemValue>(
     {
         loadingAware,
+        notMoreLoading,
         style,
         submittingAware,
         value,
@@ -37,7 +38,7 @@ const Input = React.forwardRef(function Input<T = ItemValue>(
     }, [style, styles]);
 
     const SelectT = Select as SelectType<T>;
-    return <ProcessIndicator loadingAware={loadingAware} submittingAware={submittingAware}>
+    return <ProcessIndicator loadingAware={loadingAware} notMoreLoading={notMoreLoading} submittingAware={submittingAware}>
         <SelectT {...props} ref={ref} selectedValue={value} style={styleProp} />
     </ProcessIndicator>;
 }) as <T = ItemValue>(props: ComboProps<T> & React.RefAttributes<SelectRef>) => React.ReactNode;

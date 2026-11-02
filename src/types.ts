@@ -33,6 +33,7 @@ export type DataReadyCallback = (
     newResponseUrl?: UrlPathLocal | false
 ) => /*Promise<any> |*/ any;
 
+export type DataSource = Exclude<any, UrlPath>;
 export type DataUrl = UrlPath | undefined | null;
 
 export enum Duration {
@@ -76,13 +77,15 @@ export type InputValueRef<Value> = {
 
 export type LinkHref = RelativePathString | UrlPathLocal;
 
+export type { ListRef } from '@/components/ListContent';
+
 export type MenuItem = {
     title: string,
     link: LinkHref,
     order: number,
 };
 
-export type MergeData<T> = (newData: T, oldData: any) => Promise<[any, boolean]> | [any, boolean];
+export type MergeData<T> = (newData: T, oldData: any) => Promise<[any, boolean, boolean]> | [any, boolean, boolean];
 export type NotFunc<T> = Exclude<T, Function>;
 
 export type Order = {
@@ -138,6 +141,7 @@ export type PaymentConfigs = {
 
 export type ProcessProps = {
     loadingAware?: boolean,
+    notMoreLoading?: boolean,
     submittingAware?: boolean,
 }
 

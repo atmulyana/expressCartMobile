@@ -11,6 +11,7 @@ import ProcessIndicator from './ProcessIndicator';
 const RenderHtml = React.memo(function RenderHtml({
     html,
     loadingAware,
+    notMoreLoading,
     submittingAware,
 }: {
     html: string,
@@ -18,7 +19,7 @@ const RenderHtml = React.memo(function RenderHtml({
     const cntWidth = useContentWidth();
     const styles = useStyles();
 
-    return <ProcessIndicator loadingAware={loadingAware} submittingAware={submittingAware}>
+    return <ProcessIndicator loadingAware={loadingAware} notMoreLoading={notMoreLoading} submittingAware={submittingAware}>
         <RNRenderHtml
             contentWidth={cntWidth}
             baseStyle={styles.text as any}

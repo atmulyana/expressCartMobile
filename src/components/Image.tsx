@@ -11,6 +11,7 @@ export const imagePlaceholder = NoImage;
 
 export default function Image({
     loadingAware,
+    notMoreLoading,
     ref,
     submittingAware,
     source,
@@ -22,7 +23,7 @@ export default function Image({
     ref?: React.Ref<ImageInstance>,
     uri?: UrlPath,
 }) {
-    return <ProcessIndicator loadingAware={loadingAware} submittingAware={submittingAware}>
+    return <ProcessIndicator loadingAware={loadingAware} notMoreLoading={notMoreLoading} submittingAware={submittingAware}>
         <FlexImage
             {...props}
             ref={ref}

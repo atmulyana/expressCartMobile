@@ -28,6 +28,7 @@ export default function Button({
     children,
     disabled,
     loadingAware,
+    notMoreLoading,
     pressedStyle = defaultPressedStyle,
     submittingAware,
     ...props
@@ -73,6 +74,7 @@ export default function Button({
 
     return <ProcessIndicator
         loadingAware={loadingAware}
+        notMoreLoading={notMoreLoading}
         paddingForText={false}
         submittingAware={submittingAware}
     >

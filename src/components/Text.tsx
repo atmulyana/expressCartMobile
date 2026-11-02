@@ -9,10 +9,11 @@ import TextApp from './TextApp';
 export default function Text({
     children,
     loadingAware,
+    notMoreLoading,
     submittingAware,
     ...props
 }: TextProps & ProcessProps) {
-    return <ProcessIndicator loadingAware={loadingAware} submittingAware={submittingAware}> 
+    return <ProcessIndicator loadingAware={loadingAware} notMoreLoading={notMoreLoading} submittingAware={submittingAware}> 
         <TextApp {...props}>{children}</TextApp>
     </ProcessIndicator>;
 }

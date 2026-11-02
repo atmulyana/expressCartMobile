@@ -14,11 +14,21 @@ import {
 import { setRefresher } from "@/hooks/navigation";
 import { isUrlPath } from "@/libs/server";
 import { relogin } from "@/libs/session";
-import type { DataReadyCallback, HttpReject, UrlPath } from '@/types';
+import type { DataReadyCallback, DataSource, HttpReject, UrlPath } from '@/types';
 import { useFocusEffect, useIsFocused, useNavigation } from "expo-router";
 import { emptyObject, emptyString, isPlainObject, noop } from "javascript-common";
 import React from 'react';
 import { RefreshControl, ScrollView, type ScrollViewProps } from "react-native";
+
+
+/*** We do really need VirtualizedList (FlatList) inside ScrollView */
+//LogBox.ignoreLogs(['VirtualizedLists should never be nested']); //NOT working
+const _logError = console.error.bind(console);
+console.error = (message, ...optinalParams) => {
+    if (typeof(message) == 'string' && message.startsWith('VirtualizedLists should never be nested')) return; 
+    _logError(message, ...optinalParams);
+};
+
 
 export default function Content<P extends ScrollViewProps = ScrollViewProps>({
     authenticated = false,
@@ -41,7 +51,7 @@ export default function Content<P extends ScrollViewProps = ScrollViewProps>({
     authenticated?: boolean,
     autoLoad?: boolean,
     children?: React.ReactNode,
-    dataSource?: Exclude<any, UrlPath>,
+    dataSource?: DataSource,
     noData?: boolean,
     onDataError?: HttpReject,
     onDataReady?: (data: any, silent?: boolean) => any,

@@ -21,6 +21,7 @@ type Props = InputTextProps & InputValidationProps<InputTextProps, RNInput>;
 const InputText = React.forwardRef(function InputText(
     {
         loadingAware,
+        notMoreLoading,
         multiline,
         numberOfLines = 5,
         onValueChange,
@@ -47,7 +48,7 @@ const InputText = React.forwardRef(function InputText(
         ];
     }, [styles, multiline, numberOfLines, style]);
     
-    return <ProcessIndicator loadingAware={loadingAware} submittingAware={submittingAware}>
+    return <ProcessIndicator loadingAware={loadingAware} notMoreLoading={notMoreLoading} submittingAware={submittingAware}>
         <RNInput
             placeholderTextColor={colors.disabled}
             {...props}

@@ -23,6 +23,7 @@ const ContentLink = React.memo(function ContentLink({
     children,
     href,
     loadingAware,
+    notMoreLoading,
     onPress,
     style,
     submittingAware,
@@ -41,7 +42,7 @@ const ContentLink = React.memo(function ContentLink({
         ]);
     }, [children, style]);
 
-    return <ProcessIndicator loadingAware={loadingAware} submittingAware={submittingAware}>
+    return <ProcessIndicator loadingAware={loadingAware} notMoreLoading={notMoreLoading} submittingAware={submittingAware}>
         <Pressable
             {...props}
             style={styles.view}

@@ -11,10 +11,11 @@ import ProcessIndicator from './ProcessIndicator';
 
 const ImageSlider = React.memo(function ImageSlider({
     loadingAware,
+    notMoreLoading,
     submittingAware,
     ...props
 }: Omit<ImageSliderProp, 'baseSrc' | 'noImage'> & ProcessProps) {
-    return <ProcessIndicator loadingAware={loadingAware} submittingAware={submittingAware}>
+    return <ProcessIndicator loadingAware={loadingAware} notMoreLoading={notMoreLoading} submittingAware={submittingAware}>
         <RNImageSlider
             {...props}
             baseSrc={serverUrl('/')}

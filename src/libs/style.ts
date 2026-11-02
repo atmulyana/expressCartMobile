@@ -1,6 +1,7 @@
 /**
  * https://github.com/atmulyana/expressCartMobile
  */
+import type { OrderStatus } from "@/types";
 import { noop } from "javascript-common";
 import {
     Appearance,
@@ -40,4 +41,19 @@ export const colorScheme = createHookStore(
 export async function initColorScheme() {
     const scheme = await getStoredData(COLOR_SCHEME_KEY) ?? 'unspecified';
     if (scheme != colorScheme.getData()) await colorScheme.update(scheme as ColorSchemeName);
+}
+
+const statusColors: {[status: string]: 'success' | 'warning' | 'danger'} = {
+    Paid: 'success',
+    Declined: 'danger',
+    Approved: 'success',
+    'Approved - Processing': 'success',
+    Failed: 'danger',
+    Completed: 'success',
+    Shipped: 'success',
+    Pending: 'warning',
+    Created: 'warning',
+};
+export function getStatusColor(status: OrderStatus): 'success' | 'warning' | 'danger' {
+    return statusColors[status] || 'danger';
 }

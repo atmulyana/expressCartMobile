@@ -60,7 +60,7 @@ export default function ProductList() {
     //const ref = React.useRef<VirtualizedList<ProductItem[]>>(null);
     const config = useConfig();
     const cntWidth = useContentWidth();
-    const [{results = emptyArray}, isLoading] = useData<{
+    const [{results = emptyArray}] = useData<{
         results: ProductItem[],
     }>(initData);
     // const [isRefreshing] = useRefreshing();
@@ -193,7 +193,7 @@ export default function ProductList() {
     const ProductListComp = ListContent<ProductItem[]>;
     return <ProductListComp
         dataDefault={initData}
-        ListEmptyComponent={isLoading ? null : ListEmpty}
+        ListEmptyComponent={ListEmpty}
         ListFooterComponent={/*isLoading && !isRefreshing ?*/ ListFooterComponent /*: null*/}
         ListFooterComponentStyle={styles.hidden}
         ListFooterComponentStyleLoading={styles.array('productRow', 'pb8')}

@@ -25,10 +25,11 @@ import { useRefMemo } from '../react';
 import { setSession } from '../session';
 
 type NextDataUrl = (prevUrl?: DataUrl) => UrlPath;
+type Loading = boolean | 1;
 
 type Data = Readonly<{
-    snapshot: () => [any, boolean, DataUrl],
-    isLoading: () => boolean,
+    snapshot: () => [any, Loading, DataUrl],
+    isLoading: () => Loading,
     readonly isNoMore: boolean,
     readonly isUninitialized: boolean, 
     load: (
@@ -40,7 +41,7 @@ type Data = Readonly<{
         nextUrlOrData: NotFunc<T> | NextDataUrl,
         mergeData: MergeData<T>
     ) => Promise<any>,
-    setLoading: (isLoading: boolean) => void,
+    setLoading: (isLoading: Loading) => void,
     subscribe: (listener: HookListener) => (() => void),
 }>;
 const defaultSnapshot: ReturnType<Data['snapshot']> = [null, false, null];
@@ -64,14 +65,14 @@ const uninitialized = Symbol('uninitialized-data');
 
 function createData(): Data {
     let _data: any = uninitialized;
-    let _isLoading = false;
+    let _isLoading: Loading = false;
     let _isNoMore = false;
     let _url: DataUrl;
-    let _snapshot = [_data, _isLoading, _url] as [any, boolean, DataUrl];
+    let _snapshot = [_data, _isLoading, _url] as [any, Loading, DataUrl];
     const listeners = new Set<HookListener>();
     
-    function emitChangeEvent(newData: any, newLoading: boolean, newUrl: typeof _url) {
-        if (!Object.is(newData, _data) || newLoading != _isLoading || _url != newUrl) {
+    function emitChangeEvent(newData: any, newLoading: Loading, newUrl: typeof _url) {
+        if (!Object.is(newData, _data) || !Object.is(newLoading, _isLoading) || _url != newUrl) {
             _data = newData;
             _isLoading = newLoading;
             _url = newUrl;
@@ -142,7 +143,7 @@ function createData(): Data {
         },
 
         async loadMore<T>(nextUrlOrData: NotFunc<T> | NextDataUrl, mergeData: MergeData<T>) {
-            emitChangeEvent(_data, true, _url);
+            emitChangeEvent(_data, 1, _url);
 
             let promise: Promise<T>;
             let newUrl: DataUrl;
@@ -157,11 +158,11 @@ function createData(): Data {
             }
             promise
                 .then(async (data) => {
-                    let isNext = true;
-                    [newData, isNext] = await mergeData(data, _data);
+                    let isNext = true, isRevertUrl = false;
+                    [newData, isNext, isRevertUrl] = await mergeData(data, _data);
                     if (!isNext) {
                         _isNoMore = true;
-                        if (newUrl) newUrl = _url; //if no more data then page url should not change
+                        if (newUrl && isRevertUrl) newUrl = _url;
                     }
                 })
                 .catch(err => {
@@ -174,7 +175,7 @@ function createData(): Data {
                 });
         },
         
-        setLoading(isLoading: boolean) {
+        setLoading(isLoading: Loading) {
             emitChangeEvent(_data, isLoading, _url);
         },
 
@@ -199,7 +200,7 @@ export function useData<T = any>(initData?: T) {
     const ctx = React.useContext(DataContext);
     let data = React.useSyncExternalStore(ctx.subscribe, ctx.snapshot);
     if (data[0] === uninitialized) data = [initData, data[1], data[2]];
-    return data as [T, boolean, DataUrl];
+    return data;
 }
 
 export function useIsDataUnset() {
@@ -207,9 +208,11 @@ export function useIsDataUnset() {
     return ctx.isUninitialized;
 }
 
-export function useIsLoading() {
+export function useIsLoading(notMore?: boolean) {
     const ctx = React.useContext(DataContext);
-    return React.useSyncExternalStore(ctx.subscribe, ctx.isLoading);
+    const loading = React.useSyncExternalStore(ctx.subscribe, ctx.isLoading);
+    if (notMore) return loading !== 1 && !!loading;
+    return !!loading;
 }
 
 export function useLoadData(
@@ -226,7 +229,7 @@ export function useLoadData(
 }
 
 function _mergeData<T>(newData: T) {
-    return [newData, false] as [T, boolean];
+    return [newData, false, false] as [T, boolean, boolean];
 }
 export function useLoadMoreData<T>(
     nextUrlOrData: NotFunc<T> | GetNextDataUrl = noop,
@@ -234,13 +237,6 @@ export function useLoadMoreData<T>(
 ) {
     const ctx = React.useContext(DataContext);
     const path = usePathname();
-    let _nextUrlOrData: NotFunc<T> | NextDataUrl;
-    if (typeof(nextUrlOrData) == 'function') {
-        _nextUrlOrData = (prevUrl?: DataUrl) => (nextUrlOrData as GetNextDataUrl)(prevUrl) ?? path;
-    }
-    else {
-        _nextUrlOrData = nextUrlOrData;
-    }
     return React.useCallback(async () => {
         if (
             ctx.isLoading() //prevent double invocation of `loadMore` (which will use the same URL)
@@ -253,8 +249,16 @@ export function useLoadMoreData<T>(
                 //when the position is at the end of the list. Must re-invoke `load` to reset it
                 //(by refreshing the list)
         ) return false;
+        
+        let _nextUrlOrData: NotFunc<T> | NextDataUrl;
+        if (typeof(nextUrlOrData) == 'function') {
+            _nextUrlOrData = (prevUrl?: DataUrl) => (nextUrlOrData as GetNextDataUrl)(prevUrl) ?? path;
+        }
+        else {
+            _nextUrlOrData = nextUrlOrData;
+        }
         return await ctx.loadMore(_nextUrlOrData, mergeData);
-    }, [ctx, _nextUrlOrData, mergeData]);
+    }, [ctx, nextUrlOrData, mergeData, path]);
 }
 
 export function useSetLoading() {

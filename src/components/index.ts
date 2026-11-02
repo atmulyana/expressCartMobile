@@ -19,4 +19,4 @@ export { default as RenderHtml } from './RenderHtml';
 export { default as SubmittingIndicator } from './SubmittingIndicator';
 export { default as Text } from './Text';
 export { default as TextInput } from './TextInput';
-
+export { default as TwoPane } from './TwoPane';

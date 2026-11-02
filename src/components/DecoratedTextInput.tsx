@@ -64,6 +64,7 @@ export default function DecoratedTextInput({
     decorStyle,
     loadingAware,
     name,
+    notMoreLoading,
     onLayout,
     onChangeText,
     Prefix,
@@ -98,7 +99,7 @@ export default function DecoratedTextInput({
 
     const [_value, _onChangeText, _ref] = useFormInputValue<TextInput>(name, value, onChangeText, ref);
     
-    return <ProcessIndicator loadingAware={loadingAware} submittingAware={submittingAware}>
+    return <ProcessIndicator loadingAware={loadingAware} notMoreLoading={notMoreLoading} submittingAware={submittingAware}>
         <View style={styleProps.view} onLayout={onLayout}>
             {Prefix &&
                 <View style={styleProps.decorContainer}>

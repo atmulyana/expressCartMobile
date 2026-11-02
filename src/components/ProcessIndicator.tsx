@@ -39,13 +39,13 @@ type ChildrenProps = {
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
-function useIsSubmitting() {
+function useIsSubmitting(_?: boolean) {
     const [isSubmitting] = useSubmitState();
     return isSubmitting;
 }
 
-function useIsStillProcess() {
-    const isLoading = useIsLoading();
+function useIsStillProcess(notMoreLoading?: boolean) {
+    const isLoading = useIsLoading(notMoreLoading);
     const [isSubmitting] = useSubmitState();
     return isLoading || isSubmitting;
 }
@@ -55,6 +55,7 @@ export default function ProcessIndicator<
 >({
     children,
     loadingAware,
+    notMoreLoading,
     paddingForText,
     submittingAware,
 }: {
@@ -67,7 +68,7 @@ export default function ProcessIndicator<
         null;
 
     if (useIsProcessing) {
-        return <SkeletonPlaceholder paddingForText={paddingForText} useIsProcessing={useIsProcessing}>
+        return <SkeletonPlaceholder notMoreLoading={notMoreLoading} paddingForText={paddingForText} useIsProcessing={useIsProcessing}>
             {children}
         </SkeletonPlaceholder>
     }
@@ -76,12 +77,14 @@ export default function ProcessIndicator<
 
 function SkeletonPlaceholder<P extends ChildrenProps>({
     children,
+    notMoreLoading,
     paddingForText,
     useIsProcessing,
 }: {
     children: React.ReactElement<P>,
+    notMoreLoading?: boolean,
     paddingForText?: boolean,
-    useIsProcessing: () => boolean,
+    useIsProcessing: (notMoreLoading?: boolean) => boolean,
 }) {
     const {
         key,
@@ -142,7 +145,7 @@ function SkeletonPlaceholder<P extends ChildrenProps>({
         return [styles, zIndex];
     }, [component, style, paddingForText]); //eslint-disable-line react-hooks/preserve-manual-memoization -- `component` is equivalent to `Component`
 
-    const isReady = !useIsProcessing();
+    const isReady = !useIsProcessing(notMoreLoading);
     const [layout, setLayout] = React.useState<LayoutRectangle | null>(null);
     const onLayout = React.useCallback((ev: LayoutChangeEvent) => {
         setLayout(ev.nativeEvent.layout);
