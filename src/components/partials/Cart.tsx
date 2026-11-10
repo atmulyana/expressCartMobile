@@ -32,10 +32,8 @@ import type { SubmitFunction, TCart, TCartItem } from '@/types';
 import { noChange, noop } from 'javascript-common';
 import React from 'react';
 import {
-    type StyleProp,
     StyleSheet,
-    View,
-    type ViewStyle,
+    View
 } from 'react-native';
 
 const cartStyles = StyleSheet.create({
@@ -71,7 +69,6 @@ const cartStyles = StyleSheet.create({
         justifyContent:'center',
     },
     itemQty: {
-        ...baseStyles.textInputHeight,
         flex: 3,
     }
 });
@@ -240,22 +237,19 @@ const CartTotal = React.memo(function CartTotal({
 
 const CartContent = React.memo(function CartContent({
     isSubmitting = false,
-    refreshable,
+    refreshable = false,
     readOnly,
     setCartEmpty,
-    style,
     submit = noop,
 }: {
     isSubmitting?: boolean,
     refreshable?: boolean,
     readOnly?: boolean,
     setCartEmpty: (isEmpty: boolean) => void,
-    style?: StyleProp<ViewStyle>,
     submit?: SubmitFunction,
 }) {
     const cart = useCart();
     const config = useConfig();
-    //const [, isLoading] = useData(cart);
     const lang = useLang();
 
     const itemIds = React.useMemo(() => Object.keys(cart.items), [cart]);
@@ -298,34 +292,52 @@ const CartContent = React.memo(function CartContent({
         dataSource={cart}
         extraData={renderItem}
         keyExtractor={noChange}
-        ListEmptyComponent={/*isLoading ? null :*/ <Text>{lang('Empty cart')}</Text>}
-        ListHeaderComponent={<Text style={arrayStyle('textLarge', 'textBold', 'para8')}>
-            {lang('Cart contents')}
-        </Text>}
-        ListHeaderComponentStyle={{paddingVertical: 0}}
-        ListFooterComponent={itemIds.length > 0 ? <CartTotal
-            cart={cart}
-            currency={config.currencySymbol}
-        /> : null}
+        ListEmptyComponent={CartListEmpty}
+        ListHeaderComponent={CartListHeader}
+        ListHeaderComponentStyle={baseStyles.pv0}
+        ListFooterComponent={itemIds.length > 0 ? CartListFooter : null}
         ListFooterComponentStyle={null}
         ListFooterComponentStyleLoading={null}
         partial={!refreshable}
         renderItem={renderItem}
-        style={style}
         url={refreshable ? '/checkout/cartdata' : undefined}
     />;
 });
 
+function CartListEmpty() {
+    const lang = useLang();
+    
+    return <Text>{lang('Empty cart')}</Text>;
+}
+
+function CartListFooter() {
+    const cart = useCart();
+    const config = useConfig();
+
+    return <CartTotal
+        cart={cart}
+        currency={config.currencySymbol}
+    />;
+}
+
+function CartListHeader() {
+    const lang = useLang();
+
+    return <Text style={arrayStyle('textLarge', 'textBold', 'para8')}>
+        {lang('Cart contents')}
+    </Text> ;
+}
+
 export default function Cart({
+    homeAfterClear = false,
     refreshable,
     readOnly,
     showCheckoutButton = true,
-    style,
 }: {
+    homeAfterClear?: boolean,
     refreshable?: boolean,
     readOnly?: boolean,
     showCheckoutButton?: boolean,
-    style?: StyleProp<ViewStyle>,
 }) {
     const lang = useLang();
     const nav = useNavHelpers();
@@ -337,13 +349,24 @@ export default function Cart({
         if (typeof(data?.cart) == 'object') await setCart(data.cart);
     });
 
+    const clearCart = useEffectEvent(() => {
+        submit('/product/emptycart');
+    });
+    const goHomeIfEmpty = useEffectEvent(() => {
+        if (homeAfterClear) nav.goHome();
+    });
+    
     React.useEffect(() => {
-        if (isClearingCart) submit('/product/emptycart');
-    }, [isClearingCart]); //eslint-disable-line react-hooks/exhaustive-deps
+        if (isClearingCart) clearCart();
+    }, [isClearingCart]);
 
     React.useEffect(() => {
         if (!isSubmitting) setClearingCart(false);
     }, [isSubmitting]);
+
+    React.useEffect(() => {
+        if (isCartEmpty) goHomeIfEmpty();
+    }, [isCartEmpty]);
 
     return <Form fragment>
         <Box style={cartStyles.box}>
@@ -352,17 +375,16 @@ export default function Cart({
                 refreshable={refreshable}
                 readOnly={readOnly}
                 setCartEmpty={setCartEmpty}
-                style={style}
                 submit={submit}
             />
             <SubmittingIndicator message={`${lang('Clearing cart')}...`} visible={isClearingCart} />
         </Box>
-        <View style={isCartEmpty ? arrayStyle('hidden', 'para8', 'ph8') : cartStyles.buttons}>
+        <View style={isCartEmpty ? baseStyles.hidden : cartStyles.buttons}>
             {showCheckoutButton && <Button
                 submittingAware
                 onPress={() => {
                     nav.closeCart();
-                    //nav.goto('/checkout/information');
+                    nav.goto('/checkout/information');
                 }}
             >
                 {lang('Checkout')}

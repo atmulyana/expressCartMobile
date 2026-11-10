@@ -80,7 +80,7 @@ export default function DecoratedTextInput({
     const colors = useColors();
     const styles = useStyles();
     const styleProps = React.useMemo(() => {
-        const $tyle = extractTextStyle([styles.textInput, style]);
+        const $tyle = extractTextStyle([styles.textInput, styles.textInputHeight, style]);
         $tyle.view = Object.assign($tyle.view, requiredStyles.container);
         const decorContainer =  StyleSheet.flatten([
             defaultStyles.decorContainer,

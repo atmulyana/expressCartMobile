@@ -122,15 +122,16 @@ export default function Content<P extends ScrollViewProps = ScrollViewProps>({
     const loadData = useLoadData(dataReadyHandler, urlOrData, onDataError);
     
     useMount(() => {
-        if (autoLoad && !noData) loadData();
+        if (autoLoad && !noData && isFocused) loadData();
     });
 
     useFocusEffect(
         React.useCallback(
             () => {
-                setRefresher(loadData);
+                setRefresher(noData ? null : loadData);
+                if ($data.current === emptyObject && !noData) loadData();
             }, 
-            [loadData]
+            [loadData, noData]
         )
     );
 

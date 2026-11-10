@@ -43,7 +43,7 @@ const ShippingForm = React.memo(function ShippingForm({
             notMoreLoading
             placeholder={lang("Email address")}
             rules={emailRules}
-            style={arrayStyle('textInputHeight', 'para8')}
+            style={baseStyles.para8}
             value={session.customerEmail}
         />
         <TextInput
@@ -51,7 +51,7 @@ const ShippingForm = React.memo(function ShippingForm({
             name="company"
             notMoreLoading
             placeholder={lang("Company name")}
-            style={arrayStyle('textInputHeight', 'para8')}
+            style={baseStyles.para8}
             value={session.customerCompany}
         />
         <View style={arrayStyle('flexRow', 'para8')}>
@@ -61,7 +61,7 @@ const ShippingForm = React.memo(function ShippingForm({
                 notMoreLoading
                 placeholder={lang("First name")}
                 rules={required}
-                style={arrayStyle('textInputHeight', 'flex1')}
+                style={baseStyles.flex1}
                 value={session.customerFirstname}
             />
             <TextInput
@@ -70,7 +70,7 @@ const ShippingForm = React.memo(function ShippingForm({
                 notMoreLoading
                 placeholder={lang("Last name")}
                 rules={required}
-                style={arrayStyle('textInputHeight', 'flex1', 'ml4')}
+                style={arrayStyle('flex1', 'ml4')}
                 value={session.customerLastname}
             />
         </View>
@@ -80,7 +80,7 @@ const ShippingForm = React.memo(function ShippingForm({
             notMoreLoading
             placeholder={lang("Address 1")}
             rules={required}
-            style={arrayStyle('textInputHeight', 'para8')}
+            style={baseStyles.para8}
             value={session.customerAddress1}
         />
         <TextInput
@@ -88,7 +88,7 @@ const ShippingForm = React.memo(function ShippingForm({
             name="address2"
             notMoreLoading
             placeholder={`${lang("Address 2")} (${lang("optional")})`}
-            style={arrayStyle('textInputHeight', 'para8')}
+            style={baseStyles.para8}
             value={session.customerAddress2}
         />
         <ComboBox
@@ -109,7 +109,7 @@ const ShippingForm = React.memo(function ShippingForm({
                 notMoreLoading
                 placeholder={lang("State")}
                 rules={required}
-                style={arrayStyle('textInputHeight', 'flex1')}
+                style={baseStyles.flex1}
                 value={session.customerState}
             />
             <TextInput
@@ -118,7 +118,7 @@ const ShippingForm = React.memo(function ShippingForm({
                 notMoreLoading
                 placeholder={lang("Post code")}
                 rules={required}
-                style={arrayStyle('textInputHeight', 'flex1', 'ml4')}
+                style={arrayStyle('flex1', 'ml4')}
                 value={session.customerPostcode}
             />
         </View>
@@ -132,22 +132,11 @@ const ShippingForm = React.memo(function ShippingForm({
                 required,
                 regex(phoneRegex).setErrorMessage(lang('invalid phone number'))
             ]}
-            style={arrayStyle('textInputHeight', 'para8')}
+            style={baseStyles.para8}
             value={session.customerPhone}
         />
         
         {footer}
-        {/* 
-        //PART OF `footer` in checkout info
-        <TextInput
-            loadingAware
-            multiline
-            name="orderComment"
-            numberOfLines={3}
-            placeholder={lang("Order comment")}
-            style={baseStyles.para8}
-            value={cart.orderComment}
-        /> */}
     </>;
 });
 export default ShippingForm;

@@ -47,10 +47,6 @@ const baseStyles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
-
-    btnDisabled: {
-        opacity: 0.5,
-    },
     
     center: {
         alignSelf: 'center',
@@ -58,6 +54,14 @@ const baseStyles = StyleSheet.create({
     contentCentered: {
         alignItems: 'center',
         justifyContent: 'center',
+    },
+
+    disabled: {
+        opacity: 0.5,
+    },
+    
+    end: {
+        alignSelf: 'flex-end',
     },
     fill: StyleSheet.absoluteFill,
     flex1: {
@@ -85,10 +89,16 @@ const baseStyles = StyleSheet.create({
         justifyContent: 'space-between',
     },
 
+    lineSlim: {
+        lineHeight: fontBase.fontSize,
+    },
     list: {
         rowGap: contentPadding,
     },
 
+    m_8: {
+        margin: -contentPadding,
+    },
     m0: {
         margin: 0,
     },
@@ -157,13 +167,16 @@ const baseStyles = StyleSheet.create({
     },
     para8: {
         flex: 0,
-        marginBottom: 8,
+        marginBottom: contentPadding,
     },
     pb8: {
-        paddingVertical: contentPadding,
+        paddingBottom: contentPadding,
     },
     ph8: {
         paddingHorizontal: contentPadding,
+    },
+    pv0: {
+        paddingVertical: 0,
     },
     
     pagingButtons: {

@@ -187,7 +187,7 @@ function OrderItem({
 }) {
     const config = useConfig();
     const isDark = useIsDarkMode();
-    const [isRefreshing, setRefreshing] = useRefreshing();
+    const [isRefreshing] = useRefreshing();
     const lang = useLang();
     const styles = useStyles();
     const [isOpen, setOpen] = React.useState(false);

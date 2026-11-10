@@ -4,7 +4,7 @@
 import { useData, useLoadMoreData, useRefreshing } from '@/hooks';
 import styles, { arrayStyle } from '@/styles';
 import type { DataSource, GetNextDataUrl, MergeData, NotFunc } from '@/types';
-import { emptyArray } from 'javascript-common';
+import { emptyArray, noop } from 'javascript-common';
 import React from 'react';
 import { FlatList, type StyleProp, type ViewStyle, type VirtualizedListProps } from 'react-native';
 import Content from "./Content";
@@ -41,8 +41,10 @@ export default function ListContent<T, P extends VirtualizedListProps<T> = Virtu
     const loadMoreData = useLoadMoreData(nextUrlOrData, mergeData);
     const [isRefreshing] = useRefreshing();
 
-    React.useImperativeHandle(ref, () => ({loadMoreData}), [loadMoreData]);
-    
+    React.useImperativeHandle(ref, () => ({
+        loadMoreData: nextUrlOrData === undefined ? noop : loadMoreData,
+    }), [loadMoreData, nextUrlOrData]);
+
     return <Content
         contentContainerStyle={styles.list}
         data={Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : emptyArray}
@@ -60,7 +62,7 @@ export default function ListContent<T, P extends VirtualizedListProps<T> = Virtu
                 ? ListFooterComponentStyleLoading
                 : ListFooterComponentStyle
         }
-        onEndReached={loadMoreData}
+        onEndReached={nextUrlOrData === undefined ? null : loadMoreData}
         partial={partial}
         Scroller={Scroller as React.ComponentType<P>}
     />;

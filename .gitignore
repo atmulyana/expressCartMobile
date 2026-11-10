@@ -8,7 +8,9 @@ node_modules/
 
 # Expo
 .expo/
+build/
 dist/
+prebuilds/
 web-build/
 expo-env.d.ts
 

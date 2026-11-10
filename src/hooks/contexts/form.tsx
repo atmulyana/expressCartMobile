@@ -210,14 +210,14 @@ export function useForm(onSubmitted?: DataReadyCallback, onError?: SubmitParams[
                 if (ret1 === false) return false;
                 const ret2 = await onSubmitted?.(data, newUrl);
                 if (ret2 === false) return false;
-                if ((ret1 || ret2) !== true && newUrl) {
+                if (ret1 !== true && ret2 !== true && newUrl) {
                     nav.goto(newUrl, true);
                     return false;
                 }
             };
 
             const validation = ctx.forms[id].validationRef?.current;
-            if (validation && !validation.validate()) {
+            if (!params.postData && validation && !validation.validate()) {
                 pushNotification({
                     message: lang('One or more inputs are invalid'),
                     type: 'error',
@@ -478,10 +478,12 @@ function FormValidation({
 
 async function submit(ctx: FormContextValue, params: SubmitParamsWithId) {
     const validation = ctx.validationRef?.current;
-    const data: any = (Object.keys(ctx.inputs).length > 0 || params.data) ? {
-        ...ctx.inputs,
-        ...params.data,
-    } : null;
+    const data: any = params.postData ?? (
+        (Object.keys(ctx.inputs).length > 0 || params.data) ? {
+            ...ctx.inputs,
+            ...params.data,
+        } : null
+    );
 
     let promise: Promise<any>;
     const dummyServer = 'http://dummy-server';
@@ -504,7 +506,7 @@ async function submit(ctx: FormContextValue, params: SubmitParamsWithId) {
     }
     
     promise.then(data => {
-        if (!validation || !isPlainObject(data)) return data;
+        if (params.postData || !validation || !isPlainObject(data)) return data;
         const validationData = data.__validation__;
         delete data.__validation__;
         if (validationData?.success === false) {

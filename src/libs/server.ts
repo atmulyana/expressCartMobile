@@ -53,11 +53,12 @@ export async function callServer(
 
             xhr.onload = () => {
                 if (isProcessing) {
+                    const _url = url.startsWith(SERVER) ? url.substring(SERVER.length) : url;
                     if (xhr.status == 404) {
-                        error(reject, lang("What you're looking for is not found"));
+                        error(reject, lang("What you're looking for is not found") + ":\n " + _url);
                     }
                     else if (xhr.status < 200 || xhr.status > 299) {
-                        error(reject, lang("Server can't process your request"));
+                        error(reject, lang("Server can't process your request") + ":\n " + _url);
                     }
                     else {
                         resolve(getResponse());

@@ -120,11 +120,13 @@ function createData(): Data {
                     throw {status:-1, handled: true} as HttpError;
                 }
            
-                if (isPlainObject($.config)) await setConfig($.config);
-                if (isPlainObject($.paymentConfig)) await setPaymentConfig($.paymentConfig);
-                if (isPlainObject($.menu) && Array.isArray($.menu.items)) await setMenu($.menu.items);
-                await setSession($.session);
-                await setCart($.cart);
+                if (isUrl) {
+                    if (isPlainObject($.config)) await setConfig($.config);
+                    if (isPlainObject($.paymentConfig)) await setPaymentConfig($.paymentConfig);
+                    if (isPlainObject($.menu) && Array.isArray($.menu.items)) await setMenu($.menu.items);
+                    await setSession($.session);
+                    await setCart($.cart);
+                }
 
                 return {
                     message: $.message,
@@ -200,7 +202,7 @@ export function useData<T = any>(initData?: T) {
     const ctx = React.useContext(DataContext);
     let data = React.useSyncExternalStore(ctx.subscribe, ctx.snapshot);
     if (data[0] === uninitialized) data = [initData, data[1], data[2]];
-    return data;
+    return data as [T, Loading, DataUrl];
 }
 
 export function useIsDataUnset() {

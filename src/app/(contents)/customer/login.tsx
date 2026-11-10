@@ -4,6 +4,7 @@
 import { Button, Content, Text, TextInput } from '@/components';
 import { useCorrectWidth, useForm, useLang, useSession, useStyles } from '@/hooks';
 import { login } from '@/libs/session';
+import baseStyles from '@/styles';
 import { email, required } from '@react-input-validator/rules';
 import { Redirect } from 'expo-router';
 import { emptyString } from 'javascript-common';
@@ -42,7 +43,7 @@ export default function CustomerLogin() {
                 spellCheck={false} 
                 returnKeyType="done"
                 rules={[email, required]}
-                style={styles.array('textInputHeight', 'para8')}
+                style={baseStyles.para8}
                 underlineColorAndroid="transparent"
                 value={loginEmail}
             />
@@ -56,7 +57,7 @@ export default function CustomerLogin() {
                 rules={required}
                 secureTextEntry
                 spellCheck={false}
-                style={styles.array('textInputHeight', 'para8')}
+                style={baseStyles.para8}
                 underlineColorAndroid="transparent"
                 value={password}
             />

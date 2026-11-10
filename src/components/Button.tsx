@@ -41,7 +41,7 @@ export default function Button({
     const [style, viewStyle] = React.useMemo(() => {
         const normal = extractTextStyle([
             styles.btn,
-            disabled ? styles.btnDisabled : null,
+            disabled ? styles.disabled : null,
             props.style
         ], false);
         const pressed = extractTextStyle(pressedStyle, false);

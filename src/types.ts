@@ -28,6 +28,19 @@ export type Config = {
     },
 };
 
+export type Customer = {
+    email: string,
+    company?: string,
+    firstName: string,
+    lastName: string,
+    address1: string,
+    address2?: string,
+    country: string,
+    state: string,
+    postcode: string,
+    phone: string,
+};
+
 export type DataReadyCallback = (
     data: any,
     newResponseUrl?: UrlPathLocal | false
@@ -214,6 +227,7 @@ export type SubmitParams = {
     message?: string,
     onError?: (error: HttpError) => any,
     onSubmitted?: DataReadyCallback,
+    postData?: {[name: string]: any} | null,
     rejectIfHandled?: string,
     url: HttpUrl | UrlPath,
 };

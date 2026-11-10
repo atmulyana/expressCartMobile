@@ -3,6 +3,7 @@
  */
 export { default as Box } from './Box';
 export { default as Button } from './Button';
+export { default as CheckBox } from './CheckBox';
 export { default as ComboBox } from './ComboBox';
 export { default as Content } from './Content';
 export { default as ContentLink } from './ContentLink';
@@ -20,3 +21,4 @@ export { default as SubmittingIndicator } from './SubmittingIndicator';
 export { default as Text } from './Text';
 export { default as TextInput } from './TextInput';
 export { default as TwoPane } from './TwoPane';
+

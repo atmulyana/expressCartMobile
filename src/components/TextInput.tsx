@@ -6,6 +6,7 @@ import { textInputBase } from '@/styles';
 import type { InputValidationProps, ProcessProps } from '@/types';
 import React from 'react';
 import { TextInput as RNInput, type TextInputProps } from 'react-native';
+import { forwardRef } from 'reactjs-common';
 import ProcessIndicator from './ProcessIndicator';
 import ValidatedInput from './ValidatedInput';
 
@@ -18,7 +19,7 @@ type InputTextProps = Omit<TextInputProps, 'onChangeText'>
 type Props = InputTextProps & InputValidationProps<InputTextProps, RNInput>;
 
 //Must use `React.forwardRef` in order for the validation library can invoke `focus` method
-const InputText = React.forwardRef(function InputText(
+const InputText = forwardRef(function InputText(
     {
         loadingAware,
         notMoreLoading,
@@ -36,7 +37,7 @@ const InputText = React.forwardRef(function InputText(
     const styleProp = React.useMemo(() => {
         return [
             styles.textInput,
-            multiline ? styles.textArea : null,
+            multiline ? styles.textArea : styles.textInputHeight,
             multiline && numberOfLines > 1 ? {
                 height: (textInputBase.lineHeight as number) * numberOfLines
                     + 2 * (

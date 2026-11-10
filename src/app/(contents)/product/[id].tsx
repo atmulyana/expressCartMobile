@@ -38,7 +38,7 @@ import {
     timeAgo
 } from '@/libs/number-datetime';
 import { serverUrl } from '@/libs/server';
-import baseStyles, { arrayStyle, contentPadding, fontBase } from '@/styles';
+import baseStyles, { contentPadding, fontBase } from '@/styles';
 import type {
     Product,
     ProductImagePath,
@@ -356,7 +356,7 @@ export default function ProductInfo() {
                         onExceedMax={() => {
                             Notification.warning(`Exceeds maximum quantity: ${config.maxQuantity}`);
                         }}
-                        style={styles.array('textInputHeight', 'para8')}
+                        style={baseStyles.para8}
                         value={1}
                     />
 
@@ -668,7 +668,7 @@ const ReviewForm = React.memo(function ReviewForm({
             name='title'
             placeholder={lang('Love it.')}
             rules={required}
-            style={arrayStyle('textInputHeight', 'para4')}
+            style={baseStyles.para4}
         />
         
         <Text>{lang('Description')}:</Text>
