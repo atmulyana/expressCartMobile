@@ -107,7 +107,10 @@ function FormFooter({
             </View>
         </>}
         <View style={arrayStyle('flexRow', 'justifyBetween')}>
-            <Button loadingAware>{lang('Return to cart')}</Button>
+            <Button
+                loadingAware
+                onPress={() => nav.goto('/checkout/cart')}
+            >{lang('Return to cart')}</Button>
             <Button
                 loadingAware
                 onPress={() => {
@@ -209,7 +212,10 @@ function LoginForm() {
             value={password}
         />
         <View style={arrayStyle('flexRow', 'justifyBetween', 'para8')}>
-            <Button loadingAware>{lang('Forgotten')}</Button>
+            <Button
+                loadingAware
+                onPress={() => nav.goto('/customer/forgotten')}
+            >{lang('Forgotten')}</Button>
             <Button
                 loadingAware
                 onPress={() => {
